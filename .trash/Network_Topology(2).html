@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Topology - Interactive Learning Lab</title>
+<style>
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --bg-card: #1c2128;
+    --border-color: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-accent: #58a6ff;
+    --accent-blue: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-orange: #f0883e;
+    --accent-red: #f85149;
+    --accent-purple: #a371f7;
+    --accent-cyan: #39c5cf;
+    --accent-yellow: #d29922;
+    --device-router: #f0883e;
+    --device-switch: #58a6ff;
+    --device-pc: #3fb950;
+    --device-server: #a371f7;
+    --link-active: #3fb950;
+    --link-inactive: #30363d;
+    --packet-color: #f0883e;
+    --shadow: rgba(0,0,0,0.3);
+    --glow-blue: 0 0 10px rgba(88,166,255,0.3);
+    --glow-green: 0 0 10px rgba(63,185,80,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .header h1::before {
+    content: "◈";
+    color: var(--accent-green);
+  }
+
+  .header-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-secondary);
+    padding: 0.5rem 2rem 0;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+  }
+
+  .nav-tab.active {
+    color: var(--accent-blue);
+    background: var(--bg-primary);
+    border-bottom-color: var(--accent-blue);
+  }
+
+  /* Main Layout */
+  .main-container {
+    display: flex;
+    height: calc(100vh - 120px);
+    min-height: 600px;
+  }
+
+  .canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(88,166,255,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(63,185,80,0.03) 0%, transparent 50%),
+      var(--bg-primary);
+  }
+
+  .canvas-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(48,54,61,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(48,54,61,0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .side-panel {
+    width: 400px;
+    min-width: 350px;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .panel-tab {
+    flex: 1;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+
+  .panel-tab:hover { color: var(--text-primary); }
+  .panel-tab.active {
+    color: var(--accent-blue);
+    background: var(--bg-tertiary);
+  }
+
+  .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  /* Topology Canvas */
+  #topologyCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Simulation Controls */
+  .sim-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .ctrl-btn {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .ctrl-btn:hover {
+    background: var(--bg-card);
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+  }
+
+  .ctrl-btn:active { transform: translateY(0); }
+
+  .ctrl-btn.primary {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+  }
+
+  .ctrl-btn.primary:hover {
+    background: #79b8ff;
+  }
+
+  .ctrl-btn.danger {
+    background: var(--accent-red);
+    color: #fff;
+    border-color: var(--accent-red);
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--border-color);
+  }
+
+  .speed-control label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .speed-control input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-blue);
+  }
+
+  /* Topology Selector */
+  .topology-selector {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .topology-selector-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .topo-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .topo-btn:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  .topo-btn.active {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+  }
+
+  /* Step Indicator */
+  .step-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .step-indicator .step-num {
+    color: var(--accent-blue);
+    font-weight: bold;
+  }
+
+  /* Info Panel Cards */
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-card h3 {
+    font-size: 0.95rem;
+    color: var(--accent-blue);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .info-card p, .info-card li {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .info-card ul {
+    padding-left: 1.2rem;
+  }
+
+  .info-card li { margin-bottom: 0.25rem; }
+
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-blue { background: rgba(88,166,255,0.15); color: var(--accent-blue); }
+  .tag-green { background: rgba(63,185,80,0.15); color: var(--accent-green); }
+  .tag-orange { background: rgba(240,136,62,0.15); color: var(--accent-orange); }
+  .tag-red { background: rgba(248,81,73,0.15); color: var(--accent-red); }
+  .tag-purple { background: rgba(163,113,247,0.15); color: var(--accent-purple); }
+
+  /* Packet Inspector */
+  .packet-inspector {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    overflow-x: auto;
+  }
+
+  .packet-line {
+    padding: 0.15rem 0;
+    color: var(--text-secondary);
+  }
+
+  .packet-line .field { color: var(--accent-blue); }
+  .packet-line .value { color: var(--accent-green); }
+  .packet-line .hex { color: var(--accent-purple); }
+
+  /* CLI Terminal */
+  .cli-terminal {
+    background: #000;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #0f0;
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #333;
+  }
+
+  .cli-terminal .prompt {
+    color: var(--accent-green);
+  }
+
+  .cli-terminal .cmd {
+    color: #fff;
+  }
+
+  .cli-terminal .output {
+    color: #aaa;
+  }
+
+  .cli-terminal .error {
+    color: var(--accent-red);
+  }
+
+  .cli-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cli-input {
+    background: transparent;
+    border: none;
+    color: #0f0;
+    font-family: inherit;
+    font-size: inherit;
+    flex: 1;
+    outline: none;
+  }
+
+  .cli-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: #0f0;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Device Legend */
+  .device-legend {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    font-size: 0.75rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  /* Status Bar */
+  .status-bar {
+    position: absolute;
+    bottom: 5rem;
+    left: 1rem;
+    background: var(--bg-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+  }
+
+  .status-active { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+  .status-paused { background: var(--accent-yellow); }
+  .status-stopped { background: var(--accent-red); }
+
+  /* Packet animation overlay */
+  .packet-overlay {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main-container { flex-direction: column; }
+    .side-panel { width: 100%; height: 300px; min-width: unset; border-left: none; border-top: 1px solid var(--border-color); }
+    .canvas-area { height: 400px; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+  ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+  /* Expandable section */
+  .expandable {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  .expandable-header {
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    transition: background 0.2s;
+  }
+
+  .expandable-header:hover { background: var(--bg-card); }
+
+  .expandable-body {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: none;
+  }
+
+  .expandable.expanded .expandable-body { display: block; }
+  .expandable.expanded .expand-arrow { transform: rotate(180deg); }
+
+  .expand-arrow {
+    transition: transform 0.2s;
+    font-size: 0.7rem;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    pointer-events: none;
+    z-index: 50;
+    max-width: 250px;
+    box-shadow: 0 4px 20px var(--shadow);
+    display: none;
+  }
+
+  .tooltip-title {
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-bottom: 0.25rem;
+  }
+
+  .tooltip-detail {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  /* Table Styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+  }
+
+  th, td {
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  th {
+    color: var(--accent-blue);
+    font-weight: 600;
+    background: var(--bg-tertiary);
+  }
+
+  td { color: var(--text-secondary); }
+
+  /* Highlight effect */
+  .highlight-box {
+    background: rgba(88,166,255,0.08);
+    border-left: 3px solid var(--accent-blue);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 6px 6px 0;
+    margin: 0.5rem 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .highlight-box.green {
+    background: rgba(63,185,80,0.08);
+    border-left-color: var(--accent-green);
+  }
+
+  .highlight-box.orange {
+    background: rgba(240,136,62,0.08);
+    border-left-color: var(--accent-orange);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Network Topology</h1>
+    <div class="header-subtitle">Interactive Learning Lab — CCIE Network Architect Series</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span class="tag tag-blue">CCNA</span>
+    <span class="tag tag-purple">CCNP</span>
+    <span class="tag tag-green">Interactive</span>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" data-tab="visual">Visual Topology</button>
+  <button class="nav-tab" data-tab="packet">Packet Flow</button>
+  <button class="nav-tab" data-tab="cli">Cisco CLI Sim</button>
+  <button class="nav-tab" data-tab="compare">Topology Compare</button>
+  <button class="nav-tab" data-tab="quiz">Quick Quiz</button>
+</div>
+
+<div class="main-container">
+  <div class="canvas-area" id="canvasArea">
+    <canvas id="topologyCanvas"></canvas>
+    
+    <div class="topology-selector">
+      <div class="topology-selector-title">Select Topology</div>
+      <button class="topo-btn active" data-topo="star">Star</button>
+      <button class="topo-btn" data-topo="bus">Bus</button>
+      <button class="topo-btn" data-topo="ring">Ring</button>
+      <button class="topo-btn" data-topo="mesh">Mesh</button>
+      <button class="topo-btn" data-topo="tree">Tree</button>
+      <button class="topo-btn" data-topo="leafspine">Leaf-Spine</button>
+      <button class="topo-btn" data-topo="hubspoke">Hub-and-Spoke</button>
+    </div>
+
+    <div class="step-indicator" id="stepIndicator" style="display:none;">
+      Step <span class="step-num" id="currentStep">0</span> / <span id="totalSteps">0</span>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot status-stopped" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+
+    <div class="device-legend" id="deviceLegend">
+      <div class="legend-item"><span class="legend-icon" style="background:var(--device-router)"></span> Router</div>
+      <div class="legend-item"><span class="legend-icon" style="background:var(--device-switch)"></span> Switch</div>
+      <div class="legend-item"><span class="legend-icon" style="background:var(--device-pc)"></span> PC/Host</div>
+      <div class="legend-item"><span class="legend-icon" style="background:var(--device-server)"></span> Server</div>
+    </div>
+
+    <div class="sim-controls" id="simControls">
+      <button class="ctrl-btn primary" id="btnStart">▶ Start</button>
+      <button class="ctrl-btn" id="btnPause">⏸ Pause</button>
+      <button class="ctrl-btn danger" id="btnReset">↺ Reset</button>
+      <button class="ctrl-btn" id="btnStep">→ Step</button>
+      <div class="speed-control">
+        <label>Speed</label>
+        <input type="range" id="speedRange" min="1" max="5" value="3">
+      </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <div class="side-panel">
+    <div class="panel-tabs">
+      <button class="panel-tab active" data-panel="info">Info</button>
+      <button class="panel-tab" data-panel="packets">Packets</button>
+      <button class="panel-tab" data-panel="commands">Commands</button>
+      <button class="panel-tab" data-panel="details">Details</button>
+    </div>
+
+    <div class="panel-content" id="panelInfo">
+      <!-- Dynamic content -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================
+// DATA & CONFIGURATION
+// ======================
+
+const topologyData = {
+  star: {
+    name: "Star Topology",
+    description: "All devices connect to a central switch. Each device has a dedicated point-to-point link to the center.",
+    devices: [
+      { id: "sw1", type: "switch", label: "Switch", x: 0.5, y: 0.5 },
+      { id: "pc1", type: "pc", label: "PC-1", x: 0.2, y: 0.2 },
+      { id: "pc2", type: "pc", label: "PC-2", x: 0.8, y: 0.2 },
+      { id: "pc3", type: "pc", label: "PC-3", x: 0.8, y: 0.8 },
+      { id: "srv1", type: "server", label: "Server", x: 0.2, y: 0.8 }
+    ],
+    links: [
+      { from: "pc1", to: "sw1" },
+      { from: "pc2", to: "sw1" },
+      { from: "pc3", to: "sw1" },
+      { from: "srv1", to: "sw1" }
+    ],
+    pros: ["Easy to install and manage", "Fault isolation — one link failure affects only one device", "Adding/removing devices doesn't disrupt network", "Modern switches provide full-duplex, collision-free operation"],
+    cons: ["Central switch is single point of failure", "More cabling than bus topology", "Cable length limited to 100m for UTP"],
+    ccna: "Star is the most common physical topology in modern networks. Remember: hub = logical bus, switch = true star.",
+    steps: [
+      "PC-1 wants to send data to Server. It encapsulates the frame with Destination MAC = Server's MAC.",
+      "Frame travels along the dedicated UTP cable from PC-1 to the Switch on Port 1.",
+      "Switch receives the frame and inspects the Destination MAC address.",
+      "Switch looks up the MAC in its CAM table. If found, forwards only to the destination port.",
+      "If MAC is unknown, Switch floods the frame to all ports except the incoming port.",
+      "Server receives the frame, recognizes its MAC, and processes the data.",
+      "Other devices (PC-2, PC-3) discard the frame as it's not addressed to them."
+    ]
+  },
+  bus: {
+    name: "Bus Topology",
+    description: "All devices connect to a single shared backbone cable. Data travels in both directions.",
+    devices: [
+      { id: "bus", type: "bus", label: "Backbone", x: 0.5, y: 0.5 },
+      { id: "t1", type: "pc", label: "PC-A", x: 0.15, y: 0.35 },
+      { id: "t2", type: "pc", label: "PC-B", x: 0.35, y: 0.65 },
+      { id: "t3", type: "server", label: "Server", x: 0.55, y: 0.35 },
+      { id: "t4", type: "pc", label: "PC-C", x: 0.75, y: 0.65 },
+      { id: "t5", type: "pc", label: "PC-D", x: 0.9, y: 0.35 }
+    ],
+    links: [
+      { from: "t1", to: "bus", anchor: "top" },
+      { from: "t2", to: "bus", anchor: "bottom" },
+      { from: "t3", to: "bus", anchor: "top" },
+      { from: "t4", to: "bus", anchor: "bottom" },
+      { from: "t5", to: "bus", anchor: "top" }
+    ],
+    pros: ["Minimal cabling required", "Simple to understand and install", "Inexpensive for very small networks"],
+    cons: ["Single point of failure (backbone cable)", "Difficult to troubleshoot cable faults", "Collisions reduce performance as nodes increase", "Adding/removing devices disrupts entire network"],
+    ccna: "Bus topology uses coaxial cable (10BASE2=185m, 10BASE5=500m). Terminators (50 ohm) required at both ends. CSMA/CD handles collisions.",
+    steps: [
+      "PC-A wants to send data to PC-C. It first listens to the shared backbone (carrier sense).",
+      "If the backbone is idle, PC-A transmits the frame. Signal propagates in BOTH directions.",
+      "All connected devices (PC-B, Server, PC-C, PC-D) receive the electrical signal.",
+      "Each device checks the Destination MAC address in the received frame.",
+      "Only PC-C recognizes its MAC address and processes the frame. Others discard it silently.",
+      "If two devices transmit simultaneously, a collision is detected (CSMA/CD).",
+      "Both devices send a jam signal, wait a random backoff time, and retry transmission."
+    ]
+  },
+  ring: {
+    name: "Ring Topology",
+    description: "Each node connects to exactly two neighbors, forming a closed loop. Data circulates around the ring.",
+    devices: [
+      { id: "n1", type: "switch", label: "Node A", x: 0.5, y: 0.15 },
+      { id: "n2", type: "switch", label: "Node B", x: 0.8, y: 0.35 },
+      { id: "n3", type: "switch", label: "Node C", x: 0.7, y: 0.7 },
+      { id: "n4", type: "switch", label: "Node D", x: 0.3, y: 0.7 },
+      { id: "n5", type: "switch", label: "Node E", x: 0.2, y: 0.35 }
+    ],
+    links: [
+      { from: "n1", to: "n2" },
+      { from: "n2", to: "n3" },
+      { from: "n3", to: "n4" },
+      { from: "n4", to: "n5" },
+      { from: "n5", to: "n1" }
+    ],
+    pros: ["Equal access for all nodes (token passing)", "No collisions with token ring", "Each node regenerates signal", "Predictable performance"],
+    cons: ["Single break disrupts entire network (unless dual ring)", "Adding/removing nodes requires breaking ring", "All traffic passes through intermediate nodes", "Token passing adds latency"],
+    ccna: "Ring uses Token Passing — a node can only transmit when it holds the token. FDDI uses dual counter-rotating rings for redundancy. Cisco REP provides ~50ms failover for Ethernet rings.",
+    steps: [
+      "A token (special control frame) circulates continuously around the ring.",
+      "Node A wants to send data to Node C. It waits for and captures the free token.",
+      "Node A attaches data to the token and marks it as 'busy'. Data flows A → B → C.",
+      "Node B receives the frame, checks the destination, and forwards it (not for B, so pass along).",
+      "Node C recognizes its address, copies the data, and sets the acknowledgment bit.",
+      "The frame continues circulating back to Node A (completing the full ring).",
+      "Node A sees the ACK, removes its data, and releases a new free token onto the ring."
+    ]
+  },
+  mesh: {
+    name: "Mesh Topology",
+    description: "Every node connects to every other node with dedicated point-to-point links. Maximum redundancy.",
+    devices: [
+      { id: "m1", type: "router", label: "R1", x: 0.2, y: 0.2 },
+      { id: "m2", type: "router", label: "R2", x: 0.8, y: 0.2 },
+      { id: "m3", type: "router", label: "R3", x: 0.8, y: 0.8 },
+      { id: "m4", type: "router", label: "R4", x: 0.2, y: 0.8 },
+      { id: "m5", type: "router", label: "R5", x: 0.5, y: 0.5 }
+    ],
+    links: [
+      { from: "m1", to: "m2" },
+      { from: "m1", to: "m4" },
+      { from: "m1", to: "m5" },
+      { from: "m2", to: "m3" },
+      { from: "m2", to: "m5" },
+      { from: "m3", to: "m4" },
+      { from: "m3", to: "m5" },
+      { from: "m4", to: "m5" }
+    ],
+    pros: ["Maximum redundancy — no single point of failure", "Direct paths minimize latency", "Automatic failover via routing protocols", "Load balancing across multiple paths"],
+    cons: ["Extremely expensive — n(n-1)/2 links", "Complex configuration and management", "Difficult to scale (quadratic growth)", "High port density required per device"],
+    ccna: "Full mesh formula: n(n-1)/2. For 5 routers: 10 links. Each router needs n-1 interfaces. Partial mesh reduces cost while maintaining critical redundancy.",
+    steps: [
+      "R1 wants to send a packet to R3. It consults its routing table.",
+      "Routing protocol (OSPF/EIGRP) has calculated the best path. Direct path: R1 → R5 → R3 (2 hops).",
+      "R1 encapsulates the packet and forwards it to R5 (next hop toward R3).",
+      "R5 receives the packet, checks the destination IP (R3), and forwards to R3.",
+      "If the direct link R1-R5 fails, routing protocol reconverges.",
+      "Alternative path selected: R1 → R2 → R3. Convergence time depends on protocol.",
+      "With ECMP enabled, traffic can be load-balanced across multiple equal-cost paths simultaneously."
+    ]
+  },
+  tree: {
+    name: "Tree (Hierarchical) Topology",
+    description: "Root node connects to secondary nodes, which connect to tertiary nodes. The industry-standard enterprise design.",
+    devices: [
+      { id: "core", type: "router", label: "Core", x: 0.5, y: 0.1 },
+      { id: "d1", type: "switch", label: "Dist-1", x: 0.25, y: 0.35 },
+      { id: "d2", type: "switch", label: "Dist-2", x: 0.75, y: 0.35 },
+      { id: "a1", type: "switch", label: "Acc-1", x: 0.12, y: 0.6 },
+      { id: "a2", type: "switch", label: "Acc-2", x: 0.37, y: 0.6 },
+      { id: "a3", type: "switch", label: "Acc-3", x: 0.62, y: 0.6 },
+      { id: "a4", type: "switch", label: "Acc-4", x: 0.87, y: 0.6 },
+      { id: "h1", type: "pc", label: "PC", x: 0.12, y: 0.85 },
+      { id: "h2", type: "server", label: "SRV", x: 0.87, y: 0.85 }
+    ],
+    links: [
+      { from: "core", to: "d1" },
+      { from: "core", to: "d2" },
+      { from: "d1", to: "a1" },
+      { from: "d1", to: "a2" },
+      { from: "d2", to: "a3" },
+      { from: "d2", to: "a4" },
+      { from: "a1", to: "h1" },
+      { from: "a4", to: "h2" }
+    ],
+    pros: ["Natural scalability — easy to add branches", "Simplified management through hierarchy", "Supports VLAN segmentation at each level", "Matches Cisco three-layer model"],
+    cons: ["Root node is critical (unless redundant)", "Lower branches depend on upper levels", "Bottlenecks at parent nodes", "More hops than mesh"],
+    ccna: "Cisco Three-Layer Model: Core (fast forwarding), Distribution (policy/routing), Access (end-user connection). This is a tree topology. For redundancy, use dual core and dual distribution.",
+    steps: [
+      "PC wants to send data to Server. Frame goes up the hierarchy first.",
+      "PC → Acc-1. Acc-1 forwards to Dist-1 (its upstream parent).",
+      "Dist-1 forwards to Core (root of the tree). Core routes between branches.",
+      "Core forwards down the other branch to Dist-2.",
+      "Dist-2 forwards to Acc-4 (its downstream child).",
+      "Acc-4 forwards to Server. Server processes the data.",
+      "In a redundant design, dual paths exist at each level for failover."
+    ]
+  },
+  leafspine: {
+    name: "Leaf-Spine Topology",
+    description: "Modern data center topology. Every leaf connects to every spine. All hosts are exactly 2 hops apart.",
+    devices: [
+      { id: "sp1", type: "router", label: "Spine-1", x: 0.35, y: 0.15 },
+      { id: "sp2", type: "router", label: "Spine-2", x: 0.65, y: 0.15 },
+      { id: "lf1", type: "switch", label: "Leaf-1", x: 0.2, y: 0.5 },
+      { id: "lf2", type: "switch", label: "Leaf-2", x: 0.5, y: 0.5 },
+      { id: "lf3", type: "switch", label: "Leaf-3", x: 0.8, y: 0.5 },
+      { id: "sv1", type: "server", label: "S1", x: 0.2, y: 0.8 },
+      { id: "sv2", type: "server", label: "S2", x: 0.5, y: 0.8 },
+      { id: "sv3", type: "server", label: "S3", x: 0.8, y: 0.8 }
+    ],
+    links: [
+      { from: "sp1", to: "lf1" },
+      { from: "sp1", to: "lf2" },
+      { from: "sp1", to: "lf3" },
+      { from: "sp2", to: "lf1" },
+      { from: "sp2", to: "lf2" },
+      { from: "sp2", to: "lf3" },
+      { from: "lf1", to: "sv1" },
+      { from: "lf2", to: "sv2" },
+      { from: "lf3", to: "sv3" }
+    ],
+    pros: ["Consistent latency for all host pairs (always 3 hops)", "Highly scalable — add spines for bandwidth, leafs for capacity", "Non-blocking with proper oversubscription ratio", "ECMP provides automatic load balancing"],
+    cons: ["Higher cost than traditional three-tier", "Requires BGP or advanced routing", "More inter-switch links", "Underlay/overlay complexity with VXLAN"],
+    ccna: "Leaf-Spine is based on the Clos network (1952). Every leaf connects to every spine. Leafs never connect to leafs. Spines never connect to spines. Used in modern data centers with VXLAN/EVPN.",
+    steps: [
+      "Server-1 wants to send data to Server-3. Both are on different leaf switches.",
+      "S1 → Leaf-1. Leaf-1 performs VXLAN encapsulation (if overlay is used).",
+      "Leaf-1 has two equal-cost paths to Leaf-3: via Spine-1 or Spine-2 (ECMP).",
+      "Packet goes Leaf-1 → Spine-1 (one of the available paths via hashing).",
+      "Spine-1 forwards to Leaf-3 based on the inner destination IP/MAC.",
+      "Leaf-3 decapsulates (if VXLAN) and forwards to Server-3.",
+      "Return traffic may use a different path (Spine-2) due to asymmetric hashing — this is normal."
+    ]
+  },
+  hubspoke: {
+    name: "Hub-and-Spoke Topology",
+    description: "All spoke sites connect to a central hub. Spoke-to-spoke traffic goes through the hub.",
+    devices: [
+      { id: "hub", type: "router", label: "Hub (HQ)", x: 0.5, y: 0.3 },
+      { id: "s1", type: "router", label: "Spoke-1", x: 0.15, y: 0.65 },
+      { id: "s2", type: "router", label: "Spoke-2", x: 0.38, y: 0.75 },
+      { id: "s3", type: "router", label: "Spoke-3", x: 0.62, y: 0.75 },
+      { id: "s4", type: "router", label: "Spoke-4", x: 0.85, y: 0.65 },
+      { id: "l1", type: "pc", label: "LAN-1", x: 0.15, y: 0.9 },
+      { id: "l4", type: "pc", label: "LAN-4", x: 0.85, y: 0.9 }
+    ],
+    links: [
+      { from: "hub", to: "s1" },
+      { from: "hub", to: "s2" },
+      { from: "hub", to: "s3" },
+      { from: "hub", to: "s4" },
+      { from: "s1", to: "l1" },
+      { from: "s4", to: "l4" }
+    ],
+    pros: ["Cost-effective — fewer WAN links needed", "Simplified management (centralized at hub)", "Easy to add new spoke sites", "Centralized security/policy enforcement"],
+    cons: ["Hub is single point of failure", "Spoke-to-spoke latency is higher (must go through hub)", "Hub can become bandwidth bottleneck", "All traffic must traverse hub even for nearby spokes"],
+    ccna: "Hub-and-spoke is used in WAN designs (DMVPN, SD-WAN). DMVPN Phase 2/3 allows dynamic spoke-to-spoke tunnels for direct communication after initial NHRP resolution.",
+    steps: [
+      "LAN-1 (behind Spoke-1) wants to reach LAN-4 (behind Spoke-4).",
+      "Traffic flows from LAN-1 to Spoke-1, then across the WAN to the Hub.",
+      "Hub receives the packet and routes it toward Spoke-4.",
+      "With DMVPN Phase 3: Hub provides NHRP redirect, telling Spoke-1 about Spoke-4.",
+      "Spoke-1 initiates a dynamic spoke-to-spoke tunnel directly to Spoke-4.",
+      "Subsequent traffic goes directly: Spoke-1 → Spoke-4 (bypassing the Hub).",
+      "The dynamic tunnel times out after inactivity, returning to hub-forwarded traffic."
+    ]
+  }
+};
+
+const deviceIcons = {
+  router: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y - s*0.4);
+    ctx.lineTo(x + s*0.45, y + s*0.3);
+    ctx.lineTo(x - s*0.45, y + s*0.3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${s*0.2}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('R', x, y + s*0.15);
+  },
+  switch: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.4, y - s*0.35, s*0.8, s*0.7, s*0.08);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${s*0.18}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('S', x, y + s*0.08);
+  },
+  pc: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.35, y - s*0.3, s*0.7, s*0.5, s*0.05);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${s*0.16}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('PC', x, y + s*0.02);
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.15, y + s*0.22, s*0.3, s*0.12, s*0.02);
+    ctx.fill();
+    ctx.stroke();
+  },
+  server: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.35, y - s*0.4, s*0.7, s*0.55, s*0.05);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.35, y + s*0.18, s*0.7, s*0.15, s*0.03);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${s*0.14}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('SRV', x, y + s*0.02);
+  },
+  bus: (ctx, x, y, s) => {
+    ctx.beginPath();
+    ctx.roundRect(x - s*0.5, y - s*0.12, s, s*0.24, s*0.04);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${s*0.13}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('BUS', x, y + s*0.04);
+  }
+};
+
+const deviceColors = {
+  router: '#f0883e',
+  switch: '#58a6ff',
+  pc: '#3fb950',
+  server: '#a371f7',
+  bus: '#d29922'
+};
+
+// ======================
+// STATE
+// ======================
+
+let currentTopology = 'star';
+let simulationRunning = false;
+let simulationPaused = false;
+let currentStep = 0;
+let animationFrame = null;
+let packets = [];
+let speed = 3;
+let hoveredDevice = null;
+let selectedDevice = null;
+let activeTab = 'visual';
+let activePanel = 'info';
+
+const canvas = document.getElementById('topologyCanvas');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+
+// ======================
+// CANVAS SETUP
+// ======================
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  drawTopology();
+}
+
+window.addEventListener('resize', resizeCanvas);
+
+// ======================
+// DRAWING FUNCTIONS
+// ======================
+
+function drawDevice(device, highlight = false) {
+  const x = device.x * canvas.width;
+  const y = device.y * canvas.height;
+  const size = Math.min(canvas.width, canvas.height) * 0.07;
+
+  ctx.save();
+  
+  if (highlight || hoveredDevice === device.id) {
+    ctx.shadowColor = deviceColors[device.type] || '#58a6ff';
+    ctx.shadowBlur = 20;
+  }
+
+  if (selectedDevice === device.id) {
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.65, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = deviceColors[device.type] || '#58a6ff';
+  ctx.strokeStyle = highlight ? '#fff' : 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 2;
+
+  const iconFn = deviceIcons[device.type] || deviceIcons.switch;
+  iconFn(ctx, x, y, size);
+
+  ctx.shadowBlur = 0;
+
+  // Label
+  ctx.fillStyle = '#c9d1d9';
+  ctx.font = `600 ${Math.max(10, size * 0.16)}px 'Segoe UI', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(device.label, x, y + size * 0.65);
+
+  // Type label below
+  ctx.fillStyle = '#8b949e';
+  ctx.font = `${Math.max(8, size * 0.12)}px 'Segoe UI', sans-serif`;
+  ctx.fillText(device.type.toUpperCase(), x, y + size * 0.85);
+
+  ctx.restore();
+}
+
+function drawLink(link, devices, highlight = false) {
+  const fromDev = devices.find(d => d.id === link.from);
+  const toDev = devices.find(d => d.id === link.to);
+  if (!fromDev || !toDev) return;
+
+  const x1 = fromDev.x * canvas.width;
+  const y1 = fromDev.y * canvas.height;
+  const x2 = toDev.x * canvas.width;
+  const y2 = toDev.y * canvas.height;
+
+  ctx.save();
+  ctx.strokeStyle = highlight ? 'rgba(63,185,80,0.8)' : 'rgba(48,54,61,0.8)';
+  ctx.lineWidth = highlight ? 3 : 2;
+  
+  if (highlight) {
+    ctx.shadowColor = 'rgba(63,185,80,0.5)';
+    ctx.shadowBlur = 10;
+  }
+
+  if (link.anchor === 'bottom') {
+    // Draw from device bottom to bus top
+    const midY = (y1 + y2) / 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 + 20);
+    ctx.lineTo(x1, midY);
+    ctx.lineTo(x2, midY);
+    ctx.lineTo(x2, y2 - 15);
+    ctx.stroke();
+  } else if (link.anchor === 'top') {
+    const midY = (y1 + y2) / 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 - 20);
+    ctx.lineTo(x1, midY);
+    ctx.lineTo(x2, midY);
+    ctx.lineTo(x2, y2 + 15);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawPacket(packet) {
+  ctx.save();
+  ctx.fillStyle = '#f0883e';
+  ctx.shadowColor = '#f0883e';
+  ctx.shadowBlur = 15;
+  ctx.beginPath();
+  ctx.arc(packet.x, packet.y, 6, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Packet trail
+  ctx.fillStyle = 'rgba(240,136,62,0.3)';
+  ctx.beginPath();
+  ctx.arc(packet.x - packet.vx * 3, packet.y - packet.vy * 3, 4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.restore();
+}
+
+function drawTopology() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const topo = topologyData[currentTopology];
+  if (!topo) return;
+
+  // Draw links first
+  topo.links.forEach(link => {
+    const isHighlighted = packets.some(p => p.from === link.from && p.to === link.to);
+    drawLink(link, topo.devices, isHighlighted);
+  });
+
+  // Draw devices
+  topo.devices.forEach(dev => {
+    drawDevice(dev, hoveredDevice === dev.id);
+  });
+
+  // Draw packets
+  packets.forEach(p => drawPacket(p));
+}
+
+// ======================
+// ANIMATION
+// ======================
+
+function animate() {
+  if (!simulationRunning || simulationPaused) {
+    animationFrame = requestAnimationFrame(animate);
+    return;
+  }
+
+  const topo = topologyData[currentTopology];
+  const speedMult = speed * 0.8;
+
+  packets = packets.filter(p => {
+    const toDev = topo.devices.find(d => d.id === p.to);
+    if (!toDev) return false;
+
+    const tx = toDev.x * canvas.width;
+    const ty = toDev.y * canvas.height;
+    const dx = tx - p.x;
+    const dy = ty - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 10) {
+      // Packet arrived — trigger next step
+      if (currentStep < topo.steps.length - 1) {
+        currentStep++;
+        updateStepDisplay();
+        spawnPacketForStep();
+      }
+      return false;
+    }
+
+    p.x += (dx / dist) * speedMult;
+    p.y += (dy / dist) * speedMult;
+    p.vx = (dx / dist) * speedMult;
+    p.vy = (dy / dist) * speedMult;
+    return true;
+  });
+
+  if (packets.length === 0 && currentStep >= topo.steps.length - 1) {
+    simulationRunning = false;
+    updateStatus('completed');
+  }
+
+  drawTopology();
+  animationFrame = requestAnimationFrame(animate);
+}
+
+function spawnPacketForStep() {
+  const topo = topologyData[currentTopology];
+  const devices = topo.devices;
+  
+  // Determine source and destination based on step
+  const step = currentStep;
+  let from, to;
+
+  switch(currentTopology) {
+    case 'star':
+      if (step === 0) { from = 'pc1'; to = 'sw1'; }
+      else if (step <= 4) { from = 'sw1'; to = 'srv1'; }
+      else { from = 'srv1'; to = 'srv1'; }
+      break;
+    case 'bus':
+      if (step === 0) { from = 't1'; to = 'bus'; }
+      else if (step <= 3) { from = 'bus'; to = 't3'; }
+      else { from = 't3'; to = 't3'; }
+      break;
+    case 'ring':
+      if (step === 0) { from = 'n1'; to = 'n1'; }
+      else if (step <= 3) { from = 'n1'; to = 'n3'; }
+      else { from = 'n3'; to = 'n1'; }
+      break;
+    case 'mesh':
+      if (step <= 2) { from = 'm1'; to = 'm5'; }
+      else { from = 'm5'; to = 'm3'; }
+      break;
+    case 'tree':
+      if (step === 0) { from = 'h1'; to = 'a1'; }
+      else if (step === 1) { from = 'a1'; to = 'd1'; }
+      else if (step === 2) { from = 'd1'; to = 'core'; }
+      else if (step === 3) { from = 'core'; to = 'd2'; }
+      else if (step === 4) { from = 'd2'; to = 'a4'; }
+      else { from = 'a4'; to = 'h2'; }
+      break;
+    case 'leafspine':
+      if (step === 0) { from = 'sv1'; to = 'lf1'; }
+      else if (step <= 3) { from = 'lf1'; to = 'sp1'; }
+      else if (step <= 5) { from = 'sp1'; to = 'lf3'; }
+      else { from = 'lf3'; to = 'sv3'; }
+      break;
+    case 'hubspoke':
+      if (step === 0) { from = 'l1'; to = 's1'; }
+      else if (step <= 2) { from = 's1'; to = 'hub'; }
+      else if (step <= 4) { from = 'hub'; to = 's4'; }
+      else { from = 's4'; to = 'l4'; }
+      break;
+  }
+
+  const fromDev = devices.find(d => d.id === from);
+  if (fromDev && to) {
+    packets.push({
+      x: fromDev.x * canvas.width,
+      y: fromDev.y * canvas.height,
+      vx: 0, vy: 0,
+      from, to
+    });
+  }
+}
+
+// ======================
+// UI UPDATES
+// ======================
+
+function updateStepDisplay() {
+  const topo = topologyData[currentTopology];
+  document.getElementById('currentStep').textContent = currentStep + 1;
+  document.getElementById('totalSteps').textContent = topo.steps.length;
+  document.getElementById('stepIndicator').style.display = 'flex';
+  updatePanelContent();
+}
+
+function updateStatus(state) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = 'status-dot';
+  
+  switch(state) {
+    case 'running':
+      dot.classList.add('status-active');
+      text.textContent = 'Simulation Running';
+      break;
+    case 'paused':
+      dot.classList.add('status-paused');
+      text.textContent = 'Paused';
+      break;
+    case 'completed':
+      dot.classList.add('status-active');
+      text.textContent = 'Completed';
+      break;
+    default:
+      dot.classList.add('status-stopped');
+      text.textContent = 'Ready';
+  }
+}
+
+function updatePanelContent() {
+  const topo = topologyData[currentTopology];
+  const panel = document.getElementById('panelInfo');
+
+  if (activePanel === 'info') {
+    let stepsHtml = '';
+    topo.steps.forEach((step, i) => {
+      const isActive = i === currentStep;
+      const isPast = i < currentStep;
+      stepsHtml += `
+        <div style="padding:0.5rem 0.75rem;margin-bottom:0.3rem;border-radius:6px;font-size:0.8rem;
+          ${isActive ? 'background:rgba(88,166,255,0.1);border-left:3px solid var(--accent-blue);color:var(--text-primary);' : 
+            isPast ? 'color:#555;border-left:3px solid var(--accent-green);' : 
+            'color:var(--text-secondary);border-left:3px solid var(--border-color);'}">
+          <strong style="color:${isActive ? 'var(--accent-blue)' : isPast ? 'var(--accent-green)' : 'var(--text-secondary)'};">Step ${i+1}:</strong> ${step}
+        </div>
+      `;
+    });
+
+    panel.innerHTML = `
+      <div class="info-card">
+        <h3>📐 ${topo.name}</h3>
+        <p>${topo.description}</p>
+      </div>
+      <div class="info-card">
+        <h3>▶️ Simulation Steps</h3>
+        ${stepsHtml}
+      </div>
+      <div class="info-card">
+        <h3>✅ Advantages</h3>
+        <ul>${topo.pros.map(p => `<li>${p}</li>`).join('')}</ul>
+      </div>
+      <div class="info-card">
+        <h3>❌ Disadvantages</h3>
+        <ul>${topo.cons.map(c => `<li>${c}</li>`).join('')}</ul>
+      </div>
+      <div class="highlight-box">
+        <strong style="color:var(--accent-blue)">📝 CCNA Note:</strong> ${topo.ccna}
+      </div>
+    `;
+  } else if (activePanel === 'packets') {
+    panel.innerHTML = `
+      <div class="info-card">
+        <h3>📦 Packet Inspector</h3>
+        <p style="font-size:0.8rem;margin-bottom:0.75rem;">Viewing packet structure for ${topo.name}</p>
+        <div class="packet-inspector">
+          <div class="packet-line"><span class="field">Dst MAC:</span> <span class="value">00:1A:2B:3C:4D:5E</span> <span class="hex">| 6 bytes</span></div>
+          <div class="packet-line"><span class="field">Src MAC:</span> <span class="value">00:5E:4D:3C:2B:1A</span> <span class="hex">| 6 bytes</span></div>
+          <div class="packet-line"><span class="field">EtherType:</span> <span class="value">0x0800 (IPv4)</span> <span class="hex">| 2 bytes</span></div>
+          <div class="packet-line">---</div>
+          <div class="packet-line"><span class="field">Version/IHL:</span> <span class="value">4 / 5</span> <span class="hex">| 1 byte</span></div>
+          <div class="packet-line"><span class="field">TOS:</span> <span class="value">0x00</span> <span class="hex">| 1 byte</span></div>
+          <div class="packet-line"><span class="field">Total Length:</span> <span class="value">84 bytes</span> <span class="hex">| 2 bytes</span></div>
+          <div class="packet-line"><span class="field">TTL:</span> <span class="value">64</span> <span class="hex">| 1 byte</span></div>
+          <div class="packet-line"><span class="field">Protocol:</span> <span class="value">ICMP (1)</span> <span class="hex">| 1 byte</span></div>
+          <div class="packet-line"><span class="field">Src IP:</span> <span class="value">192.168.10.10</span> <span class="hex">| 4 bytes</span></div>
+          <div class="packet-line"><span class="field">Dst IP:</span> <span class="value">192.168.20.20</span> <span class="hex">| 4 bytes</span></div>
+          <div class="packet-line">---</div>
+          <div class="packet-line"><span class="field">ICMP Type:</span> <span class="value">Echo Request (8)</span></div>
+          <div class="packet-line"><span class="field">Payload:</span> <span class="value">56 bytes data</span></div>
+          <div class="packet-line">---</div>
+          <div class="packet-line"><span class="field">FCS:</span> <span class="hex">0x4A3B2C1D</span> <span class="hex">| 4 bytes</span></div>
+        </div>
+      </div>
+      <div class="highlight-box green">
+        <strong>💡 Tip:</strong> In a ${topo.name}, packets follow the path determined by the topology's connectivity pattern.
+      </div>
+    `;
+  } else if (activePanel === 'commands') {
+    panel.innerHTML = `
+      <div class="info-card">
+        <h3>🔧 Cisco IOS Commands</h3>
+        <p style="font-size:0.8rem;margin-bottom:0.5rem;">Common commands for ${topo.name}:</p>
+        ${getCommandsForTopology(currentTopology)}
+      </div>
+    `;
+  } else if (activePanel === 'details') {
+    panel.innerHTML = getDetailedInfo(currentTopology);
+  }
+}
+
+function getCommandsForTopology(topo) {
+  const commands = {
+    star: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          Switch Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>enable</code><br>
+          <code>configure terminal</code><br>
+          <code>hostname Access-Switch</code><br>
+          <code>vlan 10</code><br>
+          <code> name DATA</code><br>
+          <code>vlan 20</code><br>
+          <code> name VOICE</code><br>
+          <code>interface range fa0/1-12</code><br>
+          <code> switchport mode access</code><br>
+          <code> switchport access vlan 10</code><br>
+          <code> spanning-tree portfast</code><br>
+          <code>interface gi0/1</code><br>
+          <code> switchport mode trunk</code><br>
+          <code> switchport trunk allowed vlan 10,20</code><br>
+        </div>
+      </div>
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          Verification Commands <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>show vlan brief</code><br>
+          <code>show mac address-table</code><br>
+          <code>show interfaces trunk</code><br>
+          <code>show spanning-tree</code><br>
+          <code>show cdp neighbors</code><br>
+        </div>
+      </div>
+    `,
+    bus: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          Legacy Bus Commands <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>show interfaces ethernet 0</code><br>
+          <code>show controllers ethernet 0</code><br>
+          <code>show interface accounting</code><br>
+          <span style="color:var(--text-secondary)">Note: Bus topology is legacy. Modern networks use star.</span>
+        </div>
+      </div>
+    `,
+    ring: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          REP Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>interface gi0/1</code><br>
+          <code> rep segment 1 edge primary</code><br>
+          <code>interface gi0/2</code><br>
+          <code> rep segment 1</code><br>
+          <code>show rep topology</code><br>
+          <code>show rep segment 1 detail</code><br>
+        </div>
+      </div>
+    `,
+    mesh: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          OSPF Mesh Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>router ospf 1</code><br>
+          <code> network 10.0.0.0 0.0.0.3 area 0</code><br>
+          <code> network 10.0.0.4 0.0.0.3 area 0</code><br>
+          <code> network 10.0.0.8 0.0.0.3 area 0</code><br>
+          <code> maximum-paths 16</code><br>
+          <code>show ip route ospf</code><br>
+          <code>show ip ospf neighbor</code><br>
+        </div>
+      </div>
+    `,
+    tree: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          Hierarchical Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>! Core Layer</code><br>
+          <code>interface range gi1/1-4</code><br>
+          <code> no switchport</code><br>
+          <code> ip ospf 1 area 0</code><br>
+          <code>! Distribution Layer</code><br>
+          <code>interface vlan 10</code><br>
+          <code> ip address 192.168.10.1 255.255.255.0</code><br>
+          <code> standby 10 ip 192.168.10.254</code><br>
+          <code> standby 10 priority 110</code><br>
+          <code> standby 10 preempt</code><br>
+        </div>
+      </div>
+    `,
+    leafspine: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          BGP Underlay Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>! Spine-1</code><br>
+          <code>router bgp 65001</code><br>
+          <code> neighbor 10.1.1.0 remote-as 65011</code><br>
+          <code> neighbor 10.1.2.0 remote-as 65012</code><br>
+          <code> maximum-paths 16</code><br>
+          <code>! Leaf-1</code><br>
+          <code>router bgp 65011</code><br>
+          <code> neighbor 10.1.1.1 remote-as 65001</code><br>
+          <code> neighbor 10.1.3.1 remote-as 65002</code><br>
+          <code> network 10.0.0.1/32</code><br>
+        </div>
+      </div>
+    `,
+    hubspoke: `
+      <div class="expandable">
+        <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+          DMVPN Hub Configuration <span class="expand-arrow">▼</span>
+        </div>
+        <div class="expandable-body">
+          <code>interface Tunnel0</code><br>
+          <code> ip address 172.16.0.1 255.255.255.0</code><br>
+          <code> tunnel source Gi0/0</code><br>
+          <code> tunnel mode gre multipoint</code><br>
+          <code> ip nhrp network-id 100</code><br>
+          <code> ip nhrp authentication Cisco123</code><br>
+          <code> ip nhrp map multicast dynamic</code><br>
+          <code> ip mtu 1400</code><br>
+          <code> ip tcp adjust-mss 1360</code><br>
+          <code>show dmvpn</code><br>
+          <code>show ip nhrp</code><br>
+        </div>
+      </div>
+    `
+  };
+  return commands[topo] || '<p>No specific commands available.</p>';
+}
+
+function getDetailedInfo(topo) {
+  const details = {
+    star: `
+      <div class="info-card">
+        <h3>📊 Star Topology Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Cable type</td><td>UTP Cat5e/Cat6</td></tr>
+          <tr><td>Max cable length</td><td>100m</td></tr>
+          <tr><td>Central device</td><td>Switch (Layer 2 or Layer 3)</td></tr>
+          <tr><td>Collision domains</td><td>Per port (with switch)</td></tr>
+          <tr><td>Broadcast domain</td><td>Single (per VLAN)</td></tr>
+          <tr><td>SPOF</td><td>Central switch</td></tr>
+          <tr><td>Cost</td><td>Low to Moderate</td></tr>
+        </table>
+      </div>
+      <div class="highlight-box">
+        <strong>Design Tip:</strong> Use dual core switches with HSRP/VRRP for redundancy. Stack access switches using StackWise or VPC.
+      </div>
+    `,
+    bus: `
+      <div class="info-card">
+        <h3>📊 Bus Topology Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Cable type</td><td>Coaxial (10BASE2/10BASE5)</td></tr>
+          <tr><td>Max segment length</td><td>185m (10BASE2), 500m (10BASE5)</td></tr>
+          <tr><td>Terminators</td><td>50 ohm resistors (both ends)</td></tr>
+          <tr><td>Collision handling</td><td>CSMA/CD</td></tr>
+          <tr><td>Max nodes per segment</td><td>30 (10BASE2), 100 (10BASE5)</td></tr>
+          <tr><td>SPOF</td><td>Backbone cable</td></tr>
+          <tr><td>Status</td><td>Legacy/Obsolete</td></tr>
+        </table>
+      </div>
+    `,
+    ring: `
+      <div class="info-card">
+        <h3>📊 Ring Topology Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Protocols</td><td>Token Ring, FDDI, REP, ERPS</td></tr>
+          <tr><td>Failover time</td><td>~50ms (with REP/ERPS)</td></tr>
+          <tr><td>Direction</td><td>Unidirectional or Bidirectional</td></tr>
+          <tr><td>Redundancy</td><td>Dual ring for protection</td></tr>
+          <tr><td>SPOF</td><td>Single ring cable break</td></tr>
+          <tr><td>Use cases</td><td>Industrial, Metro Ethernet</td></tr>
+        </table>
+      </div>
+    `,
+    mesh: `
+      <div class="info-card">
+        <h3>📊 Mesh Topology Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Full mesh links</td><td>n(n-1)/2</td></tr>
+          <tr><td>Interfaces per node</td><td>n-1</td></tr>
+          <tr><td>Redundancy</td><td>Maximum</td></tr>
+          <tr><td>Scalability</td><td>Poor (quadratic growth)</td></tr>
+          <tr><td>Protocols</td><td>OSPF, IS-IS, BGP, EIGRP</td></tr>
+          <tr><td>Load balancing</td><td>ECMP supported</td></tr>
+        </table>
+      </div>
+      <div class="highlight-box orange">
+        <strong>Cost Warning:</strong> A 10-node full mesh requires 45 links and 9 interfaces per router. Consider partial mesh for cost control.
+      </div>
+    `,
+    tree: `
+      <div class="info-card">
+        <h3>📊 Tree Topology Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Layers</td><td>Core, Distribution, Access</td></tr>
+          <tr><td>Redundancy</td><td>Dual paths at each layer</td></tr>
+          <tr><td>Scalability</td><td>Excellent (modular)</td></tr>
+          <tr><td>Protocols</td><td>OSPF, EIGRP, HSRP, STP</td></tr>
+          <tr><td>SPOF</td><td>Root (unless redundant)</td></tr>
+          <tr><td>Use cases</td><td>Enterprise campus networks</td></tr>
+        </table>
+      </div>
+    `,
+    leafspine: `
+      <div class="info-card">
+        <h3>📊 Leaf-Spine Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Host-to-host hops</td><td>Always 3 (leaf-spine-leaf)</td></tr>
+          <tr><td>Oversubscription</td><td>Typically 3:1 to 6:1</td></tr>
+          <tr><td>Protocols</td><td>BGP (eBGP), VXLAN/EVPN</td></tr>
+          <tr><td>Load balancing</td><td>ECMP across all paths</td></tr>
+          <tr><td>Leaf uplinks</td><td>2-8 per leaf (to all spines)</td></tr>
+          <tr><td>Scale</td><td>Up to 1000s of servers</td></tr>
+        </table>
+      </div>
+      <div class="highlight-box">
+        <strong>Clos Network:</strong> Based on Charles Clos's 1952 mathematical model. Non-blocking if m ≥ n, where m = spine switches and n = leaf uplinks.
+      </div>
+    `,
+    hubspoke: `
+      <div class="info-card">
+        <h3>📊 Hub-and-Spoke Details</h3>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Links required</td><td>n-1 (vs n(n-1)/2 for full mesh)</td></tr>
+          <tr><td>Spoke-to-spoke path</td><td>Via hub (2 hops)</td></tr>
+          <tr><td>Protocols</td><td>DMVPN, SD-WAN, Frame Relay</td></tr>
+          <tr><td>SPOF</td><td>Hub router</td></tr>
+          <tr><td>Scalability</td><td>Good (linear growth)</td></tr>
+          <tr><td>Use cases</td><td>WAN, Branch offices, VPN</td></tr>
+        </table>
+      </div>
+    `
+  };
+  return details[topo] || '<p>No detailed information available.</p>';
+}
+
+// ======================
+// EVENT HANDLERS
+// ======================
+
+// Topology selector
+document.querySelectorAll('.topo-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.topo-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTopology = btn.dataset.topo;
+    resetSimulation();
+    updatePanelContent();
+    drawTopology();
+  });
+});
+
+// Simulation controls
+document.getElementById('btnStart').addEventListener('click', () => {
+  if (!simulationRunning) {
+    simulationRunning = true;
+    simulationPaused = false;
+    currentStep = 0;
+    updateStepDisplay();
+    spawnPacketForStep();
+    updateStatus('running');
+  } else if (simulationPaused) {
+    simulationPaused = false;
+    updateStatus('running');
+  }
+});
+
+document.getElementById('btnPause').addEventListener('click', () => {
+  simulationPaused = true;
+  updateStatus('paused');
+});
+
+document.getElementById('btnReset').addEventListener('click', resetSimulation);
+
+document.getElementById('btnStep').addEventListener('click', () => {
+  const topo = topologyData[currentTopology];
+  if (currentStep < topo.steps.length - 1) {
+    currentStep++;
+    updateStepDisplay();
+    spawnPacketForStep();
+  }
+});
+
+document.getElementById('speedRange').addEventListener('input', (e) => {
+  speed = parseInt(e.target.value);
+});
+
+function resetSimulation() {
+  simulationRunning = false;
+  simulationPaused = false;
+  currentStep = 0;
+  packets = [];
+  updateStatus('stopped');
+  document.getElementById('stepIndicator').style.display = 'none';
+  updatePanelContent();
+  drawTopology();
+}
+
+// Canvas interactions
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  
+  const topo = topologyData[currentTopology];
+  let found = null;
+  
+  topo.devices.forEach(dev => {
+    const dx = mx - dev.x * canvas.width;
+    const dy = my - dev.y * canvas.height;
+    if (Math.sqrt(dx*dx + dy*dy) < 40) {
+      found = dev.id;
+    }
+  });
+  
+  hoveredDevice = found;
+  canvas.style.cursor = found ? 'pointer' : 'default';
+  
+  if (found) {
+    const dev = topo.devices.find(d => d.id === found);
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 15) + 'px';
+    tooltip.style.top = (e.clientY + 15) + 'px';
+    tooltip.innerHTML = `
+      <div class="tooltip-title">${dev.label}</div>
+      <div class="tooltip-detail">Type: ${dev.type.toUpperCase()}<br>
+      Position: (${Math.round(dev.x*100)}%, ${Math.round(dev.y*100)}%)<br>
+      Click to select</div>
+    `;
+  } else {
+    tooltip.style.display = 'none';
+  }
+  
+  drawTopology();
+});
+
+canvas.addEventListener('click', (e) => {
+  if (hoveredDevice) {
+    selectedDevice = selectedDevice === hoveredDevice ? null : hoveredDevice;
+    drawTopology();
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoveredDevice = null;
+  tooltip.style.display = 'none';
+  drawTopology();
+});
+
+// Panel tabs
+document.querySelectorAll('.panel-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activePanel = tab.dataset.panel;
+    updatePanelContent();
+  });
+});
+
+// Navigation tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    handleTabSwitch();
+  });
+});
+
+function handleTabSwitch() {
+  const canvasArea = document.getElementById('canvasArea');
+  const panel = document.querySelector('.side-panel');
+  
+  // Remove existing special views
+  canvasArea.querySelectorAll('.special-view').forEach(el => el.remove());
+  
+  if (activeTab === 'visual') {
+    document.getElementById('topologyCanvas').style.display = 'block';
+    document.getElementById('simControls').style.display = 'flex';
+    document.querySelector('.topology-selector').style.display = 'flex';
+    document.getElementById('deviceLegend').style.display = 'block';
+    panel.style.display = 'flex';
+    resizeCanvas();
+  } else if (activeTab === 'packet') {
+    showPacketFlowView();
+    document.getElementById('simControls').style.display = 'none';
+    document.querySelector('.topology-selector').style.display = 'none';
+    document.getElementById('deviceLegend').style.display = 'none';
+    panel.style.display = 'flex';
+    activePanel = 'packets';
+    updatePanelTabs();
+    updatePanelContent();
+  } else if (activeTab === 'cli') {
+    showCLIView();
+    document.getElementById('simControls').style.display = 'none';
+    document.querySelector('.topology-selector').style.display = 'none';
+    document.getElementById('deviceLegend').style.display = 'none';
+    panel.style.display = 'none';
+  } else if (activeTab === 'compare') {
+    showCompareView();
+    document.getElementById('simControls').style.display = 'none';
+    document.querySelector('.topology-selector').style.display = 'none';
+    document.getElementById('deviceLegend').style.display = 'none';
+    panel.style.display = 'none';
+  } else if (activeTab === 'quiz') {
+    showQuizView();
+    document.getElementById('simControls').style.display = 'none';
+    document.querySelector('.topology-selector').style.display = 'none';
+    document.getElementById('deviceLegend').style.display = 'none';
+    panel.style.display = 'none';
+  }
+}
+
+function updatePanelTabs() {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-panel="${activePanel}"]`)?.classList.add('active');
+}
+
+function showPacketFlowView() {
+  document.getElementById('topologyCanvas').style.display = 'none';
+  const canvasArea = document.getElementById('canvasArea');
+  
+  const view = document.createElement('div');
+  view.className = 'special-view';
+  view.style.cssText = 'position:absolute;inset:0;overflow-y:auto;padding:2rem;';
+  view.innerHTML = `
+    <h2 style="color:var(--accent-blue);margin-bottom:1rem;">📦 Packet Flow Visualization</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;">
+      <div class="info-card">
+        <h3>OSI Layer Journey</h3>
+        <div style="margin-top:0.5rem;">
+          ${[7,6,5,4,3,2,1].map((layer, i) => `
+            <div style="padding:0.5rem;background:${i%2===0?'var(--bg-tertiary)':'transparent'};border-radius:4px;margin-bottom:0.2rem;font-size:0.8rem;">
+              <strong style="color:var(--accent-blue)">Layer ${layer}:</strong> ${getLayerName(layer)} — ${getLayerAction(layer)}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>Encapsulation Process</h3>
+        <div style="font-family:monospace;font-size:0.75rem;margin-top:0.5rem;">
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin-bottom:0.3rem;">
+            [DATA] → L7 PDU
+          </div>
+          <div style="text-align:center;color:var(--accent-green)">↓ +TCP/UDP Header</div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin:0.3rem 0;">
+            [TCP|DATA] → Segment
+          </div>
+          <div style="text-align:center;color:var(--accent-green)">↓ +IP Header</div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin:0.3rem 0;">
+            [IP|TCP|DATA] → Packet
+          </div>
+          <div style="text-align:center;color:var(--accent-green)">↓ +Ethernet Header</div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin:0.3rem 0;">
+            [ETH|IP|TCP|DATA|FCS] → Frame
+          </div>
+          <div style="text-align:center;color:var(--accent-green)">↓ Bits on Wire</div>
+          <div style="padding:0.4rem;background:var(--accent-green);color:#000;border-radius:4px;margin-top:0.3rem;text-align:center;font-weight:bold;">
+            101010101010...
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  canvasArea.appendChild(view);
+}
+
+function getLayerName(layer) {
+  const names = {7:'Application',6:'Presentation',5:'Session',4:'Transport',3:'Network',2:'Data Link',1:'Physical'};
+  return names[layer];
+}
+
+function getLayerAction(layer) {
+  const actions = {
+    7: 'HTTP request generated by browser',
+    6: 'Data formatting and encryption (TLS)',
+    5: 'Session establishment and management',
+    4: 'TCP segmentation, port numbers added',
+    3: 'IP addressing, routing decision made',
+    2: 'MAC addressing, frame creation, FCS',
+    1: 'Electrical/optical signals on medium'
+  };
+  return actions[layer];
+}
+
+function showCLIView() {
+  document.getElementById('topologyCanvas').style.display = 'none';
+  const canvasArea = document.getElementById('canvasArea');
+  
+  const view = document.createElement('div');
+  view.className = 'special-view';
+  view.style.cssText = 'position:absolute;inset:0;padding:1.5rem;overflow-y:auto;';
+  view.innerHTML = `
+    <h2 style="color:var(--accent-green);margin-bottom:1rem;">💻 Cisco IOS CLI Simulator</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;height:calc(100% - 3rem);">
+      <div>
+        <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.5rem;">Interactive Terminal — Type commands below:</div>
+        <div class="cli-terminal" id="cliTerminal" style="height:calc(100% - 2rem);">
+          <div class="output">Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.2(7)E4</div>
+          <div class="output">Technical Support: http://www.cisco.com/techsupport</div>
+          <div class="output">Copyright (c) 1986-2021 by Cisco Systems, Inc.</div>
+          <div class="output">Compiled Wed 01-Dec-21 03:21 by prod_rel_team</div>
+          <div class="output"></div>
+          <div class="output">ROM: Bootstrap program is C2960 boot loader</div>
+          <div class="output">BOOTLDR: C2960 Boot Loader (C2960-HBOOT-M) Version 12.2(25r)FX</div>
+          <div class="output"></div>
+          <div class="output">Switch uptime is 45 days, 3 hours, 22 minutes</div>
+          <div class="output">System returned to ROM by power-on</div>
+          <div class="output"></div>
+          <div class="output">---</div>
+          <div class="cli-input-line">
+            <span class="prompt">Switch></span>
+            <input type="text" class="cli-input" id="cliInput" autofocus autocomplete="off" spellcheck="false">
+            <span class="cli-cursor"></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.5rem;">Available Commands:</div>
+        <div style="background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem;font-size:0.75rem;color:var(--text-secondary);height:calc(100% - 2rem);overflow-y:auto;">
+          <strong style="color:var(--accent-blue)">Navigation:</strong><br>
+          enable, disable, exit, end<br><br>
+          <strong style="color:var(--accent-blue)">Show Commands:</strong><br>
+          show version, show running-config, show vlan brief, show interfaces, show ip interface brief, show mac address-table, show cdp neighbors, show spanning-tree, show clock, show users<br><br>
+          <strong style="color:var(--accent-blue)">Configuration:</strong><br>
+          configure terminal, hostname, interface, vlan, switchport mode, switchport access vlan, ip address, no shutdown, line console 0, login, password<br><br>
+          <strong style="color:var(--accent-blue)">Verification:</strong><br>
+          ping, traceroute, telnet, ssh<br><br>
+          <strong style="color:var(--accent-green)">Tips:</strong><br>
+          Use '?' for help<br>
+          Use 'tab' for auto-completion<br>
+          Press 'Enter' to execute
+        </div>
+      </div>
+    </div>
+  `;
+  canvasArea.appendChild(view);
+  
+  // CLI functionality
+  setTimeout(() => {
+    const input = document.getElementById('cliInput');
+    const terminal = document.getElementById('cliTerminal');
+    let mode = 'user'; // user, privileged, config, config-if
+    let hostname = 'Switch';
+    
+    const commandResponses = {
+      'enable': () => { mode = 'privileged'; return ''; },
+      'disable': () => { mode = 'user'; return ''; },
+      'configure terminal': () => { mode = 'config'; return 'Enter configuration commands, one per line. End with CNTL/Z.'; },
+      'end': () => { mode = 'privileged'; return ''; },
+      'exit': () => {
+        if (mode === 'config-if') mode = 'config';
+        else if (mode === 'config') mode = 'privileged';
+        else if (mode === 'privileged') mode = 'user';
+        return '';
+      },
+      'show version': () => `Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.2(7)E4\nROM: System Bootstrap, Version 15.2(7r)E1\nSwitch uptime is 45 days, 3 hours, 22 minutes\nSystem image file is "flash:c2960-lanbasek9-mz.152-7.E4.bin"\n\n cisco WS-C2960-24TT-L (PowerPC405) processor (revision C0) with 65536K bytes of memory.\n Processor board ID FOC1234X567Y\n Last reset from power-on\n 24 FastEthernet/IEEE 802.3 interface(s)\n 2 Gigabit Ethernet/IEEE 802.3 interface(s)\n\n63488K bytes of flash-simulated non-volatile configuration memory.`,
+      'show vlan brief': () => `VLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4\n                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8\n                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12\n                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16\n                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20\n                                                Fa0/21, Fa0/22, Fa0/23, Fa0/24\n                                                Gi0/1, Gi0/2\n10   DATA                             active    \n20   VOICE                            active    \n30   MANAGEMENT                       active    \n99   NATIVE                           active    \n1002 fddi-default                     act/unsup \n1003 token-ring-default               act/unsup`,
+      'show ip interface brief': () => `Interface              IP-Address      OK? Method Status                Protocol\nVlan1                  192.168.1.2     YES manual up                    up      \nFastEthernet0/1        unassigned      YES unset  up                    up      \nFastEthernet0/2        unassigned      YES unset  down                  down    \nFastEthernet0/3        unassigned      YES unset  up                    up      \nGigabitEthernet0/1     unassigned      YES unset  up                    up      \nGigabitEthernet0/2     unassigned      YES unset  down                  down`,
+      'show mac address-table': () => `          Mac Address Table\n-------------------------------------------\n\nVlan    Mac Address       Type        Ports\n----    -----------       --------    -----\n   1    0050.56c0.0001    DYNAMIC     Fa0/1\n   1    0050.56c0.0002    DYNAMIC     Fa0/3\n   1    0050.56c0.0003    DYNAMIC     Fa0/5\n   1    0050.56c0.0004    DYNAMIC     Gi0/1\n   1    aabb.cc00.0100    STATIC      CPU\n  10    0050.56c0.0010    DYNAMIC     Fa0/1\n  10    0050.56c0.0011    DYNAMIC     Fa0/2\n  20    0050.56c0.0020    DYNAMIC     Fa0/7`,
+      'show cdp neighbors': () => `Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge\n                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone\n\nDevice ID        Local Intrfce     Holdtme    Capability  Platform  Port ID\nDist-Switch      Gig 0/1           125             S I   WS-C3850  Gig 1/1/1\nAP-01            Gig 0/2           90              T I   AIR-AP380 Gig 0`,
+      'show spanning-tree': () => `VLAN0001\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    32769\n             Address     aabb.cc00.0100\n             This bridge is the root\n             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec\n\n  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)\n             Address     aabb.cc00.0100\n             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec\n             Aging Time  300 sec\n\nInterface           Role Sts Cost      Prio.Nbr Type\n------------------- ---- --- --------- -------- --------------------------------\nFa0/1               Desg FWD 19        128.1    Edge P2p\nFa0/2               Desg FWD 19        128.2    Edge P2p\nGi0/1               Desg FWD 4         128.25   P2p`,
+      'show running-config': () => `Building configuration...\n\ncurrent configuration : 3241 bytes\n!\nversion 15.2\nno service pad\nservice timestamps debug datetime msec\nservice timestamps log datetime msec\n!\nhostname ${hostname}\n!\nenable secret 5 $1$ABC$1234567890abcdef\n!\nno aaa new-model\n!\n!\n!\nno ip domain-lookup\nip cef\n!\n!\nspanning-tree mode rapid-pvst\nspanning-tree portfast default\nspanning-tree portfast bpduguard default\n!\n!\n!\ninterface FastEthernet0/1\n switchport access vlan 10\n switchport mode access\n spanning-tree portfast\n!\ninterface FastEthernet0/2\n switchport access vlan 10\n switchport mode access\n spanning-tree portfast\n!\ninterface GigabitEthernet0/1\n switchport trunk allowed vlan 10,20,30,99\n switchport trunk native vlan 99\n switchport mode trunk\n!\ninterface Vlan1\n ip address 192.168.1.2 255.255.255.0\n!\nip default-gateway 192.168.1.1\n!\nend`,
+      'show clock': () => `*03:42:15.123 UTC Fri Jul 9 2026`,
+      'show users': () => `    Line       User       Host(s)              Idle       Location\n*  0 con 0                idle                 00:00:00`,
+      'show interfaces': () => `GigabitEthernet0/1 is up, line protocol is up (connected)\n  Hardware is Gigabit Ethernet, address is aabb.cc00.0101\n  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,\n     reliability 255/255, txload 1/255, rxload 1/255\n  Encapsulation ARPA, loopback not set\n  Keepalive set (10 sec)\n  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX\n  input flow-control is off, output flow-control is unsupported\n  ARP type: ARPA, ARP Timeout 04:00:00\n  Last input 00:00:01, output 00:00:02, output hang never\n  Last clearing of "show interface" counters never\n  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0\n  Queueing strategy: fifo\n  Output queue: 0/40 (size/max)\n  5 minute input rate 23000 bits/sec, 45 packets/sec\n  5 minute output rate 18000 bits/sec, 32 packets/sec\n     1234567 packets input, 98765432 bytes, 0 no buffer\n     Received 12345 broadcasts (0 IP multicasts)\n     0 runts, 0 giants, 0 throttles\n     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n     0 watchdog, 1234 multicast, 0 pause input\n     0 input packets with dribble condition detected\n     987654 packets output, 123456789 bytes, 0 underruns`,
+    };
+    
+    function getPrompt() {
+      if (mode === 'config-if') return `${hostname}(config-if)#`;
+      if (mode === 'config') return `${hostname}(config)#`;
+      if (mode === 'privileged') return `${hostname}#`;
+      return `${hostname}>`;
+    }
+    
+    function processCommand(cmd) {
+      const parts = cmd.trim().split(/\s+/);
+      const base = parts[0]?.toLowerCase();
+      
+      if (!base) return '';
+      
+      // Mode checks
+      if ((base === 'configure' || base === 'conf' || base === 'conf t') && mode !== 'privileged') {
+        return '^\n% Invalid input detected at '^' marker.';
+      }
+      if (base.startsWith('show') && mode === 'config') {
+        return '^{\n% Invalid input detected at '^' marker.\nDo show commands from privileged EXEC mode.';
+      }
+      
+      // Command matching
+      if (base === 'enable') {
+        if (mode === 'user') { mode = 'privileged'; return ''; }
+        return '';
+      }
+      if (base === 'disable') { mode = 'user'; return ''; }
+      if (base === 'conf' || base === 'configure' || cmd.includes('configure terminal') || cmd.includes('conf t')) {
+        if (mode === 'privileged') { mode = 'config'; return 'Enter configuration commands, one per line. End with CNTL/Z.'; }
+        return '% Command rejected.';
+      }
+      if (base === 'end') { mode = 'privileged'; return ''; }
+      if (base === 'exit') {
+        if (mode === 'config-if') mode = 'config';
+        else if (mode === 'config') mode = 'privileged';
+        else if (mode === 'privileged') mode = 'user';
+        return '';
+      }
+      if (base === 'hostname' && parts[1] && mode === 'config') {
+        hostname = parts[1];
+        return '';
+      }
+      if ((base === 'interface' || base === 'int') && mode === 'config') {
+        mode = 'config-if';
+        return '';
+      }
+      if (base === 'ping' && parts[1]) {
+        return `Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to ${parts[1]}, timeout is 2 seconds:\n!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms`;
+      }
+      if (base === 'traceroute' && parts[1]) {
+        return `Type escape sequence to abort.\nTracing the route to ${parts[1]}\n\n  1 192.168.1.1 2 msec 1 msec 1 msec\n  2 10.0.0.2 4 msec 3 msec 4 msec\n  3 ${parts[1]} 5 msec *  4 msec`;
+      }
+      if (base === 'write' || base === 'wr') {
+        return 'Building configuration...\n[OK]';
+      }
+      if (base === 'clear' && parts[1] === 'mac' && parts[2] === 'address-table') {
+        return 'Dynamic entries cleared.';
+      }
+      
+      // Check show commands
+      const fullCmd = parts.slice(0, 3).join(' ');
+      if (commandResponses[cmd]) return commandResponses[cmd]();
+      if (commandResponses[fullCmd]) return commandResponses[fullCmd]();
+      if (base === 'show') {
+        const showCmd = parts.slice(0, 3).join(' ');
+        if (commandResponses[showCmd]) return commandResponses[showCmd]();
+      }
+      
+      // Help
+      if (cmd.includes('?')) {
+        return '  enable    Turn on privileged commands\n  disable   Turn off privileged commands\n  show      Show running system information\n  configure Enter configuration mode\n  ping      Send echo messages\n  traceroute Trace route to destination\n  exit      Exit from the EXEC';
+      }
+      
+      return `% Unknown command or computer name, or unable to find computer address\n'${cmd}'`;
+    }
+    
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value;
+        input.value = '';
+        
+        // Remove cursor line
+        const cursorLine = terminal.querySelector('.cli-input-line');
+        
+        // Add command to output
+        const cmdDiv = document.createElement('div');
+        cmdDiv.innerHTML = `<span class="prompt">${getPrompt()}</span> <span class="cmd">${cmd}</span>`;
+        terminal.insertBefore(cmdDiv, cursorLine);
+        
+        // Process and show response
+        const response = processCommand(cmd);
+        if (response) {
+          response.split('\\n').forEach(line => {
+            const outDiv = document.createElement('div');
+            outDiv.className = 'output';
+            outDiv.textContent = line;
+            terminal.insertBefore(outDiv, cursorLine);
+          });
+        }
+        
+        // Update prompt
+        cursorLine.querySelector('.prompt').textContent = getPrompt();
+        
+        // Scroll to bottom
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    });
+    
+    input?.focus();
+  }, 100);
+}
+
+function showCompareView() {
+  document.getElementById('topologyCanvas').style.display = 'none';
+  const canvasArea = document.getElementById('canvasArea');
+  
+  const view = document.createElement('div');
+  view.className = 'special-view';
+  view.style.cssText = 'position:absolute;inset:0;overflow-y:auto;padding:2rem;';
+  view.innerHTML = `
+    <h2 style="color:var(--accent-purple);margin-bottom:1rem;">📊 Topology Comparison Matrix</h2>
+    <div style="overflow-x:auto;">
+      <table style="font-size:0.75rem;min-width:700px;">
+        <tr>
+          <th>Topology</th>
+          <th>Redundancy</th>
+          <th>Scalability</th>
+          <th>Cost</th>
+          <th>Complexity</th>
+          <th>Latency</th>
+          <th>Best For</th>
+        </tr>
+        <tr><td><strong>Bus</strong></td><td>None</td><td>Very Poor</td><td>Very Low</td><td>Very Low</td><td>Low</td><td>Legacy only</td></tr>
+        <tr><td><strong>Star</strong></td><td>Switch only</td><td>Good</td><td>Low</td><td>Low</td><td>Low</td><td>Office LAN</td></tr>
+        <tr><td><strong>Ring</strong></td><td>Dual ring</td><td>Moderate</td><td>Moderate</td><td>Moderate</td><td>Medium</td><td>Industrial/Metro</td></tr>
+        <tr><td><strong>Mesh</strong></td><td>Maximum</td><td>Very Poor</td><td>Very High</td><td>Very High</td><td>Minimum</td><td>Core/DC (small)</td></tr>
+        <tr><td><strong>Tree</strong></td><td>If redundant</td><td>Excellent</td><td>Moderate</td><td>Moderate</td><td>Medium</td><td>Enterprise campus</td></tr>
+        <tr><td><strong>Leaf-Spine</strong></td><td>Good</td><td>Excellent</td><td>High</td><td>Moderate</td><td>Consistent</td><td>Data center</td></tr>
+        <tr><td><strong>Hub-Spoke</strong></td><td>Hub only</td><td>Good</td><td>Low</td><td>Low</td><td>High (spoke-spoke)</td><td>WAN/Branch</td></tr>
+      </table>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.5rem;">
+      <div class="info-card">
+        <h3 style="color:var(--accent-blue)">🔗 Link Count Formula</h3>
+        <div style="font-family:monospace;font-size:0.85rem;margin-top:0.5rem;">
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin-bottom:0.3rem;">
+            Full Mesh: <span style="color:var(--accent-green)">n(n-1) / 2</span>
+          </div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin-bottom:0.3rem;">
+            Star: <span style="color:var(--accent-green)">n - 1</span>
+          </div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;margin-bottom:0.3rem;">
+            Ring: <span style="color:var(--accent-green)">n</span>
+          </div>
+          <div style="padding:0.4rem;background:var(--bg-tertiary);border-radius:4px;">
+            Bus: <span style="color:var(--accent-green)">1 backbone</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <h3 style="color:var(--accent-orange)">📈 Scalability Chart</h3>
+        <div style="margin-top:0.5rem;font-size:0.8rem;">
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Bus</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:15%;height:100%;background:var(--accent-red);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Star</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:50%;height:100%;background:var(--accent-orange);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Ring</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:40%;height:100%;background:var(--accent-yellow);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Mesh</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:10%;height:100%;background:var(--accent-red);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Tree</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:90%;height:100%;background:var(--accent-green);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;margin-bottom:0.3rem;">
+            <span style="width:80px;">Leaf-Spine</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:95%;height:100%;background:var(--accent-green);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <span style="width:80px;">Hub-Spoke</span>
+            <div style="flex:1;background:var(--bg-tertiary);border-radius:4px;height:16px;overflow:hidden;">
+              <div style="width:70%;height:100%;background:var(--accent-blue);border-radius:4px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  canvasArea.appendChild(view);
+}
+
+const quizQuestions = [
+  {
+    q: "Which topology has every node connected to every other node with dedicated links?",
+    options: ["Star", "Bus", "Mesh", "Ring"],
+    correct: 2,
+    explanation: "Mesh topology connects every node to every other node. Full mesh uses n(n-1)/2 links."
+  },
+  {
+    q: "What is the formula for calculating links in a full mesh topology with n nodes?",
+    options: ["n^2", "n(n-1)/2", "n-1", "2n"],
+    correct: 1,
+    explanation: "Full mesh requires n(n-1)/2 links. For 5 nodes: 5×4/2 = 10 links."
+  },
+  {
+    q: "Which topology is most commonly used in modern enterprise LANs?",
+    options: ["Bus", "Ring", "Star", "Mesh"],
+    correct: 2,
+    explanation: "Star topology is the most common physical topology, using a central switch with dedicated links to each device."
+  },
+  {
+    q: "In a physical star with a hub as the central device, what is the logical topology?",
+    options: ["Star", "Bus", "Ring", "Mesh"],
+    correct: 1,
+    explanation: "A hub repeats signals to all ports, creating a single collision domain — this is logically a bus topology."
+  },
+  {
+    q: "Which protocol provides ~50ms failover for Ethernet ring topologies?",
+    options: ["STP", "RSTP", "REP", "VTP"],
+    correct: 2,
+    explanation: "REP (Resilient Ethernet Protocol) is Cisco proprietary and provides ~50ms convergence for ring topologies."
+  },
+  {
+    q: "What is the standard enterprise hierarchical design model by Cisco?",
+    options: ["Two-tier", "Three-tier (Core-Distribution-Access)", "Flat", "Mesh"],
+    correct: 1,
+    explanation: "The Cisco Three-Layer Hierarchical Model uses Core, Distribution, and Access layers — a tree topology."
+  },
+  {
+    q: "Which modern data center topology is based on the Clos network?",
+    options: ["Three-tier", "Leaf-Spine", "Hub-and-spoke", "Full mesh"],
+    correct: 1,
+    explanation: "Leaf-Spine topology is based on Charles Clos's 1952 mathematical model for non-blocking networks."
+  },
+  {
+    q: "What is the maximum cable length for Cat5e/Cat6 UTP in a star topology?",
+    options: ["50 meters", "100 meters", "185 meters", "500 meters"],
+    correct: 1,
+    explanation: "UTP Cat5e/Cat6 has a maximum segment length of 100 meters per the Ethernet standard."
+  },
+  {
+    q: "Which WAN topology connects all branch offices through a central site?",
+    options: ["Full mesh", "Partial mesh", "Hub-and-spoke", "Ring"],
+    correct: 2,
+    explanation: "Hub-and-spoke topology has all spokes connect to a central hub, reducing WAN link costs."
+  },
+  {
+    q: "What feature should be enabled ONLY on switch ports connected to end devices?",
+    options: ["BPDU Guard", "Root Guard", "PortFast", "Loop Guard"],
+    correct: 2,
+    explanation: "PortFast immediately transitions ports to forwarding. It must NEVER be used on ports connected to switches."
+  }
+];
+
+let currentQuizQuestion = 0;
+let quizScore = 0;
+let answered = false;
+
+function showQuizView() {
+  document.getElementById('topologyCanvas').style.display = 'none';
+  const canvasArea = document.getElementById('canvasArea');
+  
+  const view = document.createElement('div');
+  view.className = 'special-view';
+  view.style.cssText = 'position:absolute;inset:0;overflow-y:auto;padding:2rem;';
+  view.id = 'quizView';
+  
+  renderQuiz(view);
+  canvasArea.appendChild(view);
+}
+
+function renderQuiz(container) {
+  const q = quizQuestions[currentQuizQuestion];
+  const progress = ((currentQuizQuestion) / quizQuestions.length * 100).toFixed(0);
+  
+  container.innerHTML = `
+    <h2 style="color:var(--accent-yellow);margin-bottom:1rem;">🎯 CCNA Topology Quiz</h2>
+    <div style="background:var(--bg-tertiary);border-radius:8px;height:8px;margin-bottom:1.5rem;overflow:hidden;">
+      <div style="width:${progress}%;height:100%;background:var(--accent-yellow);border-radius:8px;transition:width 0.3s;"></div>
+    </div>
+    <div style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">
+      Question ${currentQuizQuestion + 1} of ${quizQuestions.length} | Score: ${quizScore}/${quizQuestions.length}
+    </div>
+    
+    <div class="info-card" style="max-width:600px;">
+      <h3 style="color:var(--text-primary);margin-bottom:1rem;font-size:1rem;">${q.q}</h3>
+      <div id="quizOptions" style="display:flex;flex-direction:column;gap:0.5rem;">
+        ${q.options.map((opt, i) => `
+          <button class="quiz-option" data-index="${i}" style="
+            padding:0.75rem 1rem;
+            background:var(--bg-tertiary);
+            border:1px solid var(--border-color);
+            border-radius:8px;
+            color:var(--text-primary);
+            cursor:pointer;
+            text-align:left;
+            font-size:0.9rem;
+            transition:all 0.2s;
+          " onmouseover="this.style.borderColor='var(--accent-blue)'" onmouseout="this.style.borderColor='var(--border-color)'">
+            <strong style="color:var(--accent-blue);margin-right:0.5rem;">${String.fromCharCode(65+i)}.</strong> ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div id="quizFeedback" style="margin-top:1rem;display:none;"></div>
+    </div>
+    
+    <div style="margin-top:1.5rem;display:flex;gap:0.5rem;">
+      <button id="quizNext" style="
+        padding:0.6rem 1.5rem;
+        background:var(--accent-blue);
+        color:#fff;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+        font-size:0.9rem;
+        display:none;
+      ">Next Question →</button>
+      <button id="quizRestart" style="
+        padding:0.6rem 1.5rem;
+        background:var(--bg-tertiary);
+        color:var(--text-primary);
+        border:1px solid var(--border-color);
+        border-radius:8px;
+        cursor:pointer;
+        font-size:0.9rem;
+        display:none;
+      ">↺ Restart Quiz</button>
+    </div>
+  `;
+  
+  answered = false;
+  
+  container.querySelectorAll('.quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      
+      const selected = parseInt(btn.dataset.index);
+      const correct = q.correct;
+      const feedback = document.getElementById('quizFeedback');
+      
+      container.querySelectorAll('.quiz-option').forEach((b, i) => {
+        b.style.cursor = 'default';
+        if (i === correct) {
+          b.style.background = 'rgba(63,185,80,0.15)';
+          b.style.borderColor = 'var(--accent-green)';
+        } else if (i === selected && i !== correct) {
+          b.style.background = 'rgba(248,81,73,0.15)';
+          b.style.borderColor = 'var(--accent-red)';
+        }
+      });
+      
+      if (selected === correct) {
+        quizScore++;
+        feedback.innerHTML = `<div style="color:var(--accent-green);font-weight:600;">✅ Correct!</div><div style="color:var(--text-secondary);font-size:0.8rem;margin-top:0.3rem;">${q.explanation}</div>`;
+      } else {
+        feedback.innerHTML = `<div style="color:var(--accent-red);font-weight:600;">❌ Incorrect. The correct answer is ${String.fromCharCode(65+correct)}.</div><div style="color:var(--text-secondary);font-size:0.8rem;margin-top:0.3rem;">${q.explanation}</div>`;
+      }
+      feedback.style.display = 'block';
+      
+      // Update score display
+      container.querySelector('.info-card').previousElementSibling.textContent = 
+        `Question ${currentQuizQuestion + 1} of ${quizQuestions.length} | Score: ${quizScore}/${quizQuestions.length}`;
+      
+      if (currentQuizQuestion < quizQuestions.length - 1) {
+        document.getElementById('quizNext').style.display = 'block';
+      } else {
+        const restartBtn = document.getElementById('quizRestart');
+        restartBtn.style.display = 'block';
+        restartBtn.textContent = `🏆 Quiz Complete! Score: ${quizScore}/${quizQuestions.length} — Play Again`;
+      }
+    });
+  });
+  
+  document.getElementById('quizNext')?.addEventListener('click', () => {
+    currentQuizQuestion++;
+    renderQuiz(container);
+  });
+  
+  document.getElementById('quizRestart')?.addEventListener('click', () => {
+    currentQuizQuestion = 0;
+    quizScore = 0;
+    renderQuiz(container);
+  });
+}
+
+// ======================
+// INITIALIZATION
+// ======================
+
+function init() {
+  resizeCanvas();
+  updatePanelContent();
+  animate();
+}
+
+init();
+</script>
+
+</body>
+</html>
