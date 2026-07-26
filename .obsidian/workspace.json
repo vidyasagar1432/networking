@@ -13,30 +13,29 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "98. How/Wireless Fundamentals/2. Wireless Infrastructure/2. Autonomous AP architecture.md",
-                "mode": "source",
+                "file": "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2. Autonomous AP architecture"
+              "title": "5.9 Routing fundamentals routing table, administrative distance, metrics"
             }
           },
           {
-            "id": "1e0629d7100186c7",
+            "id": "5bac4cf1ca9fbaaf",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
                 "file": "5. Network Layer/5.10 Static routing default routes, floating static routes.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
               "title": "5.10 Static routing default routes, floating static routes"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -171,13 +170,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "5. Network Layer/5.10 Static routing default routes, floating static routes.md",
+                "file": "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 5.10 Static routing default routes, floating static routes"
+              "title": "Outline of 5.9 Routing fundamentals routing table, administrative distance, metrics"
             }
           },
           {
@@ -212,8 +211,22 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "1e0629d7100186c7",
+  "active": "a664b34f8b7425c9",
   "lastOpenFiles": [
+    "5. Network Layer/5.10 Static routing default routes, floating static routes.md",
+    "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
+    "study.md",
+    "99. Labs/Static route/Floating Static Route.md",
+    "99. Labs/Static route/Standard Static Routes.md",
+    "Pasted image 20260726172558.png",
+    "Pasted image 20260726172553.png",
+    "99. Labs/Static route/img/Pasted image 20260726172521.png",
+    "99. Labs/Static route/img",
+    "99. Labs/Static route/img/Pasted image 20260726171030.png",
+    "99. Labs/Static route",
+    "98. How/Wireless Fundamentals/2. Wireless Infrastructure/2. Autonomous AP architecture.md",
+    "Untitled",
+    "99. Labs",
     "5. Network Layer/5.1 IPv4 addressing classes, public vs private, reserved ranges.md",
     "9. Network Security Fundamentals/9.1 ACLs standard, extended, named, numbered.md",
     "98. How/Network Security/2. Standard Access Control Lists/1. ACL Basics.md",
@@ -229,10 +242,6 @@
     "98. How/images/www.networkacademy.io/sites/default/files/inline-images/UTP-Cable.jpg",
     "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Color-sheath-of-fiber-cables.png",
     "98. How/images/www.networkacademy.io/sites/default/files/inline-images/UTP-pins-2.gif",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/SOHO-with-single-device.png",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Straight-Trough-Cable-Used_0.gif",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Collision-Domain-Hub.gif",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Physical-Layer.gif",
     "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/5. Fiber-Optic Cabling.md",
     "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/6. Collision Domains.md",
     "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/1. What is VTP.md",
@@ -241,25 +250,15 @@
     "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/5. Router on a Stick (ROAS).md",
     "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/4. Forwarding Data Between VLANs.md",
     "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/7. Broadcast Domains.md",
-    "98. How/Wireless Fundamentals/2. Wireless Infrastructure/2. Autonomous AP architecture.md",
     "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/3. The Subnet Mask.md",
     "9. Network Security Fundamentals/9.6 NAT, PAT static, dynamic, overload.md",
     "NAT.canvas",
     "98. How/NAT/6. Lab - Overlapping IP ranges.md",
-    "98. How/Network Services/QoS/7. Congestion Avoidance.md",
-    "98. How/Network Services/QoS/6. Queuing and Scheduling.md",
-    "98. How/Network Services/QoS/5. Policing and Shaping.md",
-    "98. How/Network Services/QoS/4. Lab 3.1 - Marking traffic at the access.md",
-    "98. How/Network Services/QoS/3. The Modular QoS CLI (MQC).md",
     "98. How/Network Services/QoS",
     "98. How/Network Services/NAT",
     "98. How/Network Services/Miscellaneous Services",
     "98. How/Network Services/FHRP",
     "98. How/Network Services/Device Management Protocols",
-    "98. How/Network Services",
-    "98. How/QoS",
-    "98. How/NAT",
-    "98. How/Miscellaneous Services",
-    "98. How/FHRP"
+    "98. How/Network Services"
   ]
 }
