@@ -8,17 +8,17 @@
         "type": "tabs",
         "children": [
           {
-            "id": "5bac4cf1ca9fbaaf",
+            "id": "bdd40fcaf665f46e",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Networking Fundamentals/1.6 Unicast, multicast, broadcast, anycast.md",
-                "mode": "preview",
+                "file": "notes/Core/ARP.md",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "1.6 Unicast, multicast, broadcast, anycast"
+              "title": "ARP"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "1. Networking Fundamentals/1.6 Unicast, multicast, broadcast, anycast.md",
+                "file": "notes/Core/ARP.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 1.6 Unicast, multicast, broadcast, anycast"
+              "title": "Outline of ARP"
             }
           },
           {
@@ -197,20 +197,44 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "5bac4cf1ca9fbaaf",
+  "active": "b8d3878e316fd055",
   "lastOpenFiles": [
-    "1. Networking Fundamentals/1.1 What is a network; nodes, hosts, endpoints.md",
-    "98. How/Network Services/NAT/2. Static NAT.md",
-    "Web App/components/DeviceConfig.js",
-    "Web App/index.html",
-    "Web App/protocols/protocol.js",
-    "Web App/protocols/arp.js",
-    "Web App/protocols",
-    "Web App/js/utilities.js",
-    "Web App/js/topology.js",
-    "Web App/js/store.js",
-    "Web App/js/router.js",
-    "Web App/js/protocolEngine.js",
+    "study.md",
+    "notes/Core/ARP.md",
+    "notes/Core/BOOTP.md",
+    "notes/Core/NAT.md",
+    "notes/Core/PAT.md",
+    "notes/FHRP/VRRP.md",
+    "notes/FHRP/HSRP.md",
+    "notes/FHRP/GLBP.md",
+    "notes/Routing/MPLS.md",
+    "notes/Management/LLDP.md",
+    "notes/Management/CDP.md",
+    "notes/Web/HTTPS.md",
+    "notes/Web/HTTP.md",
+    "notes/IoT/IoT.md",
+    "notes/Time/PTP.md",
+    "notes/Time/NTP.md",
+    "notes/Email_Dir/LDAP.md",
+    "notes/Email_Dir/IMAP.md",
+    "notes/Email_Dir/POP3.md",
+    "notes/Email_Dir/SMTP.md",
+    "notes/File_Remote/TFTP.md",
+    "notes/File_Remote/FTP.md",
+    "notes/File_Remote/Telnet.md",
+    "notes/File_Remote/SSH.md",
+    "notes/File_Remote/RDP.md",
+    "notes/File_Remote/SMB.md",
+    "notes/Web",
+    "notes/IoT",
+    "notes/Time",
+    "notes/Email_Dir",
+    "notes/File_Remote",
+    "notes/QoS",
+    "notes/Cloud",
+    "notes/Storage",
+    "notes/Voice_Video",
+    "notes/Management",
     "Web App/assets/switch.svg",
     "Web App/assets/server.svg",
     "Web App/assets/router.svg",
@@ -221,30 +245,6 @@
     "network-simulator/assets/access-point.svg",
     "network-simulator/assets/cloud.svg",
     "network-simulator/assets/firewall.svg",
-    "98. How/STP Fundamentals/4. Rapid Spanning-Tree/6. Loop Guard.md",
-    "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
-    "98. How/Network Services/FHRP/4. VRRP.md",
-    "98. How/Network Services/FHRP/2. HSRP.md",
-    "98. How/Network Services/Device Management Protocols/1. Local console access.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/1. Ethernet Technologies Overview.md",
-    "98. How/Network Security/2. Standard Access Control Lists/1. ACL Basics.md",
-    "98. How/Network Security/4. Layer 2 Security Features/2. DHCP Snooping.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/7. Broadcast Domains.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/6. Collision Domains.md",
-    "98. How/Network Security/3. Extended Access Control Lists/1. Extended Numbered ACL.md",
-    "98. How/Network Security/2. Standard Access Control Lists/2. Standard Numbered ACL.md",
-    "98. How/Network Security/4. Layer 2 Security Features/1. Switchport Port-Security.md",
-    "98. How/Network Security/4. Layer 2 Security Features/3. IEEE 802.1x.md",
-    "98. How/Network Security/4. Layer 2 Security Features/4. Dynamic ARP Inspection (DAI).md",
-    "98. How/Network Services/Device Management Protocols/4. Cisco Discovery Protocol (CDP).md",
-    "98. How/Network Services/FHRP/5. GLBP.md",
-    "98. How/Network Services/Miscellaneous Services/1. SNMP.md",
-    "98. How/Network Services/NAT/4. NAT Overload (PAT).md",
-    "5. Network Layer/5.6 ICMP ping, traceroute, error messages.md",
-    "5. Network Layer/5.5 ARP (Address Resolution Protocol), gratuitous ARP.md",
-    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/3. ARP Security.md",
-    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/2. ARP Features.md",
-    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/1. What is ARP.md",
     "NAT.canvas"
   ]
 }
