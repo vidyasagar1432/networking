@@ -1,0 +1,13 @@
+{
+  "nodes": [
+    { "id": "pc1", "type": "pc", "hostname": "PC-A", "x": 200, "y": 200, "status": "up" },
+    { "id": "sw1", "type": "switch", "hostname": "SW-1", "x": 400, "y": 200, "status": "up" },
+    { "id": "pc2", "type": "pc", "hostname": "PC-B", "x": 600, "y": 200, "status": "up" },
+    { "id": "rt1", "type": "router", "hostname": "R1", "x": 400, "y": 400, "status": "up" }
+  ],
+  "links": [
+    { "id": "l1", "source": "pc1", "target": "sw1", "type": "copper" },
+    { "id": "l2", "source": "pc2", "target": "sw1", "type": "copper" },
+    { "id": "l3", "source": "sw1", "target": "rt1", "type": "fiber" }
+  ]
+}

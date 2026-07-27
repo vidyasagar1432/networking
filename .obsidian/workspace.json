@@ -8,31 +8,17 @@
         "type": "tabs",
         "children": [
           {
-            "id": "a664b34f8b7425c9",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
-                "mode": "preview",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "5.9 Routing fundamentals routing table, administrative distance, metrics"
-            }
-          },
-          {
             "id": "5bac4cf1ca9fbaaf",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "5. Network Layer/5.10 Static routing default routes, floating static routes.md",
-                "mode": "source",
+                "file": "1. Networking Fundamentals/1.6 Unicast, multicast, broadcast, anycast.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "5.10 Static routing default routes, floating static routes"
+              "title": "1.6 Unicast, multicast, broadcast, anycast"
             }
           }
         ]
@@ -170,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
+                "file": "1. Networking Fundamentals/1.6 Unicast, multicast, broadcast, anycast.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 5.9 Routing fundamentals routing table, administrative distance, metrics"
+              "title": "Outline of 1.6 Unicast, multicast, broadcast, anycast"
             }
           },
           {
@@ -211,54 +197,54 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "a664b34f8b7425c9",
+  "active": "5bac4cf1ca9fbaaf",
   "lastOpenFiles": [
-    "5. Network Layer/5.10 Static routing default routes, floating static routes.md",
-    "5. Network Layer/5.9 Routing fundamentals routing table, administrative distance, metrics.md",
-    "study.md",
-    "99. Labs/Static route/Floating Static Route.md",
-    "99. Labs/Static route/Standard Static Routes.md",
-    "Pasted image 20260726172558.png",
-    "Pasted image 20260726172553.png",
-    "99. Labs/Static route/img/Pasted image 20260726172521.png",
-    "99. Labs/Static route/img",
-    "99. Labs/Static route/img/Pasted image 20260726171030.png",
-    "99. Labs/Static route",
-    "98. How/Wireless Fundamentals/2. Wireless Infrastructure/2. Autonomous AP architecture.md",
-    "Untitled",
-    "99. Labs",
-    "5. Network Layer/5.1 IPv4 addressing classes, public vs private, reserved ranges.md",
-    "9. Network Security Fundamentals/9.1 ACLs standard, extended, named, numbered.md",
+    "1. Networking Fundamentals/1.1 What is a network; nodes, hosts, endpoints.md",
+    "98. How/Network Services/NAT/2. Static NAT.md",
+    "Web App/components/DeviceConfig.js",
+    "Web App/index.html",
+    "Web App/protocols/protocol.js",
+    "Web App/protocols/arp.js",
+    "Web App/protocols",
+    "Web App/js/utilities.js",
+    "Web App/js/topology.js",
+    "Web App/js/store.js",
+    "Web App/js/router.js",
+    "Web App/js/protocolEngine.js",
+    "Web App/assets/switch.svg",
+    "Web App/assets/server.svg",
+    "Web App/assets/router.svg",
+    "Web App/assets/pc.svg",
+    "Web App/assets/firewall.svg",
+    "Web App/assets/cloud.svg",
+    "Web App/assets/access-point.svg",
+    "network-simulator/assets/access-point.svg",
+    "network-simulator/assets/cloud.svg",
+    "network-simulator/assets/firewall.svg",
+    "98. How/STP Fundamentals/4. Rapid Spanning-Tree/6. Loop Guard.md",
+    "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
+    "98. How/Network Services/FHRP/4. VRRP.md",
+    "98. How/Network Services/FHRP/2. HSRP.md",
+    "98. How/Network Services/Device Management Protocols/1. Local console access.md",
+    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/1. Ethernet Technologies Overview.md",
     "98. How/Network Security/2. Standard Access Control Lists/1. ACL Basics.md",
-    "98. How/IP Subnetting/3. Design Section/1. What is VLSM.md",
-    "98. How/IPv6 Fundamentals/2. IPv6 Addressing/1. IPv6 Address Representation.md",
+    "98. How/Network Security/4. Layer 2 Security Features/2. DHCP Snooping.md",
+    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/7. Broadcast Domains.md",
+    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/6. Collision Domains.md",
+    "98. How/Network Security/3. Extended Access Control Lists/1. Extended Numbered ACL.md",
+    "98. How/Network Security/2. Standard Access Control Lists/2. Standard Numbered ACL.md",
+    "98. How/Network Security/4. Layer 2 Security Features/1. Switchport Port-Security.md",
+    "98. How/Network Security/4. Layer 2 Security Features/3. IEEE 802.1x.md",
+    "98. How/Network Security/4. Layer 2 Security Features/4. Dynamic ARP Inspection (DAI).md",
+    "98. How/Network Services/Device Management Protocols/4. Cisco Discovery Protocol (CDP).md",
+    "98. How/Network Services/FHRP/5. GLBP.md",
+    "98. How/Network Services/Miscellaneous Services/1. SNMP.md",
+    "98. How/Network Services/NAT/4. NAT Overload (PAT).md",
+    "5. Network Layer/5.6 ICMP ping, traceroute, error messages.md",
+    "5. Network Layer/5.5 ARP (Address Resolution Protocol), gratuitous ARP.md",
+    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/3. ARP Security.md",
     "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/2. ARP Features.md",
     "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/1. What is ARP.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/4. Copper Cabling.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/3. Ethernet Physical Layer Standards.md",
-    "98. How/images/cdn.networkacademy.io/sites/default/files/2023-03/determining-a-subnet-boundary.svg",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Switch-providing-power-to-end-clients.gif",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Straight-Trough-Cable-Issue_0.gif",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/UTP-Cable.jpg",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/Color-sheath-of-fiber-cables.png",
-    "98. How/images/www.networkacademy.io/sites/default/files/inline-images/UTP-pins-2.gif",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/5. Fiber-Optic Cabling.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/6. Collision Domains.md",
-    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/1. What is VTP.md",
-    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/2. Configuring and Verifying VTP v2.md",
-    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/6. InterVLAN Routing using Layer 3 Switch.md",
-    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/5. Router on a Stick (ROAS).md",
-    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/4. Forwarding Data Between VLANs.md",
-    "98. How/Ethernet Fundamentals/1. Ethernet Protocol Fundamentals/7. Broadcast Domains.md",
-    "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/3. The Subnet Mask.md",
-    "9. Network Security Fundamentals/9.6 NAT, PAT static, dynamic, overload.md",
-    "NAT.canvas",
-    "98. How/NAT/6. Lab - Overlapping IP ranges.md",
-    "98. How/Network Services/QoS",
-    "98. How/Network Services/NAT",
-    "98. How/Network Services/Miscellaneous Services",
-    "98. How/Network Services/FHRP",
-    "98. How/Network Services/Device Management Protocols",
-    "98. How/Network Services"
+    "NAT.canvas"
   ]
 }

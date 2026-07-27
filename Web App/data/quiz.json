@@ -1,0 +1,37 @@
+[
+  {
+    "text": "What does ARP stand for?",
+    "type": "mcq",
+    "options": ["Address Resolution Protocol", "Advanced Routing Protocol", "Automated Response Process", "Address Recognition Protocol"],
+    "answer": "Address Resolution Protocol",
+    "explanation": "ARP stands for Address Resolution Protocol."
+  },
+  {
+    "text": "ARP operates at which OSI layer?",
+    "type": "mcq",
+    "options": ["Layer 1", "Layer 2", "Layer 3", "Layer 4"],
+    "answer": "Layer 2",
+    "explanation": "ARP operates at Layer 2 (Data Link layer) to resolve Layer 3 IP addresses to Layer 2 MAC addresses."
+  },
+  {
+    "text": "The destination MAC of an ARP request is a broadcast.",
+    "type": "tf",
+    "options": ["True", "False"],
+    "answer": "True",
+    "explanation": "ARP requests use the broadcast MAC FF:FF:FF:FF:FF:FF to reach all devices on the local network."
+  },
+  {
+    "text": "What command can show the ARP table on a Cisco device?",
+    "type": "mcq",
+    "options": ["show ip route", "show arp", "show mac address-table", "show interfaces"],
+    "answer": "show arp",
+    "explanation": "The 'show ip arp' command displays the ARP cache on Cisco IOS devices."
+  },
+  {
+    "text": "ARP resolves IP addresses to MAC addresses.",
+    "type": "tf",
+    "options": ["True", "False"],
+    "answer": "True",
+    "explanation": "The primary function of ARP is to map known IP addresses to unknown MAC addresses on a local network."
+  }
+]
