@@ -1,4 +1,8 @@
 {
   "nativeMenus": false,
-  "cssTheme": "Things"
+  "cssTheme": "Obsidianite",
+  "enabledCssSnippets": [
+    "image-bg",
+    "styled-code-blocks"
+  ]
 }

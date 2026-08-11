@@ -1,0 +1,55 @@
+/* ==========================================
+   Code Block Horizontal Scroll — Only
+   ========================================== */
+
+/* ── Reading View ── */
+.markdown-rendered pre {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    box-sizing: border-box !important;
+}
+
+.markdown-rendered pre code {
+    display: block !important;
+    min-width: max-content !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* Prevent individual token spans from wrapping */
+.markdown-rendered pre code span {
+    white-space: pre !important;
+}
+
+/* ── Live Preview / Source Mode ── */
+.HyperMD-codeblock {
+    overflow-x: auto !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* ── Scrollbars (WebKit + Firefox) ── */
+.markdown-rendered pre::-webkit-scrollbar,
+.HyperMD-codeblock::-webkit-scrollbar {
+    height: 8px;
+}
+
+.markdown-rendered pre::-webkit-scrollbar-thumb,
+.HyperMD-codeblock::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-bg, rgba(128, 128, 128, 0.35));
+    border-radius: 4px;
+}
+
+.markdown-rendered pre,
+.HyperMD-codeblock {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-bg, rgba(128, 128, 128, 0.35)) transparent;
+}

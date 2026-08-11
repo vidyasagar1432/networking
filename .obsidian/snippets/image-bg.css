@@ -1,0 +1,62 @@
+
+
+/* ============================================
+   Image & SVG Background — Obsidian Snippet
+   Adds a subtle white/grey backdrop so transparent
+   images and SVGs remain readable on any theme
+   ============================================ */
+
+/* --- Reading View --- */
+.markdown-rendered img,
+.markdown-rendered svg {
+  background-color: var(--image-bg-solid, #F0F8FF);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  border-radius: 4px;
+  padding: 8px;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* --- Live Preview / Editor --- */
+.markdown-source-view img,
+.markdown-source-view svg,
+.cm-s-obsidian img,
+.cm-s-obsidian svg {
+  background-color: var(--image-bg-solid, #F0F8FF);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+/* --- Hover: subtle lift to indicate interactivity --- */
+.markdown-rendered img:hover,
+.markdown-rendered svg:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s ease;
+}
+
+/* --- Optional: force SVGs to respect container width --- */
+.markdown-rendered svg,
+.markdown-source-view svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+/* --- Optional: dark-theme override (slightly darker grey) --- */
+.theme-dark {
+  --image-bg-solid: #F0F8FF;
+  --image-bg-checker: #333333;
+}
+.theme-light {
+  --image-bg-solid: #f5f5f5;
+  --image-bg-checker: #e8e8e8;
+}
+
+/* Nuclear option: force all button/clickable SVGs clean */
+button svg, .clickable-icon, .copy-code-button {
+  background: none !important;
+  background-image: none !important;
+}

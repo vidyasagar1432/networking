@@ -1,0 +1,118 @@
+/* ==========================================
+   Cisco Router Terminal — Code Block Theme
+   ========================================== */
+
+/* ── Reading View: Terminal Window ── */
+.markdown-rendered pre {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    /* Terminal chrome */
+    background-color: #0c0c0c !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 6px !important;
+    padding: 18px 22px !important;
+    margin: 1.2em 0 !important;
+
+    /* Horizontal scroll */
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    box-sizing: border-box !important;
+
+    /* Subtle terminal shadow / depth */
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Reading View: Code Text ── */
+.markdown-rendered pre code {
+    display: block !important;
+    min-width: max-content !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+
+    /* Classic terminal font stack */
+    font-family: "Courier New", Courier, "Lucida Console", "DejaVu Sans Mono", monospace !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0 !important;
+    tab-size: 4 !important;
+
+    color: #33ff00 !important;
+    text-shadow: 0 0 2px rgba(51, 255, 0, 0.25) !important;
+
+    /* Crisp rendering */
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Prevent token spans from wrapping */
+.markdown-rendered pre code span {
+    white-space: pre !important;
+}
+
+/* ── Live Preview / Editor ── */
+.HyperMD-codeblock {
+    background-color: #0c0c0c !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 6px !important;
+    padding: 14px 18px !important;
+    margin: 0.6em 0 !important;
+
+    overflow-x: auto !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    font-family: "Courier New", Courier, "Lucida Console", "DejaVu Sans Mono", monospace !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.65 !important;
+    color: #d4d4d4 !important;
+    tab-size: 4 !important;
+
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* ── Text Selection (dark green highlight) ── */
+.markdown-rendered pre ::selection,
+.HyperMD-codeblock ::selection {
+    background-color: #1b4d2e !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+/* ── Scrollbars ── */
+.markdown-rendered pre::-webkit-scrollbar,
+.HyperMD-codeblock::-webkit-scrollbar {
+    height: 8px;
+}
+
+.markdown-rendered pre::-webkit-scrollbar-track,
+.HyperMD-codeblock::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.markdown-rendered pre::-webkit-scrollbar-thumb,
+.HyperMD-codeblock::-webkit-scrollbar-thumb {
+    background-color: #3a3a3a;
+    border-radius: 4px;
+}
+
+/* Firefox */
+.markdown-rendered pre,
+.HyperMD-codeblock {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a3a transparent;
+}

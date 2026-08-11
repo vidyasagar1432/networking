@@ -1,0 +1,191 @@
+
+
+/* ==========================================
+   Cisco Router Terminal — Code Block Theme
+   Highlights **bold** words & CLI commands
+   ========================================== */
+
+/* ── Reading View: Terminal Window ── */
+.markdown-rendered pre {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    background-color: #0c0c0c !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 6px !important;
+    padding: 18px 22px !important;
+    margin: 1.2em 0 !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    box-sizing: border-box !important;
+
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Terminal title bar dots */
+.markdown-rendered pre::before {
+    content: "● ● ●";
+    display: block;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 6px;
+    color: #444;
+    margin: -6px 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1f1f1f;
+    pointer-events: none;
+}
+
+/* ── Reading View: Code Text ── */
+.markdown-rendered pre code {
+    display: block !important;
+    min-width: max-content !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+
+    font-family: "Courier New", Courier, "Lucida Console", "DejaVu Sans Mono", monospace !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0 !important;
+    tab-size: 4 !important;
+    color: #d4d4d4 !important;
+    text-shadow: 0 0 1px rgba(212, 212, 212, 0.12) !important;
+}
+
+.markdown-rendered pre code span {
+    white-space: pre !important;
+}
+
+/* ── **BOLD** WORDS (between **) ── */
+/* Reading view: <strong> inside code blocks */
+.markdown-rendered pre code strong,
+.markdown-rendered pre code b {
+    color: #ffb000 !important;           /* Cisco amber/gold */
+    background-color: rgba(255, 176, 0, 0.1) !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 2px rgba(255, 176, 0, 0.25) !important;
+    padding: 0 2px !important;
+    border-radius: 2px !important;
+}
+
+/* ── Live Preview / Editor ── */
+.HyperMD-codeblock {
+    background-color: #0c0c0c !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 6px !important;
+    padding: 14px 18px !important;
+    margin: 0.6em 0 !important;
+
+    overflow-x: auto !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    font-family: "Courier New", Courier, "Lucida Console", "DejaVu Sans Mono", monospace !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.65 !important;
+    color: #d4d4d4 !important;
+    tab-size: 4 !important;
+
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Live Preview: **bold** words */
+.HyperMD-codeblock .cm-strong,
+.HyperMD-codeblock strong {
+    color: #ffb000 !important;
+    background-color: rgba(255, 176, 0, 0.1) !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 2px rgba(255, 176, 0, 0.25) !important;
+    padding: 0 2px !important;
+    border-radius: 2px !important;
+}
+
+/* ── Cisco CLI Syntax Colors ── */
+/* Hostname / Prompt (e.g. DSW1#, Router>) */
+.markdown-rendered pre code .token.class-name,
+.markdown-rendered pre code .token.selector,
+.HyperMD-codeblock .cm-variable-2 {
+    color: #00d4aa !important;           /* Teal prompt */
+    font-weight: 500 !important;
+}
+
+/* Keywords: show, configure, interface, ip, no, exit, end */
+.markdown-rendered pre code .token.keyword,
+.HyperMD-codeblock .cm-keyword {
+    color: #ff9f43 !important;           /* Amber command */
+    font-weight: 500 !important;
+}
+
+/* Strings / hostnames / descriptions */
+.markdown-rendered pre code .token.string,
+.HyperMD-codeblock .cm-string {
+    color: #55efc4 !important;           /* Mint green */
+}
+
+/* Numbers: VLAN IDs, IP octets, priorities */
+.markdown-rendered pre code .token.number,
+.HyperMD-codeblock .cm-number {
+    color: #74b9ff !important;           /* Light blue */
+}
+
+/* Comments / annotations */
+.markdown-rendered pre code .token.comment,
+.HyperMD-codeblock .cm-comment {
+    color: #636e72 !important;
+    font-style: italic !important;
+}
+
+/* Operators: |, >, #, ! */
+.markdown-rendered pre code .token.operator,
+.HyperMD-codeblock .cm-operator {
+    color: #a29bfe !important;           /* Soft purple */
+}
+
+/* ── Text Selection ── */
+.markdown-rendered pre ::selection,
+.HyperMD-codeblock ::selection {
+    background-color: #1b4d2e !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+/* ── Scrollbars ── */
+.markdown-rendered pre::-webkit-scrollbar,
+.HyperMD-codeblock::-webkit-scrollbar {
+    height: 8px;
+}
+
+.markdown-rendered pre::-webkit-scrollbar-track,
+.HyperMD-codeblock::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.markdown-rendered pre::-webkit-scrollbar-thumb,
+.HyperMD-codeblock::-webkit-scrollbar-thumb {
+    background-color: #3a3a3a;
+    border-radius: 4px;
+}
+
+.markdown-rendered pre,
+.HyperMD-codeblock {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a3a transparent;
+}

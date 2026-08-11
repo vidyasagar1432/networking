@@ -8,17 +8,17 @@
         "type": "tabs",
         "children": [
           {
-            "id": "bdd40fcaf665f46e",
+            "id": "56475437eb863658",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "notes/Core/ARP.md",
-                "mode": "source",
+                "file": "98. How/STP Fundamentals/3. Per-VLAN Spanning-Tree/2. Configuring Per-VLAN STP (PVST).md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ARP"
+              "title": "2. Configuring Per-VLAN STP (PVST)"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -156,13 +158,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "notes/Core/ARP.md",
+                "file": "98. How/STP Fundamentals/3. Per-VLAN Spanning-Tree/2. Configuring Per-VLAN STP (PVST).md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of ARP"
+              "title": "Outline"
             }
           },
           {
@@ -191,7 +193,6 @@
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
       "bases:Create new base": false,
-      "custom-sort:Toggle custom sorting": false,
       "obsidian-excalidraw-plugin:New drawing": false,
       "templater-obsidian:Templater": false,
       "obsidian-git:Open Git source control": false
@@ -199,42 +200,42 @@
   },
   "active": "b8d3878e316fd055",
   "lastOpenFiles": [
-    "study.md",
-    "notes/Core/ARP.md",
-    "notes/Core/BOOTP.md",
-    "notes/Core/NAT.md",
-    "notes/Core/PAT.md",
-    "notes/FHRP/VRRP.md",
-    "notes/FHRP/HSRP.md",
-    "notes/FHRP/GLBP.md",
-    "notes/Routing/MPLS.md",
-    "notes/Management/LLDP.md",
-    "notes/Management/CDP.md",
-    "notes/Web/HTTPS.md",
-    "notes/Web/HTTP.md",
-    "notes/IoT/IoT.md",
-    "notes/Time/PTP.md",
-    "notes/Time/NTP.md",
-    "notes/Email_Dir/LDAP.md",
-    "notes/Email_Dir/IMAP.md",
-    "notes/Email_Dir/POP3.md",
-    "notes/Email_Dir/SMTP.md",
-    "notes/File_Remote/TFTP.md",
-    "notes/File_Remote/FTP.md",
-    "notes/File_Remote/Telnet.md",
-    "notes/File_Remote/SSH.md",
-    "notes/File_Remote/RDP.md",
-    "notes/File_Remote/SMB.md",
-    "notes/Web",
-    "notes/IoT",
-    "notes/Time",
-    "notes/Email_Dir",
-    "notes/File_Remote",
-    "notes/QoS",
-    "notes/Cloud",
-    "notes/Storage",
-    "notes/Voice_Video",
-    "notes/Management",
+    "98. How/STP Fundamentals/2. Common Spanning-Tree/5. STP Topology Changes (TCN).md",
+    "98. How/STP Fundamentals/2. Common Spanning-Tree/3. Spanning-Tree Port Roles.md",
+    "98. How/STP Fundamentals/2. Common Spanning-Tree/2. The Spanning-Tree Algorithm.md",
+    "98. How/STP Fundamentals/3. Per-VLAN Spanning-Tree/2. Configuring Per-VLAN STP (PVST).md",
+    "REF/4. Data Link Layer/4.8 Spanning Tree Protocol STP, RSTP, MSTP.md",
+    "REF/4. Data Link Layer/4.7 Inter-VLAN routing router-on-a-stick, SVI (Layer 3 switch).md",
+    "REF/4. Data Link Layer/4.6 VTP (legacy) — modes, versions, pruning.md",
+    "REF/4. Data Link Layer/4.5 Trunking 802.1Q, native VLAN mismatch issues.md",
+    "REF/4. Data Link Layer/4.4 VLANs purpose, VLAN types (data, voice, native, default).md",
+    "REF/4. Data Link Layer/4.1 Ethernet fundamentals, Ethernet frame format.md",
+    "REF/4. Data Link Layer/4.12 Switch security port security, DHCP snooping, Dynamic ARP Inspection, storm control.md",
+    "REF/4. Data Link Layer/4.11 EtherChannel PAgP, LACP, load-balancing methods.md",
+    "REF/4. Data Link Layer/4.10 PortFast, BPDU Guard, Root Guard, Loop Guard.md",
+    "REF/4. Data Link Layer/4.9 Root bridge election, port roles states, BPDUs.md",
+    "REF/4. Data Link Layer/4.3 Switch frame forwarding unicast, flooding, filtering.md",
+    "20. Certification Path/20.1 CCNA (200-301).md",
+    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/3. ARP Security.md",
+    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/1. What is ARP.md",
+    "98. How/Ethernet Fundamentals/5. Address Resolution Protocol (ARP)/2. ARP Features.md",
+    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/2. Configuring and Verifying VTP v2.md",
+    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/1. What is VTP.md",
+    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/6. InterVLAN routing using Layer 3 switch.md",
+    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/4. Forwarding Data Between VLANs.md",
+    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/5. Router on a Stick (ROAS).md",
+    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/3. Trunk Native VLAN.md",
+    "98. How/Ethernet Fundamentals/3. Ethernet Virtual LANs (VLANs)/2. VLAN Trunking.md",
+    "99. Labs/GNS/VLANs/vlan/vlan.gns3.tmp",
+    "99. Labs/GNS/VLANs/vlan/project-files/captures/S-1_Gi03_to_PC3_Ethernet0.pcap",
+    "99. Labs/GNS/VLANs/vlan/project-files/captures",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/413328f8-0f69-4aa4-931b-2d67171f92d5/ubridge.log",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/413328f8-0f69-4aa4-931b-2d67171f92d5/vpcs.log",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/413328f8-0f69-4aa4-931b-2d67171f92d5/startup.vpc",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/413328f8-0f69-4aa4-931b-2d67171f92d5",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/72305c3f-2d86-4c40-abd6-d92bc432e27b/startup.vpc",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/72305c3f-2d86-4c40-abd6-d92bc432e27b",
+    "99. Labs/GNS/VLANs/vlan/project-files/vpcs/a22436f2-d0b2-45e0-9784-bdbba03f9223/startup.vpc",
     "Web App/assets/switch.svg",
     "Web App/assets/server.svg",
     "Web App/assets/router.svg",
