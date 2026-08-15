@@ -13,15 +13,72 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CCNP/Level 04 - Ethernet & Switching/01. MAC Address.md",
-                "mode": "source",
+                "file": "CCNP/Level 16 - Network Services/01. DHCP.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01. MAC Address"
+              "title": "01. DHCP"
+            }
+          },
+          {
+            "id": "8a06fceb84e8c947",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Harden an end-device access port.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Harden an end-device access port"
+            }
+          },
+          {
+            "id": "cdc77104145e4b7a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "VTP Server Configuration.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "VTP Server Configuration"
+            }
+          },
+          {
+            "id": "9100344f68c7b0be",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "CCNP/Level 16 - Network Services/02. DHCP Snooping.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "02. DHCP Snooping"
+            }
+          },
+          {
+            "id": "1a94f98428b3fba0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "VTP Server Configuration.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "VTP Server Configuration"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -158,7 +215,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "CCNP/Level 04 - Ethernet & Switching/01. MAC Address.md",
+                "file": "VTP Server Configuration.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -198,34 +255,34 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "543c649fb701f61d",
+  "active": "1a94f98428b3fba0",
   "lastOpenFiles": [
-    "notes/protocol/Switching/EtherChannel.md",
-    "REF/4. Data Link Layer/4.7 Inter-VLAN routing router-on-a-stick, SVI (Layer 3 switch).md",
-    "REF/4. Data Link Layer/4.6 VTP (legacy) — modes, versions, pruning.md",
-    "CCNP/Level 09 - Routing Fundamentals/03. Metrics.md",
-    "CCNP/Level 09 - Routing Fundamentals/02. Administrative Distance.md",
-    "CCNP/Level 09 - Routing Fundamentals/01. Routing Table.md",
-    "CCNP/Level 11 - EIGRP/01. DUAL.md",
-    "CCNP/Level 11 - EIGRP/02. RTP.md",
-    "CCNP/Level 11 - EIGRP/03. Successor.md",
-    "CCNP/Level 11 - EIGRP/04. Feasible Successor.md",
-    "CCNP/Level 11 - EIGRP/05. Named Mode.md",
-    "CCNP/Level 11 - EIGRP/06. IPv6.md",
-    "CCNP/Level 11 - EIGRP/07. Stub.md",
-    "CCNP/Level 11 - EIGRP/08. Authentication.md",
-    "CCNP/Level 11 - EIGRP/09. Variance.md",
-    "CCNP/Level 11 - EIGRP/10. Unequal Load Balancing.md",
-    "CCNP/Level 11 - EIGRP/11. Troubleshooting.md",
-    "CCNP/Level 15 - NAT/02. Dynamic NAT.md",
-    "CCNP/Level 16 - Network Services/19. RTP.md",
-    "CCNP/Level 16 - Network Services/18. SIP.md",
-    "CCNP/Level 09 - Routing Fundamentals/04. Recursive Lookup.md",
-    "CCNP/Level 09 - Routing Fundamentals/05. FIB.md",
-    "CCNP/Level 09 - Routing Fundamentals/06. RIB.md",
-    "CCNP/Level 09 - Routing Fundamentals/07. CEF.md",
-    "CCNP/Level 09 - Routing Fundamentals/08. Static Routing.md",
-    "CCNP/Level 09 - Routing Fundamentals/09. Floating Static.md",
+    "STP Configuration.md",
+    "Harden an end-device access port.md",
+    "Untitled.md",
+    "CCNP/Level 14 - First Hop Redundancy/01. HSRP.md",
+    "CCNP/Level 14 - First Hop Redundancy/02. VRRP.md",
+    "CCNP/Level 08 - STP/14. EtherChannel/01. LACP.md",
+    "CCNP/Level 16 - Network Services/02. DHCP Snooping.md",
+    "VTP Server Configuration.md",
+    "CCNP/Level 16 - Network Services/01. DHCP.md",
+    "CCNP/Level 08 - STP/14. EtherChannel/02. PAgP.md",
+    "CCNP/Level 08 - STP/14. EtherChannel/03. Static.md",
+    "CCNP/Level 07 - VLAN Technologies/05. Trunk Port.md",
+    "CCNP/Level 08 - STP/04. Rapid PVST+.md",
+    "CCNP/Level 08 - STP/08. Port States.md",
+    "CCNP/Level 08 - STP/13. Loop Guard.md",
+    "CCNP/Level 08 - STP/11. BPDU Guard.md",
+    "CCNP/Level 08 - STP/10. PortFast.md",
+    "CCNP/Level 08 - STP/09. BPDU.md",
+    "CCNP/Level 07 - VLAN Technologies/10. Inter-VLAN Routing.md",
+    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/2. Configuring and Verifying VTP v2.md",
+    "98. How/Ethernet Fundamentals/4. VLAN Trunking Protocol (VTP)/1. What is VTP.md",
+    "CCNP/Level 07 - VLAN Technologies/08. DTP.md",
+    "CCNP/Level 07 - VLAN Technologies/07. 802.1Q.md",
+    "CCNP/Level 08 - STP/12. Root Guard.md",
+    "CCNP/Level 08 - STP/06. Root Bridge.md",
+    "CCNP/Level 08 - STP/05. MST.md",
     "99. Labs/12 - Reference",
     "99. Labs/11 - Interview",
     "99. Labs/10 - Protocols",
