@@ -1,0 +1,405 @@
+{
+  "chapter": {
+    "id": "eigrp",
+    "name": "EIGRP",
+    "description": "EIGRP fundamentals, DUAL, neighbor formation, metrics, and verification"
+  },
+  "topics": [
+    {
+      "id": "eigrp-basics",
+      "name": "EIGRP Basics",
+      "subtopics": [
+        {
+          "id": "eigrp-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "EIGRP-CON-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What kind of routing protocol is EIGRP and what does DUAL stand for?",
+              "answer": "EIGRP is Cisco's proprietary enhanced distance-vector protocol (hybrid of distance-vector and link-state traits) that uses DUAL — Diffusing Update Algorithm — for loop-free, fast convergence by pre-computing alternate paths.",
+              "explanation": "DUAL lets EIGRP converge quickly: as long as a feasible successor exists, failures are handled locally with no recalculation. Metric components are bandwidth and delay by default.",
+              "tags": ["eigrp", "dual", "distance-vector"],
+              "acceptableAnswers": [
+                "cisco proprietary enhanced distance vector using dual diffusing update algorithm",
+                "hybrid protocol, dual = diffusing update algorithm"
+              ],
+              "hints": ["Who owns the protocol?", "What does 'hyrbrid' refer to here?"]
+            },
+            {
+              "id": "EIGRP-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "What is the administrative distance of internal EIGRP routes and of re-distributed (external) EIGRP routes?",
+              "choices": [
+                "Internal 90, external 170",
+                "Internal 110, external 170",
+                "Internal 90, external 120",
+                "Internal 5, external 170"
+              ],
+              "answer": "Internal 90, external 170",
+              "explanation": "Internal EIGRP routes (AD 90) beat OSPF (110) and RIP (120); external EIGRP routes drop to 170. The different ADs also support EIGRP summarization with 'administrative distance' control.",
+              "tags": ["eigrp", "administrative-distance"]
+            },
+            {
+              "id": "EIGRP-CON-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "EIGRP is limited to Cisco equipment because it is a proprietary protocol — other vendors can never interoperate with it.",
+              "answer": "false",
+              "explanation": "Cisco published EIGRP as an informational RFC (7868) so other vendors can implement it, but in practice interoperability outside Cisco ecosystems is rare.",
+              "tags": ["eigrp", "proprietary", "rfc"]
+            },
+            {
+              "id": "EIGRP-CON-004",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What multicast address does EIGRP use for its hello packets and what protocol type does it use?",
+              "answer": "224.0.0.10 with IP protocol number 88 (IPPROTO_EIGRP). Reliable transports (updates/queries/replies) on point-to-point links also use unicast to the neighbor's IP.",
+              "explanation": "Hellos are unreliable multicasts every 5 s (hello hold time 15 s); on NBMA, neighbors can be manually defined for unicast hellos. RTP (Reliable Transport Protocol) handles the five packet types: hello, update, query, reply, ACK.",
+              "tags": ["eigrp", "multicast", "packet-types"],
+              "acceptableAnswers": [
+                "224.0.0.10 and protocol 88",
+                "multicast 224.0.0.10, ip protocol 88"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "eigrp-metric",
+          "name": "Metrics and Path Selection",
+          "questions": [
+            {
+              "id": "EIGRP-MET-001",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which two factors are used in the default EIGRP metric calculation?",
+              "choices": [
+                "Bandwidth and delay",
+                "Bandwidth and hop count",
+                "Delay and load",
+                "Load and reliability"
+              ],
+              "answer": "Bandwidth and delay",
+              "explanation": "The full formula uses bandwidth (lowest along path), delay (cumulative), plus load and reliability — but by default only bandwidth and delay are used (K1=1, K3=1, others 0).",
+              "tags": ["eigrp", "metric", "k-values"]
+            },
+            {
+              "id": "EIGRP-MET-002",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "Write the default EIGRP metric formula.",
+              "answer": "Metric = [10^7 / (lowest bandwidth in kbps) + (sum of delays in tens of microseconds)] x 256, i.e. metric = [(10,000,000 / BW) + delay] * 256 with loading (K2), reliability (K4) factors included only if their K-values are non-zero.",
+              "explanation": "Example: a 10 Mb path with 20,000 usec delay = [(10^7/10000) + 2000] x 256 = 3000 x 256 = 768,000. Lower metric is preferred.",
+              "tags": ["eigrp", "metric", "formula"],
+              "acceptableAnswers": [
+                "10 million divided by slowest bandwidth plus cumulative delay times 256",
+                "k1 bandwidth plus k3 delay multiplied by 256",
+                "(10^7 / bw) + delay) * 256"
+              ],
+              "hints": ["What value multiplies the final sum?", "Which link's bandwidth — fastest or slowest — enters the formula?"]
+            },
+            {
+              "id": "EIGRP-MET-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "When EIGRP path selection is deciding between routes to the same destination, it prefers the path with the lowest composite metric, regardless of hop count.",
+              "answer": "true",
+              "explanation": "Hop count is not part of the default metric; EIGRP uses bandwidth/delay (and optionally load/reliability). A 50-hop gigabit path can beat a 2-hop T1 path.",
+              "tags": ["eigrp", "path-selection"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eigrp-dual",
+      "name": "DUAL and Topology Table",
+      "subtopics": [
+        {
+          "id": "eigrp-feasibility",
+          "name": "Feasibility Condition",
+          "questions": [
+            {
+              "id": "EIGRP-DUAL-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "State the EIGRP Feasibility Condition.",
+              "answer": "A route can become a feasible successor only if its reported distance (RD — the neighbor's advertised distance to the destination) is lower than the current feasible distance (FD — the best metric to the destination). If RD >= FD, no feasible successor exists and DUAL must run a diffusing computation.",
+              "explanation": "This guarantees loop-free alternatives: the alternate path's cost must be strictly lower than the best path's cost from the perspective of the downstream neighbor.",
+              "tags": ["eigrp", "dual", "feasibility-condition"],
+              "acceptableAnswers": [
+                "reported distance must be less than feasible distance",
+                "rd < fd",
+                "the neighbor's advertised distance must be lower than the best metric"
+              ],
+              "hints": ["Symbols: what is RD and what is FD?"]
+            },
+            {
+              "id": "EIGRP-DUAL-002",
+              "type": "multiple_choice",
+              "difficulty": "hard",
+              "question": "Router A's FD to 10.0.0.0/24 is 300. Neighbors advertise: B=280, C=300, D=350. Which neighbors are feasible successors?",
+              "choices": [
+                "Only B (RD 280 < 300)",
+                "B and D (RD below and equal to FD)",
+                "B, C and D since all have routes",
+                "None — only the successor is a feasible successor"
+              ],
+              "answer": "Only B (RD 280 < 300)",
+              "explanation": "Feasibility Condition: RD must be strictly LESS than FD. C's RD equals FD and D's RD is greater, so they can only be used after a diffusing computation (active state).",
+              "tags": ["eigrp", "dual", "feasibility-condition"]
+            }
+          ]
+        },
+        {
+          "id": "eigrp-topology",
+          "name": "Successors and Topology Table",
+          "questions": [
+            {
+              "id": "EIGRP-TOP-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is the difference between a successor and a feasible successor in EIGRP?",
+              "answer": "A successor is the neighbor on the best (lowest-metric) path to a destination and is used for forwarding traffic and entered in the routing table. A feasible successor is a backup neighbor whose reported distance meets the feasibility condition — it is kept in the topology table for instant local failover with no diffusing computation.",
+              "explanation": "show ip eigrp topology shows both: successors are the 'via' entries with P (passive) at the top; the topology table stores every DUAL state, both passive (P) and active (A).",
+              "tags": ["eigrp", "successor", "feasible-successor", "topology"],
+              "acceptableAnswers": [
+                "successor is the best path neighbor, feasible successor is a loop free backup neighbor",
+                "successor for forwarding, feasible successor for instant backup"
+              ],
+              "hints": ["Which one forwards traffic?", "Which one enables instant failover without querying?"]
+            },
+            {
+              "id": "EIGRP-TOP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "What do the states 'Passive' and 'Active' mean in the EIGRP topology table?",
+              "choices": [
+                "Passive = route stable and in use; Active = DUAL actively searching (querying) for a new path because no feasible successor existed",
+                "Passive = route installed in the forwarding table; Active = route from a passive interface",
+                "Passive = valid backup; Active = candidate successor",
+                "Passive = link up; Active = the route is being redistributed"
+              ],
+              "answer": "Passive = route stable and in use; Active = DUAL actively searching (querying) for a new path because no feasible successor existed",
+              "explanation": "A route that must go Active triggers queries to neighbors; if DUAL finds no feasible successor the route becomes Active until replies arrive — a stuck-in-active (SIA) situation arises if neighbors fail to reply.",
+              "tags": ["eigrp", "dual", "topology"]
+            },
+            {
+              "id": "EIGRP-TOP-003",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What does 'Stuck in Active' (SIA) mean and what usually causes it?",
+              "answer": "SIA means a neighbor failed to answer EIGRP queries within the active-time limit (default 3 minutes) while DUAL was searching for a new path. Common causes: CPU saturation, congested/unreliable links dropping reliable-transport packets, or asymmetric MTU issues.",
+              "explanation": "SIA events can cascade: a neighbor that is stuck stays in the topology table and the local router keeps waiting, sometimes causing flapping and route loss. Troubleshooting focuses on the physical/logical link quality.",
+              "tags": ["eigrp", "sia", "troubleshooting", "queries"],
+              "acceptableAnswers": [
+                "neighbor failed to answer queries within active time",
+                "stuck in active means query replies never came"
+              ],
+              "hints": ["Which DUAL state does the route enter?", "Which packet type carries the search?"]
+            }
+          ]
+        },
+        {
+          "id": "eigrp-neighbors",
+          "name": "Neighbor Formation",
+          "questions": [
+            {
+              "id": "EIGRP-NBR-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "How do EIGRP neighbors form?",
+              "answer": "Routers exchange hellos on the interface (every 5 s, multicast 224.0.0.10). Once they see a matching AS number and K-values, they exchange full routing information via reliable updates; each update is acknowledged. After the initial exchange, only changes trigger updates (event-driven).",
+              "explanation": "Unlike OSPF there are no adjacency state machines to speak of — show ip eigrp neighbors lists them; a neighbor is formed approximately when hellos are exchanged successfully.",
+              "tags": ["eigrp", "neighbors", "hellos"],
+              "acceptableAnswers": [
+                "hellos on the same as with matching k values, then full updates with acks",
+                "exchange hellos then reliable updates"
+              ],
+              "hints": ["What packet type starts it?", "Why are updates called reliable?"]
+            },
+            {
+              "id": "EIGRP-NBR-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Which of these does NOT prevent EIGRP neighbor formation on a directly connected link?",
+              "choices": [
+                "A different router ID on each side",
+                "Different EIGRP AS numbers",
+                "Mismatched K-values",
+                "Passive interface on one side"
+              ],
+              "answer": "A different router ID on each side",
+              "explanation": "Router IDs merely need to be unique per instance — mismatched AS or K-values, or a passive interface (no hellos sent), break adjacency. Timers do NOT need to match in EIGRP (asymmetric failure still works).",
+              "tags": ["eigrp", "neighbors", "troubleshooting"]
+            },
+            {
+              "id": "EIGRP-NBR-003",
+              "type": "true_false",
+              "difficulty": "hard",
+              "question": "EIGRP hello and hold timers do not need to match between neighbors for an adjacency to form.",
+              "answer": "true",
+              "explanation": "Unlike OSPF, EIGRP allows mismatched timers: each side uses its own hold time to time out the peer. AS number, K-values, and availability of hellos are what matter.",
+              "tags": ["eigrp", "timers", "neighbors"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eigrp-ops",
+      "name": "Operation and Verification",
+      "subtopics": [
+        {
+          "id": "eigrp-config",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "EIGRP-CFG-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to enable EIGRP AS 100 on a router, advertise only 10.1.1.0/24, and disable auto-summarization.",
+              "answer": "R1(config)# router eigrp 100\nR1(config-router)# no auto-summary\nR1(config-router)# network 10.1.1.0",
+              "explanation": "With the classic configuration, 'network' matches the classful boundary unless auto-summary is disabled; 10.1.1.0 matches interface 10.1.1.x. Enable EIGRP per-interface with 'ip eigrp 100' only, or covered by a network statement.",
+              "tags": ["eigrp", "configuration", "auto-summary"],
+              "commands": [
+                "router eigrp 100",
+                "no auto-summary",
+                "network 10.1.1.0"
+              ],
+              "acceptableAnswers": [
+                "router eigrp, no auto-summary, network"
+              ]
+            },
+            {
+              "id": "EIGRP-CFG-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "What is the effect of the 'passive-interface' command under EIGRP?",
+              "choices": [
+                "The interface stops sending and receiving EIGRP hello packets, so no neighbors form on it, but any already-learned routes stay in the table",
+                "The interface stops routing all traffic",
+                "It shrinks the hello timer to 1 second",
+                "It only suppresses multicast but keeps unicast neighbors"
+              ],
+              "answer": "The interface stops sending and receiving EIGRP hello packets, so no neighbors form on it, but any already-learned routes stay in the table",
+              "explanation": "'passive-interface default' makes all interfaces passive; individual 'no passive-interface' re-enables specific ones. Very common to stop routes leaking toward LAN segments.",
+              "tags": ["eigrp", "configuration", "passive-interface"]
+            }
+          ]
+        },
+        {
+          "id": "eigrp-verify",
+          "name": "Verification Commands",
+          "questions": [
+            {
+              "id": "EIGRP-VER-001",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the EIGRP neighbor table — including the current timers toward each neighbor?",
+              "answer": "show ip eigrp neighbors",
+              "explanation": "Columns: Hold (time remaining), Uptime, SRTT and RTO (reliability timers), Q Cnt, Seq Num. Use 'show ip eigrp neighbors detail' for more, like passive-interface status.",
+              "tags": ["eigrp", "verification", "show"],
+              "commands": ["show ip eigrp neighbors"],
+              "acceptableAnswers": [
+                "show ip eigrp neighbors"
+              ]
+            },
+            {
+              "id": "EIGRP-VER-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the EIGRP topology table with successors, feasible successors, and DUAL states (P/A)?",
+              "answer": "show ip eigrp topology",
+              "explanation": "First line per route shows FD and route state Passive/Active; 'via' lines name the neighbor, its RD and, if it is a feasible successor, '(FD is ...)' markers. Add '/all-links' to see every path including those violating the feasibility condition.",
+              "tags": ["eigrp", "verification", "topology", "show"],
+              "commands": ["show ip eigrp topology"],
+              "acceptableAnswers": [
+                "show ip eigrp topology"
+              ]
+            },
+            {
+              "id": "EIGRP-VER-003",
+              "type": "show_command",
+              "difficulty": "hard",
+              "question": "Which command shows EIGRP route entries in the routing table along with their source and whether the path is internal or external?",
+              "answer": "show ip route eigrp",
+              "explanation": "Displays lines prefixed with 'D' (internal) or 'D EX' (external), together with '[90/4373760]' style AD/metric values.",
+              "tags": ["eigrp", "verification", "show"],
+              "commands": ["show ip route eigrp"],
+              "acceptableAnswers": [
+                "show ip route eigrp",
+                "show ip route"
+              ]
+            },
+            {
+              "id": "EIGRP-VER-004",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows EIGRP traffic statistics and the number of packets sent/received of each type?",
+              "answer": "show ip eigrp traffic",
+              "explanation": "Breaks down hellos, updates, queries, replies, acks, and SIA queries sent and received, plus queued counts.",
+              "tags": ["eigrp", "verification", "traffic"],
+              "commands": ["show ip eigrp traffic"],
+              "acceptableAnswers": [
+                "show ip eigrp traffic"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "eigrp-troubleshoot",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "EIGRP-TS-001",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "After adding a router, the neighbor table shows the neighbor but no routes are exchanged. What is the most likely cause?",
+              "answer": "Auto-summary (default on older IOS) collapsed the networks to classful boundaries on one or both sides, so the routes were summarized to a different classful network (e.g. 10.0.0.0) and dropped by the remote side.",
+              "explanation": "Classic EIGRP defaults to auto-summary; 'no auto-summary' under router eigrp fixes this.",
+              "tags": ["eigrp", "troubleshooting", "auto-summary"],
+              "symptoms": [
+                "Neighbors form and stay stable",
+                "No EIGRP routes appear in show ip route",
+                "show ip eigrp topology has entries summarized at classful boundaries"
+              ],
+              "topology": "Two routers connected via GigabitEthernet0/0 on 10.1.1.0/30 with subnet 10.1.2.0/24 behind R1",
+              "showOutput": "R1# show ip eigrp topology\nP 10.0.0.0/8, 1 successors, FD is 28160 via R2",
+              "acceptableAnswers": [
+                "auto summary collapsed routes",
+                "auto summarization on",
+                "classful summarization dropped the routes"
+              ],
+              "hints": ["Which EIGRP default creates classful advertisements?", "Where are the routes listed — does the destination match the actual subnet?"]
+            },
+            {
+              "id": "EIGRP-TS-002",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "A remote site's link is flapping: the neighbor table is empty every few minutes, then repopulates. What could cause intermittent EIGRP neighbors, and what do you check first?",
+              "answer": "Check physical/logical link quality (errors, drops, MTU), hello/hold reachability, and any ACL or firewall dropping protocol 88; common cause is packet loss exceeding the 15s hold time on a congested link — verify with show ip eigrp neighbors (watch uptime) and interface error counters/underruns.",
+              "explanation": "If reliable packets are lost, EIGRP marks routes active and re-queries; flapping neighbor tables usually mean hellos being dropped intermittently — CPU, link errors, or L3 filtering (ACL/permit protocol 88).",
+              "tags": ["eigrp", "troubleshooting", "link-flap"],
+              "symptoms": [
+                "Neighbors appear and disappear cyclically",
+                "show ip eigrp topology shows routes occasionally going Active (A)",
+                "No config changes were made"
+              ],
+              "topology": "WAN router pair separated by a provider link with visible interface error counters",
+              "showOutput": "R1# show ip eigrp neighbors\nH Address    Interface   Hold Uptime  SRTT RTO Q Seq\n1 10.0.0.2   Gi0/1       2    01:12:34 12  120  0  44\nR1# show interface Gi0/1 | include error|CRC\n  input errors: 1482, CRC: 1482",
+              "acceptableAnswers": [
+                "link errors/crc dropping hellos",
+                "packet loss on the wan link",
+                "an acl blocking protocol 88"
+              ],
+              "hints": ["What packet type keeps the neighbor table alive?", "What does the CRC counter tell you?"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

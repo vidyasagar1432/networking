@@ -1,0 +1,261 @@
+{
+  "chapter": {
+    "id": "fundamentals",
+    "name": "Fundamentals",
+    "description": "OSI / TCP/IP models, IPv4, subnetting and IPv6 foundations"
+  },
+  "topics": [
+    {
+      "id": "osi-tcpip",
+      "name": "OSI & TCP/IP",
+      "subtopics": [
+        {
+          "id": "models",
+          "name": "Models",
+          "questions": [
+            {
+              "id": "FUN-MODEL-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What problem does the layered model solve in networking?",
+              "answer": "Layering breaks the network into modular, well-defined functions so that each layer can be designed, implemented and replaced independently while only communicating with the layers directly above and below it.",
+              "explanation": "A layered model hides internal complexity, standardizes interfaces between layers, promotes interoperability between vendors, and lets you troubleshoot one layer at a time.",
+              "tags": ["osi", "tcpip", "models", "fundamentals"],
+              "acceptableAnswers": [
+                "modular independent layers",
+                "standardization and interoperability",
+                "breaking networking into independent functional layers"
+              ],
+              "references": ["CCNA 200-301 OCG Ch.1 — Network Models"]
+            },
+            {
+              "id": "FUN-MODEL-002",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What are the four layers of the TCP/IP model, from bottom to top?",
+              "answer": "Network Access (Link), Internet, Transport, Application.",
+              "explanation": "The TCP/IP model condenses the OSI seven layers into four: the link layer (L1/L2), the internet layer (L3), the transport layer (L4) and the application layer (L5-L7).",
+              "tags": ["tcpip", "models", "osi"],
+              "acceptableAnswers": [
+                "link internet transport application",
+                "network access internet transport application",
+                "data link network transport application"
+              ]
+            },
+            {
+              "id": "FUN-MODEL-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Routing between networks happens at which OSI layer?",
+              "choices": [
+                "Layer 2 — Data Link",
+                "Layer 3 — Network",
+                "Layer 4 — Transport",
+                "Layer 1 — Physical"
+              ],
+              "answer": "Layer 3 — Network",
+              "explanation": "The network layer is responsible for logical addressing (IP) and path selection (routing). Layer 2 handles switching within a segment using MAC addresses.",
+              "tags": ["osi", "routing", "layer3"]
+            },
+            {
+              "id": "FUN-MODEL-004",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "The transport layer (TCP/IP) provides end-to-end delivery between the source and destination applications.",
+              "answer": "true",
+              "explanation": "Transport-layer protocols such as TCP and UDP run on the source and destination hosts and provide end-to-end, host-to-host communication to applications. Routers forward based on layers 1-3 and do not care about transport content beyond basic QoS marking.",
+              "tags": ["tcpip", "transport", "osi"]
+            },
+            {
+              "id": "FUN-MODEL-005",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Compare connection-oriented (TCP) and connectionless (UDP) transport delivery.",
+              "answer": "TCP establishes a session (three-way handshake), numbers segments, acknowledges data, retransmits lost segments and provides flow control, giving reliable ordered delivery at the cost of overhead. UDP adds only port numbers, checksum and length, giving fast best-effort delivery with no retransmission or ordering.",
+              "explanation": "TCP: reliable, ordered, connection-oriented, higher overhead. UDP: unreliable, unordered, connectionless, minimal overhead — used by DNS, DHCP, VoIP, video.",
+              "tags": ["tcp", "udp", "transport"],
+              "acceptableAnswers": [
+                "tcp is reliable with handshake and retransmission, udp is fast best effort",
+                "tcp reliable ordered, udp fast connectionless"
+              ],
+              "hints": ["Think about the three-way handshake.", "Which one retransmits lost segments?"]
+            },
+            {
+              "id": "FUN-ENCAP-001",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "Trace what happens to data as a host sends it across the network: describe the encapsulation process from application to wire.",
+              "answer": "1) Application layer creates the data. 2) Transport layer segments it and adds a TCP/UDP header with source and destination ports. 3) Internet layer adds an IP header with source and destination IP addresses, forming a packet. 4) Link layer wraps the packet in a frame with source and destination MAC addresses plus a trailer (FCS). 5) The frame is converted to bits and sent on the wire.",
+              "explanation": "Encapsulation adds a header at each layer as data travels down the stack. The receiving host reverses the process (de-encapsulation).",
+              "tags": ["encapsulation", "packet-flow", "osi"],
+              "acceptableAnswers": [
+                "data then segments then packets then frames then bits",
+                "application, transport, internet, link"
+              ],
+              "hints": ["Each layer adds its own header.", "The TCP/IP layer order: Application → Transport → Internet → Link."]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ipv4",
+      "name": "IPv4 Addressing",
+      "subtopics": [
+        {
+          "id": "ipv4-basics",
+          "name": "Basics",
+          "questions": [
+            {
+              "id": "FUN-IPV4-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is the broadcast address of the network 192.168.1.0/24?",
+              "answer": "192.168.1.255",
+              "explanation": "In a /24 network (255.255.255.0 mask) the host bits are the last octet. Setting all host bits to 1 gives the directed broadcast address 192.168.1.255.",
+              "tags": ["ipv4", "addressing", "broadcast"],
+              "acceptableAnswers": ["192.168.1.255", "the last address with all host bits 1"]
+            },
+            {
+              "id": "FUN-IPV4-002",
+              "type": "fill_blank",
+              "difficulty": "easy",
+              "question": "The dotted-decimal subnet mask for a /24 prefix is __________.",
+              "answer": "255.255.255.0",
+              "explanation": "A /24 has the first 24 bits set: 11111111.11111111.11111111.00000000 → 255.255.255.0.",
+              "tags": ["ipv4", "subnetting", "mask"],
+              "acceptableAnswers": ["255.255.255.0"]
+            },
+            {
+              "id": "FUN-IPV4-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which of the following is a private IPv4 address (RFC 1918)?",
+              "choices": [
+                "172.16.45.10",
+                "8.8.8.8",
+                "192.168.0.0",
+                "172.32.45.10"
+              ],
+              "answer": "172.16.45.10",
+              "explanation": "RFC 1918 private ranges: 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0 – 172.31.255.255) and 192.168.0.0/16. 172.32.x.x falls outside 172.16.0.0/12.",
+              "tags": ["ipv4", "private", "rfc1918"]
+            },
+            {
+              "id": "FUN-IPV4-004",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "A host is configured with IP 192.168.1.10/24 and needs to reach 192.168.2.20. How does it decide the packet must go to its default gateway?",
+              "answer": "The host ANDs its own address with its mask (192.168.1.0) and ANDs the destination with the same mask (192.168.2.0). Because the results differ, the destination is not local, so the host forwards the frame to its default gateway (the router) using the gateway's MAC address.",
+              "explanation": "Local vs remote determination is a logical AND of address and mask. Remote traffic is sent to the gateway; local traffic is sent directly to the destination host.",
+              "tags": ["ipv4", "gateway", "addressing"],
+              "acceptableAnswers": [
+                "it compares networks by anding and sends it to the gateway",
+                "the destination is not in its local network so it uses the default gateway"
+              ],
+              "hints": ["What two numbers does a host AND together to decide if a destination is local?"]
+            }
+          ]
+        },
+        {
+          "id": "subnetting",
+          "name": "Subnetting",
+          "questions": [
+            {
+              "id": "FUN-SUBNET-001",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "You must put exactly 30 hosts in a subnet with room to grow. Which subnet mask uses address space most efficiently?",
+              "answer": "A /27 mask (255.255.255.224), which provides 32 addresses per subnet — 30 usable host addresses (2^5 − 2 = 30).",
+              "explanation": "Host bits n give 2^n − 2 usable addresses. 30 usable needs 5 host bits (32 − 2 = 30) → prefix length 32 − 5 = 27.",
+              "tags": ["ipv4", "subnetting", "host-count"],
+              "acceptableAnswers": [
+                "255.255.255.224",
+                "/27",
+                "a 27 bit mask"
+              ],
+              "hints": ["How many host bits give 32 addresses?", "32 addresses means 5 host bits."]
+            },
+            {
+              "id": "FUN-SUBNET-002",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "How many usable host addresses does 192.168.10.0/26 provide?",
+              "answer": "62 usable hosts (64 total addresses minus network and broadcast).",
+              "explanation": "A /26 leaves 6 host bits: 2^6 = 64 addresses, minus network and broadcast = 62 usable.",
+              "tags": ["ipv4", "subnetting", "host-count"],
+              "acceptableAnswers": ["62", "62 usable hosts"]
+            },
+            {
+              "id": "FUN-SUBNET-003",
+              "type": "multiple_choice",
+              "difficulty": "hard",
+              "question": "192.168.5.192/27 is a subnet of 192.168.5.0/24. Which addresses are NOT usable hosts in that subnet?",
+              "choices": [
+                "192.168.5.222",
+                "192.168.5.193",
+                "192.168.5.254",
+                "192.168.5.201"
+              ],
+              "answer": "192.168.5.254",
+              "explanation": "A /27 gives blocks of 32: .192–.223. The block for .192/27 is .192 to .223 (network .192, broadcast .223). .254 belongs to the .224/27 block, not this one.",
+              "tags": ["ipv4", "subnetting"],
+              "hints": ["What are the /27 block boundaries starting at .0? (0, 32, 64, ...)"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ipv6",
+      "name": "IPv6",
+      "subtopics": [
+        {
+          "id": "ipv6-basics",
+          "name": "Basics",
+          "questions": [
+            {
+              "id": "FUN-IPV6-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is the purpose of the IPv6 address range 2001:db8::/32?",
+              "answer": "It is the documentation prefix — addresses in 2001:db8::/32 are reserved for documentation and examples and must never be routed on the public internet.",
+              "explanation": "RFC 3849 reserves 2001:db8::/32 for documentation. Use it in labs, books and examples; it is not globally routable.",
+              "tags": ["ipv6", "addressing"],
+              "acceptableAnswers": [
+                "documentation",
+                "reserved for documentation and examples"
+              ],
+              "references": ["RFC 3849"]
+            },
+            {
+              "id": "FUN-IPV6-002",
+              "type": "fill_blank",
+              "difficulty": "medium",
+              "question": "IPv6 link-local addresses always begin with the prefix __________.",
+              "answer": "fe80::/10",
+              "explanation": "Link-local addresses (fe80::/10) are automatically generated and only valid on the local link — they are used for neighbor discovery, NTP, routing adjacencies and next-hop addressing on point-to-point links.",
+              "tags": ["ipv6", "link-local"],
+              "acceptableAnswers": ["fe80", "fe80::/10", "fe80::"]
+            },
+            {
+              "id": "FUN-IPV6-003",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Why does IPv6 rely on ICMPv6 (and no ARP) for Layer 2 address resolution?",
+              "choices": [
+                "Neighbor Discovery replaces ARP with multicast-based Neighbor Solicitation/Advertisement messages",
+                "IPv6 does not need address resolution because MAC addresses are globally unique",
+                "ARP was removed to save bandwidth on IPv6-only links",
+                "IPv6 hosts resolve addresses using DNS at Layer 2"
+              ],
+              "answer": "Neighbor Discovery replaces ARP with multicast-based Neighbor Solicitation/Advertisement messages",
+              "explanation": "Neighbor Discovery (ICMPv6 types 135/136) resolves IPv6 addresses to MAC addresses using solicited-node multicast, and also covers router discovery, duplicate address detection and redirects.",
+              "tags": ["ipv6", "ndp", "icmpv6"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

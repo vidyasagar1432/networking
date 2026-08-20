@@ -1,0 +1,458 @@
+{
+  "chapter": {
+    "id": "security",
+    "name": "Security",
+    "description": "ACLs, Port Security, DHCP Snooping, AAA and switch/network hardening"
+  },
+  "topics": [
+    {
+      "id": "sec-acls",
+      "name": "Access Control Lists",
+      "subtopics": [
+        {
+          "id": "acl-types",
+          "name": "Types and Ordering",
+          "questions": [
+            {
+              "id": "SEC-ACL-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What are the differences between standard and extended ACLs?",
+              "answer": "Standard ACLs (1-99, 1300-1999) filter only by source address, evaluated closest to the destination. Extended ACLs (100-199, 2000-2699) filter by source, destination, protocol, and port (and can use 'established'), evaluated closest to the source.",
+              "explanation": "Named ACLs can be standard or extended too. Wildcard masks match: 0.0.0.0 = exact host, 255.255.255.255 = any; processing stops at the first matching line.",
+              "tags": ["acl", "standard", "extended", "wildcard"],
+              "acceptableAnswers": [
+                "standard filters by source only, extended by source destination protocol port",
+                "standard near destination, extended near source"
+              ],
+              "hints": ["What does the rule 'least specific location' mean?", "Which one can filter by port?"]
+            },
+            {
+              "id": "SEC-ACL-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "How do you place a wildcard mask to match exactly the host 192.168.10.5?",
+              "choices": [
+                "192.168.10.5 0.0.0.0",
+                "192.168.10.5 255.255.255.255",
+                "192.168.10.0 0.0.0.255",
+                "any"
+              ],
+              "answer": "192.168.10.5 0.0.0.0",
+              "explanation": "The wildcard mask bits mark which bits to ignore — all 0s means check every bit. 255.255.255.255 is 'any', 0.0.0.255 is an exact /24.",
+              "tags": ["acl", "wildcard", "host"]
+            },
+            {
+              "id": "SEC-ACL-003",
+              "type": "true_false",
+              "difficulty": "hard",
+              "question": "ACL entries are evaluated in order, and the first matching line decides the action — a later 'permit all' does not rescue a packet hit by an earlier deny.",
+              "answer": "true",
+              "explanation": "Process order matters absolutely. Any packet that matches an earlier line is immediately permitted or denied; there is no aggregation of rules. Access-control lists implicitly deny everything not explicitly permitted.",
+              "tags": ["acl", "ordering", "implicit-deny"]
+            }
+          ]
+        },
+        {
+          "id": "acl-config",
+          "name": "Configuration and Verification",
+          "questions": [
+            {
+              "id": "SEC-ACL-CFG-001",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "Write a named extended ACL (SEC-100) that permits HTTP and HTTPS from host 10.1.1.10 to server 10.9.9.9/32 and denies everything else — then apply it inbound on interface Gi0/1.",
+              "answer": "R1(config)# ip access-list extended SEC-100\nR1(config-ext-nacl)# permit tcp host 10.1.1.10 host 10.9.9.9 eq 80\nR1(config-ext-nacl)# permit tcp host 10.1.1.10 host 10.9.9.9 eq 443\nR1(config-ext-nacl)# deny ip any any\nR1(config)# interface GigabitEthernet0/1\nR1(config-if)# ip access-group SEC-100 in",
+              "explanation": "Named ACLs are edited line-by-line with permit/deny statements; the implicit deny is redundant but explicit here for clarity. The interface direction is from the perspective of the router.",
+              "tags": ["acl", "configuration", "extended", "access-group"],
+              "commands": [
+                "ip access-list extended SEC-100",
+                "permit tcp host 10.1.1.10 host 10.9.9.9 eq 80",
+                "permit tcp host 10.1.1.10 host 10.9.9.9 eq 443",
+                "deny ip any any",
+                "interface GigabitEthernet0/1",
+                "ip access-group SEC-100 in"
+              ],
+              "acceptableAnswers": [
+                "named extended acl permitting 80 and 443 for that host pair, applied inbound"
+              ]
+            },
+            {
+              "id": "SEC-ACL-VER-001",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the rules of an access list together with the match counters on every line?",
+              "answer": "show access-lists",
+              "explanation": "Counters on each ACE show how many packets matched — use them to find 'shadowed' lines that never match. 'show ip access-lists' shows only IP ACLs.",
+              "tags": ["acl", "verification", "show"],
+              "commands": ["show access-lists", "show ip access-lists"],
+              "acceptableAnswers": [
+                "show access-lists"
+              ]
+            },
+            {
+              "id": "SEC-ACL-VER-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the ACLs applied to each interface and the direction they face?",
+              "answer": "show ip interface (or show ip interface GigabitEthernet0/1)",
+              "explanation": "Under 'Inbound access list is ...' / 'Outgoing access list is ...' you can see the applied lists; 'show access-lists' then gives the counters per ACE.",
+              "tags": ["acl", "verification", "interface"],
+              "commands": ["show ip interface"],
+              "acceptableAnswers": [
+                "show ip interface"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "acl-troubleshoot",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SEC-ACL-TS-001",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "Users can browse the web but an application server behind the router fails. show access-lists shows deny counts climbing on lines for 10.1.1.0/24. What is the most likely problem?",
+              "answer": "The ACL is missing a rule for the application's ports/protocol (e.g. TCP 8443 or UDP), or the server's traffic is being denied by an earlier line that accidentally matches — verify the application port in the ACL and check counters against the server IP.",
+              "explanation": "Deny counters climbing indicate matching packets: check whether the intended traffic is hitting the deny line (wrong port/protocol in the rule) or the rule order.",
+              "tags": ["acl", "troubleshooting", "counters"],
+              "symptoms": [
+                "Web traffic works, the application server does not",
+                "Deny counters increment on lines affecting the server subnet",
+                "No recent config change to the server"
+              ],
+              "topology": "Host 10.1.1.50 -> Router Gi0/1 -> App server 10.9.9.99/32 listening on TCP 8443",
+              "showOutput": "R1# show access-lists SEC-100\n10 permit tcp host 10.1.1.10 host 10.9.9.99 eq 80 (12 matches)\n20 permit tcp host 10.1.1.10 host 10.9.9.99 eq 443 (3 matches)\n30 permit ip any any (1771 matches)\nR1# show access-lists SEC-100\n10 permit tcp host 10.1.1.10 host 10.9.9.99 eq 80 (0 matches)",
+              "acceptableAnswers": [
+                "application port not permitted by the acl",
+                "deny hit the app traffic"
+              ],
+              "hints": ["Which traffic is the server expecting?", "What does a climbing deny counter mean?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-portsecurity",
+      "name": "Port Security",
+      "subtopics": [
+        {
+          "id": "portsec-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SEC-PSEC-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What does port security do and what are the three violation modes?",
+              "answer": "Port security restricts which MAC addresses may send traffic on a switchport. Violation modes: protect (drops frames from unknown MACs, does nothing else), restrict (drops frames AND increments the violation counter, can log), and shutdown (err-disables the port — default and safest).",
+              "explanation": "Config: switchport port-security maximum N, mac-address sticky/static, violation {protect|restrict|shutdown}. Sticky entries learn dynamically and are stored in config.",
+              "tags": ["port-security", "violation", "mac"],
+              "acceptableAnswers": [
+                "restricts macs on the port; protect restrict shutdown",
+                "protect drops, restrict drops and counts, shutdown err disables"
+              ],
+              "hints": ["Which mode actually tears down the port?", "What does restrict do that protect does not?"]
+            },
+            {
+              "id": "SEC-PSEC-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "A workstation was replaced with one that has a new MAC address. Which violation mode causes the switchport to go into err-disable state when the new MAC sends traffic?",
+              "choices": [
+                "shutdown (default)",
+                "protect",
+                "restrict",
+                "none — port security never disables ports"
+              ],
+              "answer": "shutdown (default)",
+              "explanation": "Limit the max to 2 and use 'errdisable recovery' so the port auto-recovers; or pre-authorize both MACs as sticky/static.",
+              "tags": ["port-security", "err-disable"]
+            }
+          ]
+        },
+        {
+          "id": "portsec-config",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SEC-PSEC-CFG-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to enable port security on Gi0/1 with a maximum of 2 MACs and auto-recovery from err-disable in 30 seconds.",
+              "answer": "SW1(config)# interface GigabitEthernet0/1\nSW1(config-if)# switchport mode access\nSW1(config-if)# switchport port-security maximum 2\nSW1(config-if)# switchport port-security\nSW1(config)# errdisable recovery cause psecure-violation interval 30",
+              "explanation": "Port security defaults to maximum 1 and violation shutdown; you should also consider 'switchport port-security aging time' for dynamic aging.",
+              "tags": ["port-security", "configuration", "errdisable"],
+              "commands": [
+                "interface GigabitEthernet0/1",
+                "switchport mode access",
+                "switchport port-security maximum 2",
+                "switchport port-security",
+                "errdisable recovery cause psecure-violation interval 30"
+              ],
+              "acceptableAnswers": [
+                "port security with max 2 and errdisable recovery"
+              ]
+            },
+            {
+              "id": "SEC-PSEC-CFG-002",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "Once a switchport has port security enabled with sticky learning, the learned MACs survive a reboot even without being explicitly configured.",
+              "answer": "false",
+              "explanation": "No: sticky entries only survive reboots if they were written to the running/startup config with 'write' — the 'sticky' keyword merely converts dynamically learned MACs into config entries that are then saved.",
+              "tags": ["port-security", "sticky"]
+            }
+          ]
+        },
+        {
+          "id": "portsec-verify",
+          "name": "Verification and Recovery",
+          "questions": [
+            {
+              "id": "SEC-PSEC-VER-001",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the port security settings and current secure MACs of an interface?",
+              "answer": "show port-security interface GigabitEthernet0/1",
+              "explanation": "Shows max, violation mode, secure MAC addresses, security violation count, and whether the port is in err-disable.",
+              "tags": ["port-security", "verification", "show"],
+              "commands": ["show port-security interface GigabitEthernet0/1"],
+              "acceptableAnswers": [
+                "show port-security interface"
+              ]
+            },
+            {
+              "id": "SEC-PSEC-VER-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "After a violation, which commands both recover the err-disabled port manually?",
+              "answer": "SW1(config)# errdisable recovery cause psecure-violation\nSW1(config)# errdisable recovery interval 30\nor manually: SW1(config)# interface Gi0/1 ; SW1(config-if)# shutdown ; SW1(config-if)# no shutdown",
+              "explanation": "The automatic path needs both the cause and an interval (globally). The manual path is shutdown/no shutdown on the interface.",
+              "tags": ["port-security", "errdisable", "recovery"],
+              "commands": [
+                "errdisable recovery cause psecure-violation",
+                "errdisable recovery interval 30",
+                "shutdown",
+                "no shutdown"
+              ],
+              "acceptableAnswers": [
+                "errdisable recovery with the psecure violation cause",
+                "shutdown then no shutdown"
+              ],
+              "hints": ["Which two global commands together auto-recover?", "Which manual sequence flips the port?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-dhcpsnoop",
+      "name": "DHCP Snooping",
+      "subtopics": [
+        {
+          "id": "dhcpsnoop-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SEC-DHCP-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is DHCP snooping and what are trusted vs untrusted ports?",
+              "answer": "DHCP snooping filters DHCP messages per port and builds a DHCP snooping binding table (IP + MAC + port + VLAN) to block rogue DHCP servers and spoofed DHCP replies. Trusted ports (uplinks to real DHCP servers) pass all DHCP traffic; untrusted ports (typically towards clients) only permit DHCP Discover/Request — they drop Offer/Ack from anyone.",
+              "explanation": "Untrusted ports also rate-limit DHCP packets (rate limiter default 15 pps for IOS). The binding table protects against IP/MAC spoofing by validating source IP in later packets.",
+              "tags": ["dhcp-snooping", "trusted", "untrusted"],
+              "acceptableAnswers": [
+                "filters dhcp to block rogue servers; trusted toward server, untrusted toward clients",
+                "dhcp snooping builds ip mac port vlan bindings"
+              ],
+              "hints": ["Which direction is toward the real server?", "What table does it build?"]
+            },
+            {
+              "id": "SEC-DHCP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Where do you typically mark ports as TRUSTED in a DHCP snooping design?",
+              "choices": [
+                "Ports connecting to switches or routers upstream, toward the legitimate DHCP server",
+                "All ports facing user workstations",
+                "Only ports in the management VLAN",
+                "The ports of the DHCP server's own access device, only if voice VLAN is used"
+              ],
+              "answer": "Ports connecting to switches or routers upstream, toward the legitimate DHCP server",
+              "explanation": "Client-facing ports must be untrusted — otherwise an attacker on a client port could send forged offers which are normally dropped by an untrusted port.",
+              "tags": ["dhcp-snooping", "trusted", "design"]
+            }
+          ]
+        },
+        {
+          "id": "dhcpsnoop-config",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SEC-DHCP-CFG-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to enable DHCP snooping for VLAN 10 and mark Gi0/24 (the uplink) as trusted.",
+              "answer": "SW1(config)# ip dhcp snooping\nSW1(config)# ip dhcp snooping vlan 10\nSW1(config)# interface GigabitEthernet0/24\nSW1(config-if)# ip dhcp snooping trust",
+              "explanation": "Global enable first, then per-VLAN. Optionally add 'ip dhcp snooping rate-limit' on client ports and 'ip dhcp snooping binding' to statically seed the table.",
+              "tags": ["dhcp-snooping", "configuration", "trust"],
+              "commands": [
+                "ip dhcp snooping",
+                "ip dhcp snooping vlan 10",
+                "interface GigabitEthernet0/24",
+                "ip dhcp snooping trust"
+              ],
+              "acceptableAnswers": [
+                "global snooping, vlan 10, trust on uplink"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dhcpsnoop-verify",
+          "name": "Verification",
+          "questions": [
+            {
+              "id": "SEC-DHCP-VER-001",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the DHCP snooping binding table with IP, MAC, VLAN, and port for each client?",
+              "answer": "show ip dhcp snooping binding",
+              "explanation": "Columns: MAC address, IP address, Lease, Type (dhcp-snooping vs static), VLAN, Interface. A stale entry here can cause traffic drops after an IP change.",
+              "tags": ["dhcp-snooping", "verification", "show"],
+              "commands": ["show ip dhcp snooping binding"],
+              "acceptableAnswers": [
+                "show ip dhcp snooping binding"
+              ]
+            },
+            {
+              "id": "SEC-DHCP-VER-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the DHCP snooping configuration summary — VLANs enabled, trusted interfaces, and violation counters?",
+              "answer": "show ip dhcp snooping",
+              "explanation": "Lists status (enabled), VLANs with snooping, the rate limit, and every trusted/untrusted interface with packet counters.",
+              "tags": ["dhcp-snooping", "verification", "show"],
+              "commands": ["show ip dhcp snooping"],
+              "acceptableAnswers": [
+                "show ip dhcp snooping"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-aaa",
+      "name": "AAA and Management",
+      "subtopics": [
+        {
+          "id": "aaa-concepts",
+          "name": "AAA Concepts",
+          "questions": [
+            {
+              "id": "SEC-AAA-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What do the three A's of AAA stand for and what methods servers can provide it?",
+              "answer": "Authentication (who you are), Authorization (what you can do), Accounting (what you did — logging/tracking). Implemented with RADIUS (UDP 1812/1813) or TACACS+ (TCP 49), plus the local database ('aaa authentication login default local').",
+              "explanation": "TACACS+ encrypts the whole packet and separates A/A/A steps; RADIUS combines authentication and authorization. aaa new-model activates AAA.",
+              "tags": ["aaa", "radius", "tacacs"],
+              "acceptableAnswers": [
+                "authentication authorization accounting",
+                "radius or tacacs plus local database"
+              ],
+              "hints": ["What does each A mean?", "Which two remote server protocols?"]
+            },
+            {
+              "id": "SEC-AAA-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Which AAA protocol separates authentication, authorization, and accounting completely and encrypts the full packet?",
+              "choices": [
+                "TACACS+",
+                "RADIUS",
+                "Both equally",
+                "LDAP"
+              ],
+              "answer": "TACACS+",
+              "explanation": "TACACS+ (TCP 49, Cisco) encrypts the entire body and each phase is separate; RADIUS (UDP 1812/1813) encrypts only the password and merges auth + authorization.",
+              "tags": ["aaa", "tacacs", "radius"]
+            },
+            {
+              "id": "SEC-AAA-003",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "Before AAA can be used on a Cisco device you must enter the command 'aaa new-model'.",
+              "answer": "true",
+              "explanation": "aaa new-model enables all AAA commands; it automatically applies 'aaa authentication login default local' if nothing else is configured.",
+              "tags": ["aaa", "configuration"]
+            }
+          ]
+        },
+        {
+          "id": "aaa-config",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SEC-AAA-CFG-001",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "Write the commands to enable AAA on login with a RADIUS server 10.2.2.2 (secret cisco123) and fall back to local authentication.",
+              "answer": "R1(config)# aaa new-model\nR1(config)# radius server RADIUS-PROD\nR1(config-radius-server)# address ipv4 10.2.2.2\nR1(config-radius-server)# key cisco123\nR1(config)# aaa authentication login default group radius local",
+              "explanation": "The 'default' method list applies to all lines that don't have a named list. Fallback order matters: 'group radius local' tries the server first, then the local DB.",
+              "tags": ["aaa", "configuration", "radius"],
+              "commands": [
+                "aaa new-model",
+                "radius server RADIUS-PROD",
+                "address ipv4 10.2.2.2",
+                "key cisco123",
+                "aaa authentication login default group radius local"
+              ],
+              "acceptableAnswers": [
+                "aaa new model, radius server config, group radius local"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sec-hardening",
+          "name": "Device Hardening",
+          "questions": [
+            {
+              "id": "SEC-HRD-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Name at least four common switch/router hardening measures.",
+              "answer": "Examples: SSH instead of telnet, disable unused services (http server, snmp if unused), strong passwords (secret not password, maybe type 6/9), login block-for on failed attempts, exec-timeout, banner motd, enable secret with encryption, restrict management (ACL + specific VTY lines), control plane policing, edge port security + DHCP snooping.",
+              "explanation": "For CCNP focus on: enable secret, vty transport input ssh, exec-timeout, service password-encryption (weak vs type 6), login block-for, no ip http server, ACLs on VTY access.",
+              "tags": ["security", "hardening", "management"],
+              "acceptableAnswers": [
+                "ssh only, disable http, enable secret, timeout, banner, vty acl",
+                "disable unused services and use strong management"
+              ]
+            },
+            {
+              "id": "SEC-HRD-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which command prevents brute-force SSH attempts on the VTY lines by blocking a source after repeated failed logins?",
+              "choices": [
+                "login block-for 120 attempts 3 within 60",
+                "ip ssh failed-authentication 3",
+                "login local 3",
+                "aaa authentication attempts 3"
+              ],
+              "answer": "login block-for 120 attempts 3 within 60",
+              "explanation": "This global command temporarily blocks the source IP for 120 s after 3 failed attempts within a 60 s window. Show state: 'show login'. Also relevant: 'ip ssh maxstartups'.",
+              "tags": ["security", "vty", "brute-force"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

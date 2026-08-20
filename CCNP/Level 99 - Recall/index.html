@@ -1,0 +1,3884 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networking Recall</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c1320'/%3E%3Ctext x='16' y='22' font-size='15' font-family='monospace' fill='%233ddc84' text-anchor='middle'%3ENR%3C/text%3E%3C/svg%3E">
+
+<script>
+window.__vueFailed = false;
+</script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"
+        onload="window.__vueLoaded = true; window.__vueFailed = false;"
+        onerror="window.__vueFailed = true; var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js'; s.onload = function(){ window.__vueLoaded = true; window.__vueFailed = false; }; s.onerror = function(){ window.__vueFailed = true; }; document.head.appendChild(s);"></script>
+
+<style>
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+:root, [data-theme="dark"] {
+  --bg0: #070b11;
+  --bg1: #0c1320;
+  --bg2: #101a2b;
+  --card: #0e1626;
+  --card2: #132035;
+  --card3: #182742;
+  --line: #1b293d;
+  --line2: #253650;
+  --t0: #e9eff8;
+  --t1: #aebccf;
+  --t2: #71829b;
+  --t3: #4b5a70;
+  --green: #3ddc84;
+  --green-dim: #1f7a4e;
+  --red: #ff5d6c;
+  --red-dim: #8a2e3a;
+  --amber: #ffb454;
+  --amber-dim: #8a5f24;
+  --blue: #4da3ff;
+  --blue-dim: #24558f;
+  --cyan: #3ecfd6;
+  --cyan-dim: #1f6f74;
+  --purple: #a98bff;
+  --purple-dim: #5d4a99;
+  --pink: #ff7eb0;
+  --orange: #ff9040;
+  --term-bg: #04070c;
+  --term-line: #1b2436;
+  --shadow: 0 8px 24px rgba(0,0,0,.35);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --sans: -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sidebar-w: 232px;
+  --ok: var(--green);
+  --bad: var(--red);
+}
+[data-theme="light"] {
+  --bg0: #eef1f6;
+  --bg1: #f7f9fc;
+  --bg2: #e6ebf3;
+  --card: #ffffff;
+  --card2: #f1f4f9;
+  --card3: #e6ebf4;
+  --line: #d5dde8;
+  --line2: #bcc8d8;
+  --t0: #141b26;
+  --t1: #3d4a5c;
+  --t2: #64748a;
+  --t3: #94a3b8;
+  --green: #12905a;
+  --green-dim: #c9f0dc;
+  --red: #d33547;
+  --red-dim: #f8d3d8;
+  --amber: #b26a10;
+  --amber-dim: #f7e2c4;
+  --blue: #1f6fd6;
+  --blue-dim: #cfe3fb;
+  --cyan: #0f7f86;
+  --cyan-dim: #c9eef0;
+  --purple: #6d4fd1;
+  --purple-dim: #e2dafb;
+  --pink: #c2407c;
+  --orange: #c96a12;
+  --term-bg: #f4f6fa;
+  --term-line: #dfe6f0;
+  --shadow: 0 8px 24px rgba(30,41,59,.12);
+}
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg0);
+  color: var(--t0);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+[v-cloak] { display: none !important; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { margin: 0 0 .4em; font-weight: 650; line-height: 1.25; }
+h1 { font-size: 21px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--t2); margin-bottom: .5em; }
+p { margin: 0 0 .8em; }
+code { font-family: var(--mono); font-size: .92em; background: var(--bg1); border: 1px solid var(--line); border-radius: 4px; padding: .05em .35em; color: var(--cyan); }
+kbd {
+  font-family: var(--mono); font-size: 10.5px; color: var(--t2);
+  background: var(--bg1); border: 1px solid var(--line2); border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 5px; margin-left: 4px;
+}
+::selection { background: var(--blue-dim); color: var(--t0); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 6px; border: 2px solid var(--bg0); }
+::-webkit-scrollbar-thumb:hover { background: var(--t3); }
+input, select, textarea, button { font-family: inherit; font-size: 14px; color: var(--t0); }
+.mono { font-family: var(--mono); }
+.muted { color: var(--t2); }
+.small { font-size: 12px; }
+.center { text-align: center; }
+.nowrap { white-space: nowrap; }
+
+/* ============================================================
+   3. LAYOUT
+   ============================================================ */
+.app { min-height: 100vh; display: flex; }
+.sidebar {
+  width: var(--sidebar-w);
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 40;
+  background: var(--bg1);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  transition: transform .22s ease;
+}
+.sidebar .brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.brand-mark {
+  width: 36px; height: 36px; flex: 0 0 36px;
+  border-radius: 8px; background: linear-gradient(135deg, var(--green-dim), var(--blue-dim));
+  border: 1px solid var(--line2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--t0);
+}
+.brand-name { font-weight: 700; font-size: 13.5px; letter-spacing: .02em; }
+.brand-sub { font-size: 11px; color: var(--t2); font-family: var(--mono); }
+.sidebar nav { flex: 1; overflow-y: auto; padding: 10px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; margin-bottom: 2px;
+  border-radius: var(--radius-sm);
+  color: var(--t1); cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 13.5px; font-weight: 500;
+  user-select: none;
+}
+.nav-item:hover { background: var(--bg2); color: var(--t0); }
+.nav-item.active { background: var(--card3); color: var(--t0); border-color: var(--line2); }
+.nav-icon { width: 20px; text-align: center; color: var(--t2); font-size: 14px; }
+.nav-item.active .nav-icon { color: var(--green); }
+.nav-badge {
+  margin-left: auto; font-family: var(--mono); font-size: 11px;
+  background: var(--red-dim); color: var(--red);
+  border-radius: 999px; padding: 1px 7px; border: 1px solid var(--line2);
+}
+.sidebar-foot {
+  border-top: 1px solid var(--line); padding: 12px 14px;
+  font-size: 11.5px; color: var(--t2); font-family: var(--mono);
+}
+.sidebar-foot div { margin-bottom: 3px; }
+.sidebar-close { display: none; }
+.main {
+  flex: 1; min-width: 0;
+  margin-left: var(--sidebar-w);
+  padding: 26px 30px 70px;
+}
+.topbar {
+  display: none;
+  position: sticky; top: 0; z-index: 30;
+  background: var(--bg1); border-bottom: 1px solid var(--line);
+  padding: 10px 14px; align-items: center; gap: 12px;
+}
+.topbar .brand-name { font-size: 14px; }
+.topbar .hamburger, .sidebar-close {
+  background: transparent; border: 1px solid var(--line); color: var(--t1);
+  border-radius: var(--radius-sm); padding: 4px 10px; cursor: pointer; font-size: 15px;
+}
+.topbar .hamburger:hover { color: var(--t0); border-color: var(--line2); }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 35;
+  background: rgba(0,0,0,.5);
+}
+.page { max-width: 1100px; margin: 0 auto; animation: fadeIn .18s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.page-head { margin-bottom: 20px; }
+.page-head p { color: var(--t2); margin: 2px 0 0; font-size: 13px; }
+.page-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  color: var(--t2); font-size: 13px; margin-bottom: 10px;
+  background: transparent; border: none; padding: 2px 0;
+}
+.back-link:hover { color: var(--t0); }
+.section-title { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--t2); margin: 26px 0 12px; font-weight: 700; }
+
+/* ============================================================
+   4. CARDS, GRIDS, STATS
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.card + .card { margin-top: 14px; }
+.card-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+@media (max-width: 900px) {
+  .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) { .grid-3 { grid-template-columns: 1fr; } }
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.stat-card .stat-value { font-size: 26px; font-weight: 700; font-family: var(--mono); letter-spacing: -.02em; }
+.stat-card .stat-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--t2); margin-top: 2px; }
+.stat-card .stat-sub { font-size: 11.5px; color: var(--t2); margin-top: 4px; }
+.stat-card.accent { border-color: var(--line2); background: linear-gradient(180deg, var(--card2), var(--card)); }
+.stat-value.ok { color: var(--green); }
+.stat-value.warn { color: var(--amber); }
+.stat-value.bad { color: var(--red); }
+.stat-value.info { color: var(--blue); }
+.dash-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.dash-cols { display: grid; grid-template-columns: 1fr 1.4fr; gap: 14px; align-items: start; }
+@media (max-width: 900px) { .dash-cols { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   5. BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--bg2); color: var(--t0);
+  border: 1px solid var(--line2); border-radius: var(--radius-sm);
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: background .12s, border-color .12s, transform .05s;
+}
+.btn:hover { background: var(--card3); border-color: var(--t3); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--green-dim); border-color: var(--green); color: #eafff2; }
+.btn-primary:hover { background: var(--green); color: #04150c; }
+.btn-danger { background: var(--red-dim); border-color: var(--red); color: #ffe9ec; }
+.btn-danger:hover { background: var(--red); color: #2a0409; }
+.btn-ghost { background: transparent; }
+.btn-lg { padding: 10px 20px; font-size: 14px; }
+.btn-sm { padding: 4px 9px; font-size: 12px; }
+.btn .key-hint { opacity: .7; font-family: var(--mono); font-size: 11px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.seg .seg-btn {
+  background: var(--bg1); color: var(--t1);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 5px 12px; font-size: 12.5px; cursor: pointer; font-weight: 600;
+}
+.seg .seg-btn:hover { color: var(--t0); border-color: var(--line2); }
+.seg .seg-btn.on { background: var(--card3); border-color: var(--blue); color: var(--blue); }
+.seg .seg-btn.danger-on { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+/* ============================================================
+   6. BADGES & BARS
+   ============================================================ */
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  border: 1px solid var(--line2); border-radius: 999px; padding: 2px 9px;
+  color: var(--t1); background: var(--bg1);
+}
+.badge.type-recall { color: var(--blue); border-color: var(--blue-dim); background: var(--blue-dim); }
+.badge.type-multiple_choice { color: var(--cyan); border-color: var(--cyan-dim); background: var(--cyan-dim); }
+.badge.type-true_false { color: var(--cyan); border-color: var(--cyan-dim); background: var(--cyan-dim); }
+.badge.type-fill_blank { color: var(--purple); border-color: var(--purple-dim); background: var(--purple-dim); }
+.badge.type-command { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-dim); }
+.badge.type-configuration { color: var(--purple); border-color: var(--purple-dim); background: var(--purple-dim); }
+.badge.type-troubleshooting { color: var(--red); border-color: var(--red-dim); background: var(--red-dim); }
+.badge.type-scenario { color: var(--orange); border-color: var(--amber-dim); background: var(--amber-dim); }
+.badge.type-compare { color: var(--pink); border-color: var(--line2); background: var(--bg1); }
+.badge.type-explain { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.badge.type-packet_flow { color: var(--blue); border-color: var(--blue-dim); background: var(--blue-dim); }
+.badge.type-show_command { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-dim); }
+.badge.diff-easy { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.badge.diff-medium { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-dim); }
+.badge.diff-hard { color: var(--red); border-color: var(--red-dim); background: var(--red-dim); }
+.badge.ok { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.badge.bad { color: var(--red); border-color: var(--red-dim); background: var(--red-dim); }
+.bar { height: 7px; background: var(--bg1); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue-dim), var(--blue)); transition: width .3s ease; }
+.bar-fill.ok { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+.bar-fill.warn { background: linear-gradient(90deg, var(--amber-dim), var(--amber)); }
+.bar-fill.bad { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
+.bar-fill.purple { background: linear-gradient(90deg, var(--purple-dim), var(--purple)); }
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.bar-row .bar-label { width: 170px; flex: 0 0 170px; font-size: 12.5px; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-row .bar { flex: 1; }
+.bar-row .bar-num { width: 42px; flex: 0 0 42px; text-align: right; font-family: var(--mono); font-size: 12px; color: var(--t2); }
+
+/* ============================================================
+   7. TABLES & LISTS
+   ============================================================ */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--t2); padding: 6px 10px; border-bottom: 1px solid var(--line2); font-weight: 700;
+}
+.table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: var(--bg1); }
+.list-plain { list-style: none; margin: 0; padding: 0; }
+.list-plain li { padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.list-plain li:last-child { border-bottom: none; }
+
+/* ============================================================
+   8. CHAPTERS & TOPICS
+   ============================================================ */
+.chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.chapter-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; cursor: pointer; transition: border-color .12s, transform .12s;
+}
+.chapter-card:hover { border-color: var(--line2); transform: translateY(-1px); }
+.chapter-card h3 { margin-bottom: 3px; }
+.chapter-card .ch-ids { font-family: var(--mono); font-size: 11px; color: var(--t3); }
+.chapter-card .ch-meta { display: flex; gap: 14px; font-size: 12px; color: var(--t2); margin: 8px 0 10px; flex-wrap: wrap; }
+.chapter-card .ch-meta b { color: var(--t0); font-family: var(--mono); font-weight: 600; }
+.topic-block { margin-bottom: 20px; }
+.topic-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: var(--card2); border: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.topic-head .topic-name { font-weight: 700; font-size: 14.5px; }
+.topic-head .topic-count { font-family: var(--mono); font-size: 12px; color: var(--t2); }
+.topic-body { border: 1px solid var(--line); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+.subtopic-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; border-top: 1px solid var(--line);
+  font-size: 13px; color: var(--t1);
+}
+.subtopic-row:first-child { border-top: none; }
+.subtopic-row .sub-name { flex: 1; }
+.subtopic-row:hover { background: var(--bg1); }
+.subtopic-row .sub-count { font-family: var(--mono); font-size: 12px; color: var(--t3); }
+.tree-glyph { font-family: var(--mono); color: var(--t3); font-size: 12px; }
+.practice-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--card2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 18px;
+}
+.practice-bar .pb-label { font-size: 12px; color: var(--t2); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+.practice-bar select, .filter-bar select {
+  background: var(--bg1); border: 1px solid var(--line2); border-radius: var(--radius-sm);
+  padding: 5px 8px; font-size: 12.5px; color: var(--t0);
+}
+.practice-bar input[type=number] {
+  background: var(--bg1); border: 1px solid var(--line2); border-radius: var(--radius-sm);
+  padding: 5px 8px; width: 70px; font-size: 12.5px; font-family: var(--mono);
+}
+.checkbox-line { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--t1); cursor: pointer; user-select: none; }
+.checkbox-line input { accent-color: var(--green); }
+
+/* ============================================================
+   9. QUESTION PANEL
+   ============================================================ */
+.q-panel { }
+.q-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.q-crumb { font-family: var(--mono); font-size: 11.5px; color: var(--t2); }
+.q-tags { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; }
+.q-tag { font-family: var(--mono); font-size: 10.5px; color: var(--t3); background: var(--bg1); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+.q-text { font-size: 16.5px; font-weight: 600; line-height: 1.55; margin: 4px 0 16px; }
+.q-scenario {
+  background: var(--bg1); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 13px 15px; margin-bottom: 14px;
+}
+.q-scenario h4 { margin-top: 10px; }
+.q-scenario h4:first-child { margin-top: 0; }
+.q-scenario .sym-list { margin: 0; padding-left: 18px; font-size: 13px; color: var(--t1); }
+.q-scenario .sym-list li { margin-bottom: 3px; }
+.q-scenario .sym-list li::marker { color: var(--red); }
+.q-scenario .topo-text { font-size: 13px; color: var(--t1); margin: 0; }
+.mc-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.mc-opt {
+  display: flex; align-items: center; gap: 10px;
+  text-align: left; background: var(--bg1); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 10px 13px; cursor: pointer;
+  font-size: 13.5px; color: var(--t0); width: 100%;
+}
+.mc-opt .mc-letter {
+  flex: 0 0 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line2); border-radius: 50%;
+  font-family: var(--mono); font-size: 11px; color: var(--t2);
+}
+.mc-opt:hover { border-color: var(--line2); background: var(--bg2); }
+.mc-opt.selected { border-color: var(--blue); background: var(--blue-dim); }
+.mc-opt.selected .mc-letter { color: var(--blue); border-color: var(--blue); }
+.mc-opt.right { border-color: var(--green); background: var(--green-dim); color: var(--t0); }
+.mc-opt.right .mc-letter { color: var(--green); border-color: var(--green); }
+.mc-opt.wrong { border-color: var(--red); background: var(--red-dim); color: var(--t0); }
+.mc-opt.wrong .mc-letter { color: var(--red); border-color: var(--red); }
+.mc-opt.dim { opacity: .55; }
+.tf-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.tf-opt {
+  flex: 1; padding: 12px; font-size: 14px; font-weight: 700;
+  background: var(--bg1); border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer;
+}
+.tf-opt:hover { border-color: var(--line2); }
+.tf-opt.selected-true { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.tf-opt.selected-false { border-color: var(--red); background: var(--red-dim); color: var(--red); }
+.input-row { margin-bottom: 14px; }
+.input-row input[type=text], .input-row input:not([type]) {
+  width: 100%; background: var(--bg1); border: 1px solid var(--line2); border-radius: var(--radius-sm);
+  padding: 9px 12px; color: var(--t0);
+}
+.input-row input:focus, .input-row textarea:focus, .term-input textarea:focus { outline: none; border-color: var(--blue); }
+.term-input { margin-bottom: 10px; }
+.term-input textarea, .free-input textarea {
+  width: 100%; background: var(--term-bg); color: var(--cyan);
+  border: 1px solid var(--term-line); border-radius: var(--radius-sm);
+  padding: 11px 12px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
+  resize: vertical; min-height: 86px; caret-color: var(--green);
+}
+.free-input textarea { color: var(--t0); }
+.term-hint { font-size: 11.5px; color: var(--t3); margin: 5px 2px 0; font-family: var(--mono); }
+.reveal-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+.reveal-block { margin-top: 16px; animation: fadeIn .18s ease; }
+
+/* ============================================================
+   10. TERMINAL / CODE BLOCK
+   ============================================================ */
+.terminal {
+  background: var(--term-bg); border: 1px solid var(--term-line); border-radius: var(--radius-sm);
+  margin: 6px 0 12px; overflow: hidden;
+}
+.terminal-head {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg1); border-bottom: 1px solid var(--term-line);
+  padding: 5px 10px;
+}
+.term-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line2); }
+.term-dot:first-child { background: var(--red); opacity: .8; }
+.term-dot:nth-child(2) { background: var(--amber); opacity: .8; }
+.term-dot:nth-child(3) { background: var(--green); opacity: .8; }
+.terminal-title { font-family: var(--mono); font-size: 10.5px; color: var(--t3); margin-left: 6px; flex: 1; }
+.copy-btn {
+  font-family: var(--mono); font-size: 10.5px; color: var(--t2);
+  background: transparent; border: 1px solid var(--line); border-radius: 4px;
+  padding: 1px 8px; cursor: pointer;
+}
+.copy-btn:hover { color: var(--green); border-color: var(--green); }
+.terminal-body {
+  padding: 10px 12px; overflow-x: auto;
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.65; color: var(--t1);
+  white-space: pre; margin: 0;
+}
+.terminal-body .prompt { color: var(--green); font-weight: 700; }
+.terminal-body .cmd { color: var(--t0); }
+
+/* ============================================================
+   11. REVEAL / VERDICT / RATING
+   ============================================================ */
+.verdict {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: 13px;
+  border-radius: var(--radius-sm); padding: 6px 14px; margin-bottom: 14px;
+}
+.verdict.ok { background: var(--green-dim); color: var(--green); }
+.verdict.no { background: var(--red-dim); color: var(--red); }
+.verdict.part { background: var(--amber-dim); color: var(--amber); }
+.answer-box { margin-bottom: 14px; }
+.answer-box h4 { margin-bottom: 6px; }
+.answer-box pre {
+  margin: 0; white-space: pre-wrap; word-break: break-word;
+  background: var(--bg1); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 10px 12px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+}
+.answer-box.user pre { border-color: var(--line2); color: var(--t1); }
+.answer-box.correct pre { color: var(--t0); }
+.explanation-box { margin-bottom: 14px; }
+.explanation-box p { margin: 0; font-size: 13.5px; color: var(--t1); line-height: 1.65; }
+.hints-box { margin-bottom: 14px; }
+.hints-box ul { margin: 8px 0 0; padding-left: 18px; color: var(--t1); font-size: 13px; }
+.hints-box li { margin-bottom: 4px; }
+.refs-box { margin-bottom: 14px; }
+.refs-box ul { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--t2); }
+.cmd-compare { font-size: 12.5px; margin-bottom: 12px; }
+.cmd-compare .cm-missing { color: var(--red); }
+.cmd-compare .cm-extra { color: var(--amber); }
+.rating-row {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  padding-top: 14px; border-top: 1px solid var(--line);
+}
+.rating-btn {
+  flex: 1; min-width: 110px; padding: 11px 10px;
+  border-radius: var(--radius-sm); border: 1px solid; cursor: pointer;
+  font-weight: 700; font-size: 13.5px; text-align: center;
+  transition: transform .05s;
+}
+.rating-btn:active { transform: translateY(1px); }
+.rating-btn .rb-sub { display: block; font-weight: 500; font-size: 11px; opacity: .75; margin-top: 2px; }
+.rating-again { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+.rating-hard { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+.rating-good { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+.rating-easy { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.rating-btn:hover { filter: brightness(1.15); }
+
+/* ============================================================
+   12. SESSION
+   ============================================================ */
+.session-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.session-count { font-family: var(--mono); font-size: 14px; color: var(--t0); font-weight: 700; }
+.session-count .sc-total { color: var(--t2); font-weight: 400; }
+.session-mode { font-size: 12px; color: var(--t2); font-family: var(--mono); }
+.session-top .grow { flex: 1; }
+.session-bar { height: 4px; background: var(--bg1); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
+.session-bar .bar-fill { height: 100%; }
+.session-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
+.summary-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.missed-list { margin-top: 16px; max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.missed-item { padding: 8px 12px; font-size: 12.5px; border-bottom: 1px solid var(--line); color: var(--t1); cursor: pointer; }
+.missed-item:last-child { border-bottom: none; }
+.missed-item:hover { background: var(--bg1); }
+.missed-item .mi-qid { font-family: var(--mono); color: var(--red); margin-right: 8px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--t2); }
+.empty-state .es-icon { font-size: 30px; margin-bottom: 8px; color: var(--t3); }
+.empty-state .es-title { font-weight: 700; color: var(--t1); font-size: 14px; margin-bottom: 4px; }
+
+/* ============================================================
+   13. EXAM
+   ============================================================ */
+.exam-head {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 11px 16px; margin-bottom: 14px;
+}
+.exam-head .eh-item { display: flex; flex-direction: column; }
+.exam-head .eh-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--t2); }
+.exam-head .eh-value { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+.exam-head .timer { color: var(--blue); }
+.exam-head .timer.urgent { color: var(--red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+.palette { display: flex; gap: 6px; flex-wrap: wrap; }
+.palette .p-cell {
+  width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; cursor: pointer;
+  background: var(--bg1); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  color: var(--t1);
+}
+.palette .p-cell.current { border-color: var(--blue); color: var(--blue); }
+.palette .p-cell.answered { background: var(--green-dim); color: var(--green); border-color: var(--green-dim); }
+.palette .p-cell.marked { box-shadow: 0 0 0 2px var(--amber); }
+.palette .p-cell:hover { border-color: var(--line2); }
+.exam-foot { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+.score-ring {
+  width: 150px; height: 150px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: conic-gradient(var(--green) calc(var(--score) * 1%), var(--bg1) 0);
+  position: relative; margin: 0 auto 10px;
+}
+.score-ring::before { content: ""; position: absolute; inset: 10px; background: var(--card); border-radius: 50%; }
+.score-ring .score-val { position: relative; font-family: var(--mono); font-size: 34px; font-weight: 700; }
+.score-ring .score-sub { position: relative; font-size: 11px; color: var(--t2); text-transform: uppercase; letter-spacing: .08em; }
+.weak-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.weak-chip {
+  font-size: 12px; padding: 5px 12px; border-radius: 999px;
+  background: var(--red-dim); border: 1px solid var(--red); color: var(--red); font-weight: 600;
+}
+.exam-review-item { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 12px; }
+.exam-review-item .eri-head { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.exam-review-item .eri-q { font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
+.exam-review-item .eri-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .exam-review-item .eri-body { grid-template-columns: 1fr; } }
+.exam-review-item .eri-ans { font-size: 12.5px; }
+.exam-review-item .eri-ans .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--t2); font-weight: 700; display: block; margin-bottom: 3px; }
+.exam-review-item .eri-ans pre { margin: 0; white-space: pre-wrap; font-family: var(--mono); font-size: 12px; background: var(--bg1); border-radius: 4px; padding: 7px 9px; border: 1px solid var(--line); }
+.flag-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--t1); cursor: pointer; user-select: none; }
+.flag-toggle .flag-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg1); border: 1px solid var(--line2); }
+.flag-toggle.on .flag-dot { background: var(--amber); border-color: var(--amber); }
+
+/* ============================================================
+   14. WEAK TOPICS / PROGRESS
+   ============================================================ */
+.weak-list { display: flex; flex-direction: column; gap: 10px; }
+.weak-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.weak-item .wi-info { flex: 1; min-width: 0; }
+.weak-item .wi-name { font-weight: 700; font-size: 13.5px; }
+.weak-item .wi-sub { font-size: 12px; color: var(--t2); font-family: var(--mono); }
+.weak-item .wi-stats { text-align: right; font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.weak-item .wi-stats .acc { font-size: 18px; font-weight: 700; }
+.weak-item .wi-stats .acc.bad { color: var(--red); }
+.weak-item .wi-stats .acc.warn { color: var(--amber); }
+.weak-item .wi-stats .acc.ok { color: var(--green); }
+.weak-item .wi-stats .att { color: var(--t2); font-size: 11px; }
+.activity-chart { display: flex; align-items: flex-end; gap: 5px; height: 120px; padding: 10px 4px 0; }
+.activity-chart .ac-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.activity-chart .ac-bar-wrap { width: 100%; height: 90px; display: flex; align-items: flex-end; }
+.activity-chart .ac-bar { width: 100%; background: linear-gradient(180deg, var(--blue), var(--blue-dim)); border-radius: 3px 3px 0 0; min-height: 2px; }
+.activity-chart .ac-bar.correct { background: linear-gradient(180deg, var(--green), var(--green-dim)); }
+.activity-chart .ac-label { font-family: var(--mono); font-size: 9.5px; color: var(--t3); }
+.legend { display: flex; gap: 14px; font-size: 11.5px; color: var(--t2); margin-top: 6px; }
+.legend .lg { display: inline-flex; align-items: center; gap: 5px; }
+.legend .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ============================================================
+   15. FILTERS / SEARCH / BROWSE
+   ============================================================ */
+.filter-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  background: var(--card2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 14px;
+}
+.filter-bar .fb-field { display: flex; flex-direction: column; gap: 3px; }
+.filter-bar .fb-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--t2); font-weight: 700; }
+.filter-bar select, .filter-bar input {
+  background: var(--bg1); border: 1px solid var(--line2); border-radius: var(--radius-sm);
+  padding: 5px 8px; font-size: 12.5px; color: var(--t0); max-width: 170px;
+}
+.search-box { position: relative; flex: 1; min-width: 220px; }
+.search-box input { width: 100%; padding: 8px 12px 8px 32px; font-size: 13.5px; }
+.search-box .search-glyph { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: 13px; }
+.qlist-item { border: 1px solid var(--line); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+.qlist-item .qli-head {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; font-size: 13px;
+}
+.qlist-item .qli-head:hover { background: var(--bg1); }
+.qlist-item .qli-q { flex: 1; color: var(--t0); font-weight: 500; }
+.qlist-item .qli-body { padding: 0 12px 12px; }
+.search-group { margin-bottom: 18px; }
+.search-group .sg-head { font-size: 12.5px; color: var(--t2); margin-bottom: 8px; font-family: var(--mono); }
+.search-group .sg-head b { color: var(--t0); }
+.tag-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag-chip {
+  font-family: var(--mono); font-size: 11px; cursor: pointer; user-select: none;
+  color: var(--t2); background: var(--bg1); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px;
+}
+.tag-chip.on { color: var(--cyan); border-color: var(--cyan-dim); background: var(--cyan-dim); }
+.tag-chip:hover { border-color: var(--line2); }
+
+/* ============================================================
+   16. SETTINGS
+   ============================================================ */
+.settings-section { margin-bottom: 18px; }
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 11px 0; border-bottom: 1px solid var(--line);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row .sr-info { font-size: 13px; }
+.setting-row .sr-info .sr-desc { font-size: 11.5px; color: var(--t2); margin-top: 2px; }
+.switch { position: relative; width: 40px; height: 22px; flex: 0 0 40px; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: var(--bg1); border: 1px solid var(--line2); transition: background .15s;
+}
+.switch .slider::before {
+  content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  left: 2px; top: 2px; background: var(--t2); transition: transform .15s, background .15s;
+}
+.switch input:checked + .slider { background: var(--green-dim); border-color: var(--green); }
+.switch input:checked + .slider::before { transform: translateX(18px); background: var(--green); }
+.data-source-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 12.5px; font-family: var(--mono); }
+.data-source-row .ds-status { margin-left: auto; }
+.ds-status .ok { color: var(--green); }
+.ds-status .err { color: var(--red); }
+.ds-err { font-size: 11px; color: var(--red); font-family: var(--mono); word-break: break-all; }
+
+/* ============================================================
+   17. MODAL / TOAST / LOADING / NOTICES
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(4, 8, 14, .66);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: fadeIn .15s ease;
+}
+.modal-card {
+  background: var(--card); border: 1px solid var(--line2); border-radius: var(--radius);
+  max-width: 460px; width: 100%; padding: 20px; box-shadow: var(--shadow);
+}
+.modal-card h3 { margin-bottom: 8px; }
+.modal-card p { color: var(--t1); font-size: 13px; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.toast-host { position: fixed; right: 18px; bottom: 18px; z-index: 120; display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
+.toast {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--card2); border: 1px solid var(--line2); border-left: 3px solid var(--blue);
+  border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12.5px; color: var(--t0);
+  box-shadow: var(--shadow); animation: slideIn .18s ease;
+}
+.toast.ok { border-left-color: var(--green); }
+.toast.err { border-left-color: var(--red); }
+.toast.warn { border-left-color: var(--amber); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.load-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; }
+.spinner {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--line2); border-top-color: var(--green);
+  animation: spin .8s linear infinite; margin-bottom: 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.notice { border: 1px solid; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12.5px; margin-bottom: 14px; }
+.notice.warn { border-color: var(--amber-dim); background: var(--amber-dim); color: var(--amber); }
+.notice.err { border-color: var(--red-dim); background: var(--red-dim); color: var(--red); }
+.notice.ok { border-color: var(--green-dim); background: var(--green-dim); color: var(--green); }
+.notice.info { border-color: var(--blue-dim); background: var(--blue-dim); color: var(--blue); }
+.error-box { text-align: left; font-size: 12px; color: var(--red); }
+.error-box div { padding: 3px 0; font-family: var(--mono); }
+
+/* ============================================================
+   18. RESPONSIVE
+   ============================================================ */
+@media (max-width: 980px) {
+  .sidebar { transform: translateX(-100%); box-shadow: var(--shadow); }
+  .sidebar.open { transform: none; }
+  .sidebar-close { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: auto; }
+  .sidebar-overlay.show { display: block; }
+  .main { margin-left: 0; padding: 18px 16px 60px; }
+  .topbar { display: flex; }
+  .bar-row .bar-label { width: 120px; flex-basis: 120px; }
+}
+@media (max-width: 520px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .rating-row { flex-direction: column; }
+  .rating-btn { min-width: 0; }
+  .page-head h1 { font-size: 18px; }
+  .chapter-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<body>
+<noscript><div style="padding:40px; text-align:center; font-family: sans-serif">Networking Recall requires JavaScript. Please enable it and reload.</div></noscript>
+
+<div id="app" v-cloak>
+
+  <template v-if="$G.store.vueError">
+    <div class="load-page" style="min-height:100vh">
+      <div class="es-icon">&#9888;</div>
+      <h2>Vue.js could not be loaded</h2>
+      <p class="muted">This application needs the Vue 3 library (loaded from a CDN). Check your internet connection, then retry.</p>
+      <button class="btn btn-primary" @click="$G.UI.reload()">Retry</button>
+    </div>
+  </template>
+
+  <template v-else-if="!$G.store.appReady">
+    <div class="load-page">
+      <div class="spinner"></div>
+      <h2>Loading question banks...</h2>
+      <p class="muted">Networking Recall</p>
+
+      <div class="notice warn" v-if="$G.store.fileProtocol" style="max-width:560px; text-align:left">
+        <b>Opening from the filesystem (file://).</b> Some browsers block fetch() of local JSON files, which prevents the
+        question banks from loading. This application works best served over HTTP or inside an Obsidian web-view. Options:
+        <div style="font-family:var(--mono); margin-top:8px; font-size:11.5px; line-height:1.8">
+          &#8226; From a terminal: <code>python3 -m http.server 8000</code> in this folder, then open
+          <code>http://localhost:8000/index.html</code><br>
+          &#8226; In Obsidian: use a web-view plugin (e.g. &#8220;HTML&#8221; by jjspace) to open this file<br>
+          &#8226; Or use Firefox, which permits local file fetch() by default
+        </div>
+      </div>
+
+      <div class="card" style="text-align:left; min-width:300px; max-width:560px" v-if="$G.store.loadErrors.length || $G.store.validationErrors.length">
+        <div class="card-title">
+          <h3>Data loading report</h3>
+          <button class="btn btn-sm btn-ghost" @click="$G.DataStore.loadAll()">Retry load</button>
+        </div>
+        <div class="notice err" v-if="$G.store.loadErrors.length">
+          <b>Failed to load {{ $G.store.loadErrors.length }} file(s):</b>
+          <div class="error-box">
+            <div v-for="e in $G.store.loadErrors" :key="e.file">&#8226; {{ e.file }} — {{ e.message }}</div>
+          </div>
+        </div>
+        <div class="notice warn" v-if="$G.store.validationErrors.length">
+          <b>Validation issues in {{ $G.store.validationErrors.length }} question(s):</b>
+          <div class="error-box" style="color:var(--amber)">
+            <div v-for="(v, i) in $G.store.validationErrors.slice(0, 12)" :key="i">
+              &#8226; [{{ v.file }}] {{ v.questionId || v.file }}: {{ v.problem }}
+            </div>
+            <div v-if="$G.store.validationErrors.length > 12" class="muted">... and {{ $G.store.validationErrors.length - 12 }} more</div>
+          </div>
+        </div>
+        <div class="notice info" v-if="$G.store.loadErrors.length && $G.store.questions.length">
+          <b>{{ $G.store.questions.length }} questions loaded</b> from the other files — the application is usable.
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template v-else>
+    <header class="topbar">
+      <button class="hamburger" @click="$G.UI.toggleSidebar()">&#9776;</button>
+      <div class="brand-name">NETWORKING RECALL</div>
+      <span class="badge bad" style="margin-left:auto" v-if="$G.store.dueCount() > 0">{{ $G.store.dueCount() }} due</span>
+    </header>
+    <div class="sidebar-overlay" :class="{show: $G.store.ui.sidebarOpen}" @click="$G.UI.toggleSidebar(false)"></div>
+    <aside class="sidebar" :class="{open: $G.store.ui.sidebarOpen}">
+      <div class="brand">
+        <div class="brand-mark">NR</div>
+        <div>
+          <div class="brand-name">NETWORKING RECALL</div>
+          <div class="brand-sub">active recall &middot; spaced repetition</div>
+        </div>
+        <button class="sidebar-close" @click="$G.UI.toggleSidebar(false)">&#10005;</button>
+      </div>
+      <nav>
+        <div class="nav-item" v-for="item in $G.NAV" :key="item.view"
+             :class="{active: $G.store.view === item.view}"
+             @click="$G.UI.go(item.view)">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+          <span class="nav-badge" v-if="item.view === 'review' && $G.store.dueCount() > 0">{{ $G.store.dueCount() }}</span>
+        </div>
+      </nav>
+      <div class="sidebar-foot">
+        <div>{{ $G.store.questions.length }} questions &middot; {{ $G.store.chapters.length }} chapters</div>
+        <div>streak {{ $G.Stats.streak().current }}d &middot; {{ $G.Storage.state.settings.theme }} theme</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <dashboard-view v-show="$G.store.view === 'dashboard'"></dashboard-view>
+      <chapters-view v-show="$G.store.view === 'chapters'"></chapters-view>
+      <topics-view v-show="$G.store.view === 'topics'"></topics-view>
+      <review-view v-show="$G.store.view === 'review'"></review-view>
+      <random-view v-show="$G.store.view === 'random'"></random-view>
+      <exam-view v-show="$G.store.view === 'exam'"></exam-view>
+      <trouble-view v-show="$G.store.view === 'trouble'"></trouble-view>
+      <weak-view v-show="$G.store.view === 'weak'"></weak-view>
+      <progress-view v-show="$G.store.view === 'progress'"></progress-view>
+      <browse-view v-show="$G.store.view === 'browse'"></browse-view>
+      <search-view v-show="$G.store.view === 'search'"></search-view>
+      <settings-view v-show="$G.store.view === 'settings'"></settings-view>
+    </main>
+  </template>
+
+  <confirm-modal></confirm-modal>
+  <toast-host></toast-host>
+</div>
+
+<script>
+/* ============================================================
+   NETWORKING RECALL
+   1. Configuration      2. Utilities            3. Storage
+   4. Data loading       5. Validation           6. Normalization
+   7. Progress           8. Spaced repetition    9. Answer evaluation
+   10. Filters & search  11. Statistics          12. UI helpers
+   13. Session engine    14. Random mode         15. Exam engine
+   16. Troubleshooting   17. Vue application     18. Initialisation
+   ============================================================ */
+'use strict';
+
+/* ============================================================
+   1. CONFIGURATION
+   ============================================================ */
+const APP = {
+  name: 'Networking Recall',
+  storageKey: 'networking-recall-v1',
+  version: '1.0.0',
+  questionFiles: [
+    { path: './data/fundamentals.json', chapterId: 'fundamentals' },
+    { path: './data/switching.json',    chapterId: 'switching' },
+    { path: './data/routing.json',      chapterId: 'routing' },
+    { path: './data/ospf.json',         chapterId: 'ospf' },
+    { path: './data/eigrp.json',        chapterId: 'eigrp' },
+    { path: './data/security.json',     chapterId: 'security' },
+    { path: './data/services.json',     chapterId: 'services' }
+  ],
+  questionTypes: [
+    'recall', 'multiple_choice', 'true_false', 'fill_blank', 'command',
+    'configuration', 'troubleshooting', 'scenario', 'compare', 'explain',
+    'packet_flow', 'show_command'
+  ],
+  difficulties: ['easy', 'medium', 'hard'],
+  sr: {
+    againMinutes: 10,
+    hardDays: 1,
+    goodDays: [3, 7, 14, 30, 60],
+    easyDays: [7, 21, 45, 90]
+  },
+  defaultSettings: {
+    theme: 'dark',
+    queueCap: 30,
+    showHints: true,
+    tokenThreshold: 0.66,
+    weakMinAttempts: 2,
+    weakMinAccuracy: 70
+  },
+  typeLabels: {
+    recall: 'Recall',
+    multiple_choice: 'Multiple Choice',
+    true_false: 'True / False',
+    fill_blank: 'Fill Blank',
+    command: 'Command',
+    configuration: 'Configuration',
+    troubleshooting: 'Troubleshooting',
+    scenario: 'Scenario',
+    compare: 'Compare',
+    explain: 'Explain',
+    packet_flow: 'Packet Flow',
+    show_command: 'Show Command'
+  },
+  diffLabels: { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+};
+
+/* ============================================================
+   2. UTILITIES
+   ============================================================ */
+const U = {
+  todayStr(d) {
+    const dt = d || new Date();
+    return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+  },
+  endOfToday() {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d;
+  },
+  fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? iso : d.toLocaleDateString();
+  },
+  fmtTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? iso : d.toLocaleString();
+  },
+  fmtClock(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+  },
+  pct(part, total) {
+    return total ? Math.round((part / total) * 100) : 0;
+  },
+  num(v, def) {
+    const d = def === undefined ? 0 : def;
+    return typeof v === 'number' && isFinite(v) ? v : d;
+  },
+  cap(s) {
+    return typeof s === 'string' ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  },
+  shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  },
+  pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+};
+
+/* ============================================================
+   3. STORAGE (localStorage, namespaced, corruption-safe)
+   ============================================================ */
+const Storage = {
+  state: null,
+
+  freshState() {
+    return {
+      progress: {},
+      meta: { created: U.todayStr(), updated: U.todayStr(), sessions: [], activity: {} },
+      settings: JSON.parse(JSON.stringify(APP.defaultSettings))
+    };
+  },
+
+  sanitizeRecord(raw) {
+    const rec = {
+      attempts: 0, correct: 0, incorrect: 0, lastReviewed: null, nextReview: null,
+      interval: 0, ease: 2.5, srLevel: 0, lastRating: null, firstSeen: U.todayStr()
+    };
+    if (raw && typeof raw === 'object') {
+      rec.attempts = U.num(raw.attempts);
+      rec.correct = U.num(raw.correct);
+      rec.incorrect = U.num(raw.incorrect);
+      if (typeof raw.lastReviewed === 'string') rec.lastReviewed = raw.lastReviewed;
+      if (typeof raw.nextReview === 'string' && !isNaN(Date.parse(raw.nextReview))) rec.nextReview = raw.nextReview;
+      rec.interval = U.num(raw.interval);
+      if (typeof raw.ease === 'number' && isFinite(raw.ease)) rec.ease = Math.min(3, Math.max(1.3, raw.ease));
+      rec.srLevel = U.num(raw.srLevel);
+      if (['again', 'hard', 'good', 'easy'].indexOf(raw.lastRating) !== -1) rec.lastRating = raw.lastRating;
+      if (typeof raw.firstSeen === 'string') rec.firstSeen = raw.firstSeen;
+    }
+    return rec;
+  },
+
+  load() {
+    const defaults = Storage.freshState();
+    let raw = null;
+    try {
+      raw = localStorage.getItem(APP.storageKey);
+    } catch (e) {
+      Storage.state = defaults;
+      return defaults;
+    }
+    if (!raw) { Storage.state = defaults; return defaults; }
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('bad root shape');
+      const state = Storage.freshState();
+      if (parsed.progress && typeof parsed.progress === 'object') {
+        Object.keys(parsed.progress).forEach((qid) => {
+          state.progress[qid] = Storage.sanitizeRecord(parsed.progress[qid]);
+        });
+      }
+      if (parsed.meta && typeof parsed.meta === 'object') {
+        if (typeof parsed.meta.created === 'string') state.meta.created = parsed.meta.created;
+        if (typeof parsed.meta.updated === 'string') state.meta.updated = parsed.meta.updated;
+        if (Array.isArray(parsed.meta.sessions)) {
+          state.meta.sessions = parsed.meta.sessions.filter((s) => s && typeof s === 'object').slice(-300);
+        }
+        if (parsed.meta.activity && typeof parsed.meta.activity === 'object') {
+          Object.keys(parsed.meta.activity).forEach((k) => {
+            const a = parsed.meta.activity[k];
+            if (a && typeof a === 'object' && /^\d{4}-\d{2}-\d{2}$/.test(k)) {
+              state.meta.activity[k] = { attempts: U.num(a.attempts), correct: U.num(a.correct) };
+            }
+          });
+        }
+      }
+      if (parsed.settings && typeof parsed.settings === 'object') {
+        Object.keys(APP.defaultSettings).forEach((key) => {
+          if (parsed.settings[key] !== undefined) state.settings[key] = parsed.settings[key];
+        });
+        if (['dark', 'light'].indexOf(state.settings.theme) === -1) state.settings.theme = 'dark';
+      }
+      Storage.state = state;
+      return state;
+    } catch (err) {
+      try { localStorage.setItem(APP.storageKey + '-corrupt', String(raw)); } catch (e) { /* ignore */ }
+      Storage.state = defaults;
+      return defaults;
+    }
+  },
+
+  save() {
+    try {
+      Storage.state.meta.updated = U.todayStr();
+      localStorage.setItem(APP.storageKey, JSON.stringify(Storage.state));
+    } catch (err) {
+      const ui = typeof UI !== 'undefined' ? UI : null;
+      if (ui) ui.toast('Could not save to localStorage (storage full?)', 'err');
+    }
+  },
+
+  reset() {
+    Storage.state = Storage.freshState();
+    Storage.save();
+  },
+
+  pruneActivity() {
+    const cutoff = U.todayStr(new Date(Date.now() - 90 * 86400000));
+    Object.keys(Storage.state.meta.activity).forEach((k) => {
+      if (k < cutoff) delete Storage.state.meta.activity[k];
+    });
+  },
+
+  exportJson() {
+    return {
+      app: APP.name,
+      version: APP.version,
+      exportedAt: new Date().toISOString(),
+      progress: Storage.state.progress,
+      meta: Storage.state.meta,
+      settings: Storage.state.settings
+    };
+  },
+
+  importData(data, mode) {
+    const count = 0;
+    if (mode === 'replace') Storage.state.progress = {};
+    if (data && data.progress && typeof data.progress === 'object') {
+      Object.keys(data.progress).forEach((qid) => {
+        Storage.state.progress[qid] = Storage.sanitizeRecord(data.progress[qid]);
+      });
+    }
+    if (data && data.meta && typeof data.meta === 'object') {
+      if (Array.isArray(data.meta.sessions)) {
+        Storage.state.meta.sessions = Storage.state.meta.sessions.concat(data.meta.sessions).slice(-300);
+      }
+      if (data.meta.activity && typeof data.meta.activity === 'object') {
+        Object.keys(data.meta.activity).forEach((k) => {
+          const a = data.meta.activity[k];
+          if (!a || typeof a !== 'object') return;
+          const cur = Storage.state.meta.activity[k] || { attempts: 0, correct: 0 };
+          cur.attempts += U.num(a.attempts);
+          cur.correct += U.num(a.correct);
+          Storage.state.meta.activity[k] = cur;
+        });
+      }
+    }
+    if (data && data.settings && typeof data.settings === 'object') {
+      Object.keys(APP.defaultSettings).forEach((key) => {
+        if (data.settings[key] !== undefined) Storage.state.settings[key] = data.settings[key];
+      });
+    }
+    Storage.save();
+    return { count: Object.keys(Storage.state.progress).length };
+  }
+};
+
+/* ============================================================
+   6. NORMALIZATION (flat internal question records)
+   ============================================================ */
+function normalizeQuestion(raw, ch, top, sub) {
+  const answerText = Array.isArray(raw.answer) ? raw.answer.join('\n') : String(raw.answer == null ? '' : raw.answer);
+  return {
+    id: raw.id,
+    type: raw.type,
+    difficulty: raw.difficulty,
+    question: raw.question,
+    answer: raw.answer,
+    answerText: answerText,
+    explanation: typeof raw.explanation === 'string' ? raw.explanation : '',
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
+    choices: Array.isArray(raw.choices) ? raw.choices : [],
+    acceptableAnswers: Array.isArray(raw.acceptableAnswers) ? raw.acceptableAnswers : [],
+    commands: Array.isArray(raw.commands) ? raw.commands : [],
+    expectedOutput: typeof raw.expectedOutput === 'string' ? raw.expectedOutput : '',
+    hints: Array.isArray(raw.hints) ? raw.hints : [],
+    references: Array.isArray(raw.references) ? raw.references : [],
+    relatedQuestions: Array.isArray(raw.relatedQuestions) ? raw.relatedQuestions : [],
+    symptoms: Array.isArray(raw.symptoms) ? raw.symptoms : [],
+    topology: typeof raw.topology === 'string' ? raw.topology : '',
+    showOutput: typeof raw.showOutput === 'string' ? raw.showOutput : '',
+    config: typeof raw.config === 'string' ? raw.config : '',
+    chapterId: ch.id,
+    chapterName: ch.name,
+    topicId: top.id,
+    topicName: top.name,
+    subtopicId: sub.id,
+    subtopicName: sub.name,
+    hasScenario: !!((raw.symptoms && raw.symptoms.length) || raw.topology || raw.showOutput || raw.config)
+  };
+}
+
+/* ============================================================
+   5. VALIDATION
+   ============================================================ */
+const Validator = {
+  validateFile(file, data, seenIds) {
+    const errors = [];
+    const chapters = [];
+    const err = (questionId, problem) => errors.push({ file, questionId, problem });
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      err(null, 'File root is not a JSON object');
+      return { errors, chapters };
+    }
+    const ch = data.chapter;
+    if (!ch || typeof ch !== 'object') {
+      err(null, 'Missing "chapter" object');
+      return { errors, chapters };
+    }
+    if (typeof ch.id !== 'string' || !ch.id.trim()) err(null, 'Chapter is missing a non-empty "id"');
+    if (typeof ch.name !== 'string' || !ch.name.trim()) err(null, 'Chapter is missing a non-empty "name"');
+    if (!Array.isArray(data.topics)) {
+      err(null, 'Missing "topics" array');
+      return { errors, chapters };
+    }
+
+    const chapter = { chapter: { id: ch.id, name: ch.name, description: ch.description || '' }, topics: [] };
+
+    data.topics.forEach((t, ti) => {
+      const tname = (t && (t.name || t.id)) || '(topic at index ' + ti + ')';
+      if (!t || typeof t !== 'object') { err(null, 'Topic at index ' + ti + ' is not an object'); return; }
+      if (!t.id) err(null, 'Topic "' + tname + '" is missing "id"');
+      if (!t.name) err(null, 'Topic "' + t.id + '" is missing "name"');
+
+      let subs = Array.isArray(t.subtopics) ? t.subtopics : null;
+      if (!subs && Array.isArray(t.questions)) {
+        subs = [{ id: t.id || 'general', name: t.name || 'General', questions: t.questions }];
+      }
+      if (!subs) { err(null, 'Topic "' + tname + '" has neither "subtopics" nor "questions"'); return; }
+
+      const topic = { id: t.id || tname, name: t.name || tname, subtopics: [] };
+      subs.forEach((s, si) => {
+        const sname = (s && (s.name || s.id)) || '(subtopic at index ' + si + ')';
+        if (!s || typeof s !== 'object') { err(null, 'Subtopic at index ' + si + ' of "' + tname + '" is not an object'); return; }
+        if (!s.id) err(null, 'Subtopic "' + sname + '" of "' + tname + '" is missing "id"');
+        if (!s.name) err(null, 'Subtopic "' + s.id + '" of "' + tname + '" is missing "name"');
+        if (!Array.isArray(s.questions)) { err(null, 'Subtopic "' + sname + '" has no "questions" array'); return; }
+
+        const subtopic = { id: s.id || sname, name: s.name || sname, questions: [] };
+        s.questions.forEach((q, qi) => {
+          const qid = (q && q.id) || '(question at index ' + qi + ')';
+          if (!q || typeof q !== 'object') { err(qid, 'Question is not an object'); return; }
+          if (typeof q.id !== 'string' || !q.id.trim()) { err(qid, 'Missing "id" — skipped'); return; }
+          if (seenIds.has(q.id)) { err(q.id, 'Duplicate question ID — skipped'); return; }
+          seenIds.add(q.id);
+          if (APP.questionTypes.indexOf(q.type) === -1) { err(q.id, 'Invalid type "' + q.type + '" — skipped'); return; }
+          if (APP.difficulties.indexOf(q.difficulty) === -1) { err(q.id, 'Invalid difficulty "' + q.difficulty + '" — skipped'); return; }
+          if (typeof q.question !== 'string' || !q.question.trim()) { err(q.id, 'Missing "question" text — skipped'); return; }
+          if (q.type === 'multiple_choice') {
+            if (!Array.isArray(q.choices) || q.choices.length < 2) { err(q.id, 'Multiple-choice question needs at least 2 choices — skipped'); return; }
+            if (!q.choices.some((c) => typeof c === 'string' && Evaluator.normalize(c) === Evaluator.normalize(q.answer))) {
+              err(q.id, 'Answer is not one of the choices — skipped'); return;
+            }
+          }
+          if (!q.answer && q.answer !== 0 && q.answer !== false) { err(q.id, 'Missing "answer" — skipped'); return; }
+          if (typeof q.explanation !== 'string' || !q.explanation.trim()) {
+            err(q.id, 'Missing "explanation" (question loaded without one)');
+          }
+          if (!Array.isArray(q.tags)) err(q.id, 'Missing "tags" array (defaulted to [])');
+          subtopic.questions.push(normalizeQuestion(q, chapter.chapter, topic, subtopic));
+        });
+
+        if (subtopic.questions.length) topic.subtopics.push(subtopic);
+        else if (s.questions.length) err(null, 'Subtopic "' + sname + '" of "' + tname + '" has no loadable questions');
+      });
+      if (topic.subtopics.length) chapter.topics.push(topic);
+      else err(null, 'Topic "' + tname + '" has no loadable questions');
+    });
+
+    if (chapter.topics.length) chapters.push(chapter);
+    return { errors, chapters };
+  }
+};
+
+/* ============================================================
+   4. DATA LOADING (fetch all JSON banks, keep going on failure)
+   ============================================================ */
+const DataStore = {
+  chapters: [],
+  questions: [],
+  byId: {},
+  searchIndex: {},
+  allTags: [],
+  chapterCounts: {},
+  loadErrors: [],
+  validationErrors: [],
+  fileStatus: {},
+
+  async loadAll() {
+    DataStore.loadErrors = [];
+    DataStore.validationErrors = [];
+    DataStore.fileStatus = {};
+    const jobs = APP.questionFiles.map((f) =>
+      fetch(f.path, { cache: 'no-cache' }).then((res) => {
+        if (!res.ok) throw new Error('HTTP ' + res.status + (res.statusText ? ' ' + res.statusText : ''));
+        return res.json();
+      })
+    );
+    const results = await Promise.allSettled(jobs);
+    const seenIds = new Set();
+    const validChapters = [];
+    APP.questionFiles.forEach((f, i) => {
+      const res = results[i];
+      if (res.status === 'rejected') {
+        const message = (res.reason && res.reason.message) ? res.reason.message : String(res.reason);
+        DataStore.loadErrors.push({ file: f.path, message });
+        DataStore.fileStatus[f.path] = { state: 'error', message };
+        return;
+      }
+      const out = Validator.validateFile(f.path, res.value, seenIds);
+      DataStore.validationErrors.push(...out.errors);
+      DataStore.fileStatus[f.path] = { state: 'ok', message: '' };
+      validChapters.push(...out.chapters);
+    });
+
+    DataStore.chapters = validChapters;
+    const flat = [];
+    validChapters.forEach((c) => c.topics.forEach((t) => t.subtopics.forEach((s) => s.questions.forEach((q) => flat.push(q)))));
+    DataStore.questions = flat;
+
+    DataStore.byId = {};
+    DataStore.searchIndex = {};
+    const tagSet = new Set();
+    DataStore.chapterCounts = {};
+    flat.forEach((q) => {
+      DataStore.byId[q.id] = q;
+      const hay = [q.question, q.answerText, q.explanation, (q.tags || []).join(' '),
+        q.chapterName, q.topicName, q.subtopicName, APP.typeLabels[q.type] || q.type].join(' ');
+      DataStore.searchIndex[q.id] = Evaluator.normalize(hay);
+      (q.tags || []).forEach((t) => tagSet.add(t));
+      DataStore.chapterCounts[q.chapterId] = (DataStore.chapterCounts[q.chapterId] || 0) + 1;
+    });
+    DataStore.allTags = Array.from(tagSet).sort();
+
+    store.loadErrors = DataStore.loadErrors;
+    store.validationErrors = DataStore.validationErrors;
+    store.fileStatus = DataStore.fileStatus;
+    store.questions = DataStore.questions;
+    store.chapters = DataStore.chapters;
+    return { errors: DataStore.loadErrors.length, validations: DataStore.validationErrors.length };
+  }
+};
+
+/* ============================================================
+   7. PROGRESS
+   ============================================================ */
+const Progress = {
+  get(qid) {
+    return Storage.state.progress[qid] || null;
+  },
+  ensure(qid) {
+    if (!Storage.state.progress[qid]) {
+      Storage.state.progress[qid] = {
+        attempts: 0, correct: 0, incorrect: 0, lastReviewed: null, nextReview: null,
+        interval: 0, ease: 2.5, srLevel: 0, lastRating: null, firstSeen: U.todayStr()
+      };
+    }
+    return Storage.state.progress[qid];
+  },
+  isAnswered(qid) {
+    const r = Progress.get(qid);
+    return !!(r && r.attempts > 0);
+  },
+  isDue(qid) {
+    const r = Progress.get(qid);
+    if (!r || !r.nextReview) return false;
+    return Date.parse(r.nextReview) <= U.endOfToday().getTime();
+  },
+  isIncorrect(qid) {
+    const r = Progress.get(qid);
+    return !!(r && r.attempts > 0 && r.incorrect >= r.correct);
+  },
+  accuracyOf(qid) {
+    const r = Progress.get(qid);
+    return r && r.attempts ? Math.round((r.correct / r.attempts) * 100) : null;
+  },
+  dueQuestions() {
+    const ids = [];
+    DataStore.questions.forEach((q) => { if (Progress.isDue(q.id)) ids.push(q.id); });
+    ids.sort((a, b) => {
+      const ra = Progress.get(a), rb = Progress.get(b);
+      return (ra ? Date.parse(ra.nextReview) : 0) - (rb ? Date.parse(rb.nextReview) : 0);
+    });
+    return ids;
+  },
+  recordAttempt(qid, correct, rating) {
+    const rec = Progress.ensure(qid);
+    rec.attempts += 1;
+    if (correct) rec.correct += 1; else rec.incorrect += 1;
+    rec.lastReviewed = U.todayStr();
+    if (rating) {
+      SR.schedule(rating, rec);
+      rec.lastRating = rating;
+    } else {
+      rec.lastRating = null;
+    }
+    const today = U.todayStr();
+    const act = Storage.state.meta.activity[today] || { attempts: 0, correct: 0 };
+    act.attempts += 1;
+    if (correct) act.correct += 1;
+    Storage.state.meta.activity[today] = act;
+    Storage.pruneActivity();
+    Storage.save();
+  },
+  recordSession(mode, total, correct, durationMs) {
+    Storage.state.meta.sessions.push({
+      ts: new Date().toISOString(), mode: mode, total: total, correct: correct,
+      duration: Math.round(durationMs || 0)
+    });
+    if (Storage.state.meta.sessions.length > 300) {
+      Storage.state.meta.sessions = Storage.state.meta.sessions.slice(-300);
+    }
+    Storage.save();
+  }
+};
+
+/* ============================================================
+   8. SPACED REPETITION (Again / Hard / Good / Easy)
+   ============================================================ */
+const SR = {
+  schedule(rating, rec) {
+    const now = Date.now();
+    if (rating === 'again') { rec.interval = APP.sr.againMinutes / 1440; rec.srLevel = 0; }
+    else if (rating === 'hard') { rec.interval = APP.sr.hardDays; rec.srLevel = 0; }
+    else if (rating === 'good') {
+      rec.srLevel = Math.min((rec.srLevel || 0) + 1, APP.sr.goodDays.length - 1);
+      rec.interval = APP.sr.goodDays[rec.srLevel];
+    } else if (rating === 'easy') {
+      rec.srLevel = Math.min((rec.srLevel || 0) + 1, APP.sr.easyDays.length - 1);
+      rec.interval = APP.sr.easyDays[rec.srLevel];
+    }
+    if (rating === 'again') rec.ease = Math.max(1.3, (rec.ease || 2.5) - 0.2);
+    else if (rating === 'hard') rec.ease = Math.max(1.3, (rec.ease || 2.5) - 0.1);
+    else if (rating === 'good') rec.ease = Math.min(3.0, (rec.ease || 2.5) + 0.05);
+    else if (rating === 'easy') rec.ease = Math.min(3.0, (rec.ease || 2.5) + 0.1);
+    rec.nextReview = new Date(now + rec.interval * 86400000).toISOString();
+    return rec;
+  },
+  previewInterval(rating, rec) {
+    if (rating === 'again') return APP.sr.againMinutes / 1440;
+    if (rating === 'hard') return APP.sr.hardDays;
+    const lvl = rec ? Math.min(rec.srLevel || 0, APP.sr.goodDays.length - 1) : 0;
+    if (rating === 'good') return APP.sr.goodDays[lvl];
+    if (rating === 'easy') return APP.sr.easyDays[lvl];
+    return 0;
+  },
+  intervalLabel(days) {
+    if (days <= 0) return 'now';
+    if (days < 1) return Math.round(days * 1440) + ' min';
+    if (days < 30) return Math.round(days) + ' days';
+    if (days < 365) return Math.round(days / 30) + ' months';
+    return Math.round(days / 365) + ' years';
+  }
+};
+
+/* ============================================================
+   9. ANSWER EVALUATION (lenient, normalization-based)
+   ============================================================ */
+const Evaluator = {
+  normalize(s) {
+    return String(s == null ? '' : s)
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+  tokens(s) {
+    return Evaluator.normalize(s).split(' ').filter(Boolean);
+  },
+  overlap(user, ref) {
+    const u = Evaluator.tokens(user);
+    const r = Evaluator.tokens(ref);
+    if (!u.length || !r.length) return 0;
+    const set = new Set(r);
+    let hits = 0;
+    for (const t of u) if (set.has(t)) hits++;
+    return hits / r.length;
+  },
+  stripIosPrompt(line) {
+    return String(line).replace(/^\s*[a-zA-Z0-9_.-]+(?:\([a-zA-Z0-9_.-]+\))?[#>]\s*/, '').trim();
+  },
+  normalizeCommand(line) {
+    return Evaluator.stripIosPrompt(line)
+      .toLowerCase()
+      .replace(/[^\w./:?-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+  commandTokens(cmd) {
+    return Evaluator.normalizeCommand(cmd).split(' ').filter(Boolean);
+  },
+  tokenMatch(u, e) {
+    if (u === e) return true;
+    if (/^[0-9]/.test(e)) return false;
+    return u.length >= 2 && e.startsWith(u);
+  },
+  commandMatches(userCmd, expCmd) {
+    const u = Evaluator.commandTokens(userCmd);
+    const e = Evaluator.commandTokens(expCmd);
+    if (!u.length || !e.length || u.length !== e.length) return false;
+    for (let i = 0; i < u.length; i++) {
+      if (!Evaluator.tokenMatch(u[i], e[i])) return false;
+    }
+    return true;
+  },
+  splitCommands(text) {
+    return String(text == null ? '' : text).split(/\r?\n/).map(Evaluator.normalizeCommand).filter(Boolean);
+  },
+  compareCommands(userText, expectedList) {
+    const user = Evaluator.splitCommands(userText);
+    const exp = (expectedList || []).map(Evaluator.normalizeCommand).filter(Boolean);
+    if (!exp.length) return { matched: [], missing: [], extra: user, score: 0 };
+    const matched = [];
+    const missing = [];
+    const extra = [];
+    const used = new Set();
+    for (const uc of user) {
+      let hit = -1;
+      for (let i = 0; i < exp.length; i++) {
+        if (used.has(i)) continue;
+        if (Evaluator.commandMatches(uc, exp[i])) { hit = i; break; }
+      }
+      if (hit >= 0) { matched.push(exp[hit]); used.add(hit); }
+      else extra.push(uc);
+    }
+    exp.forEach((c, i) => { if (!used.has(i)) missing.push(c); });
+    return { matched: matched, missing: missing, extra: extra, score: Math.round((matched.length / exp.length) * 100) };
+  },
+  commandCandidateLists(question) {
+    const lists = [];
+    if (question.commands && question.commands.length) lists.push(question.commands);
+    else if (typeof question.answer === 'string' && question.answer.trim()) lists.push([question.answer]);
+    else if (Array.isArray(question.answer)) lists.push(question.answer);
+    (question.acceptableAnswers || []).forEach((alt) => {
+      if (Array.isArray(alt)) lists.push(alt);
+      else if (typeof alt === 'string' && alt.trim()) lists.push([alt]);
+    });
+    return lists;
+  },
+  evaluate(question, userAnswer) {
+    const type = question.type;
+    const user = String(userAnswer == null ? '' : userAnswer).trim();
+
+    if (type === 'multiple_choice') {
+      const u = Evaluator.normalize(user);
+      const c = Evaluator.normalize(question.answer);
+      const ok = u !== '' && u === c;
+      return {
+        correct: ok, score: ok ? 100 : 0,
+        detail: ok ? 'Correct choice' : (u === '' ? 'No answer selected' : 'Incorrect choice'),
+        matched: ok ? question.answer : null
+      };
+    }
+    if (type === 'true_false') {
+      const aliases = { t: 'true', f: 'false', y: 'true', n: 'false', yes: 'true', no: 'false' };
+      const u = aliases[Evaluator.normalize(user)] || Evaluator.normalize(user);
+      const c = Evaluator.normalize(question.answer);
+      const ok = u !== '' && u === c;
+      return {
+        correct: ok, score: ok ? 100 : 0,
+        detail: ok ? 'Correct' : (u === '' ? 'No answer selected' : 'Incorrect'),
+        matched: ok ? question.answer : null
+      };
+    }
+    if (type === 'command' || type === 'configuration' || type === 'show_command') {
+      const lists = Evaluator.commandCandidateLists(question);
+      let best = { matched: [], missing: [], extra: [], score: 0, detail: 'No expected commands defined for this question' };
+      for (const list of lists) {
+        const res = Evaluator.compareCommands(user, list);
+        if (res.score > best.score) best = res;
+      }
+      best.correct = best.score === 100;
+      if (best.score === 100) best.detail = 'All commands correct';
+      else if (best.missing.length) {
+        best.detail = best.matched.length + ' of ' + (best.missing.length + best.matched.length) + ' expected commands matched';
+      }
+      else best.detail = 'No commands matched';
+      return best;
+    }
+
+    const candidates = [];
+    const push = (a) => {
+      if (typeof a === 'string' && a.trim()) candidates.push(a);
+      else if (Array.isArray(a)) a.forEach(push);
+    };
+    push(question.answer);
+    push(question.acceptableAnswers);
+
+    if (!user) return { correct: false, score: 0, detail: 'No answer given', matched: null };
+    const threshold = Storage.state.settings.tokenThreshold;
+    let best = { correct: false, score: 0, matched: null };
+    for (const cand of candidates) {
+      const u = Evaluator.normalize(user);
+      const c = Evaluator.normalize(cand);
+      if (u === c) { best = { correct: true, score: 100, matched: cand }; break; }
+      const ov = Evaluator.overlap(user, cand);
+      if (ov > best.score) best = { correct: ov >= threshold, score: ov, matched: cand };
+    }
+    best.score = Math.round(best.score * 100);
+    if (best.correct && best.score === 100) best.detail = 'Exact match';
+    else if (best.correct) best.detail = 'Close match (' + best.score + '% similarity)';
+    else if (best.score > 0) best.detail = 'Partial match (' + best.score + '% similarity)';
+    else best.detail = 'Incorrect';
+    return best;
+  }
+};
+
+/* ============================================================
+   10. FILTERING & SEARCH
+   ============================================================ */
+const Query = {
+  defaultFilters() {
+    return { chapterId: '', topicId: '', subtopicId: '', difficulty: '', type: '', tag: '', status: '', search: '' };
+  },
+  apply(s) {
+    const f = s || {};
+    let list = DataStore.questions;
+    if (f.chapterId) list = list.filter((q) => q.chapterId === f.chapterId);
+    if (f.topicId) list = list.filter((q) => q.topicId === f.topicId);
+    if (f.subtopicId) list = list.filter((q) => q.subtopicId === f.subtopicId);
+    if (f.difficulty) list = list.filter((q) => q.difficulty === f.difficulty);
+    if (f.type) list = list.filter((q) => q.type === f.type);
+    if (f.tag) list = list.filter((q) => q.tags.indexOf(f.tag) !== -1);
+    if (f.status === 'due') list = list.filter((q) => Progress.isDue(q.id));
+    else if (f.status === 'unanswered') list = list.filter((q) => !Progress.isAnswered(q.id));
+    else if (f.status === 'incorrect') list = list.filter((q) => Progress.isIncorrect(q.id));
+    else if (f.status === 'completed') list = list.filter((q) => Progress.isAnswered(q.id));
+    else if (f.status === 'weak') {
+      list = list.filter((q) => {
+        const r = Progress.get(q.id);
+        return !!(r && r.attempts >= Storage.state.settings.weakMinAttempts &&
+          (r.correct / r.attempts) * 100 < Storage.state.settings.weakMinAccuracy);
+      });
+    }
+    if (f.search) {
+      const sq = Evaluator.normalize(f.search);
+      if (sq) list = list.filter((q) => DataStore.searchIndex[q.id].indexOf(sq) !== -1);
+    }
+    return list;
+  },
+  search(query) {
+    const sq = Evaluator.normalize(query);
+    if (!sq) return [];
+    const scored = [];
+    for (const q of DataStore.questions) {
+      const hay = DataStore.searchIndex[q.id];
+      let score = 0;
+      const pos = hay.indexOf(sq);
+      if (pos !== -1) score = 1000 - pos;
+      else {
+        const qtokens = sq.split(' ').filter(Boolean);
+        if (qtokens.length > 1 && qtokens.every((t) => hay.indexOf(t) !== -1)) score = 500 - qtokens.length;
+        else if (qtokens.length) {
+          const hits = qtokens.filter((t) => hay.indexOf(t) !== -1).length;
+          score = hits / qtokens.length;
+        }
+      }
+      if (score > 0) scored.push({ q: q, score: score });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 200).map((x) => x.q);
+  }
+};
+
+/* ============================================================
+   11. STATISTICS
+   ============================================================ */
+const Stats = {
+  overall() {
+    let attempts = 0, correct = 0;
+    for (const q of DataStore.questions) {
+      const r = Progress.get(q.id);
+      if (r) { attempts += r.attempts; correct += r.correct; }
+    }
+    const answered = DataStore.questions.filter((q) => Progress.isAnswered(q.id)).length;
+    return {
+      total: DataStore.questions.length,
+      answered: answered,
+      remaining: DataStore.questions.length - answered,
+      attempts: attempts,
+      correct: correct,
+      incorrect: attempts - correct,
+      accuracy: attempts ? Math.round((correct / attempts) * 100) : 0
+    };
+  },
+  perChapter() {
+    return DataStore.chapters.map((ch) => {
+      const questions = [];
+      ch.topics.forEach((t) => t.subtopics.forEach((s) => s.questions.forEach((q) => questions.push(q))));
+      let attempts = 0, correct = 0, answered = 0, due = 0;
+      for (const q of questions) {
+        const r = Progress.get(q.id);
+        if (r && r.attempts > 0) { answered++; attempts += r.attempts; correct += r.correct; }
+        if (Progress.isDue(q.id)) due++;
+      }
+      return {
+        id: ch.chapter.id, name: ch.chapter.name, description: ch.chapter.description || '',
+        topics: ch.topics.length, total: questions.length, answered: answered,
+        attempts: attempts, correct: correct, due: due,
+        accuracy: attempts ? Math.round((correct / attempts) * 100) : 0,
+        completion: questions.length ? Math.round((answered / questions.length) * 100) : 0
+      };
+    });
+  },
+  perType() {
+    const map = {};
+    for (const q of DataStore.questions) {
+      if (!map[q.type]) map[q.type] = { type: q.type, total: 0, attempts: 0, correct: 0 };
+      const cell = map[q.type];
+      cell.total++;
+      const r = Progress.get(q.id);
+      if (r) { cell.attempts += r.attempts; cell.correct += r.correct; }
+    }
+    return Object.keys(map).sort((a, b) => map[b].total - map[a].total).map((k) => {
+      const c = map[k];
+      return { type: c.type, total: c.total, attempts: c.attempts, correct: c.correct,
+        accuracy: c.attempts ? Math.round((c.correct / c.attempts) * 100) : 0 };
+    });
+  },
+  perDifficulty() {
+    const map = {};
+    for (const q of DataStore.questions) {
+      if (!map[q.difficulty]) map[q.difficulty] = { difficulty: q.difficulty, total: 0, attempts: 0, correct: 0 };
+      const cell = map[q.difficulty];
+      cell.total++;
+      const r = Progress.get(q.id);
+      if (r) { cell.attempts += r.attempts; cell.correct += r.correct; }
+    }
+    return Object.keys(map).map((k) => {
+      const c = map[k];
+      return { difficulty: c.difficulty, total: c.total, attempts: c.attempts, correct: c.correct,
+        accuracy: c.attempts ? Math.round((c.correct / c.attempts) * 100) : 0 };
+    });
+  },
+  weakTopics(limit) {
+    const groups = new Map();
+    for (const q of DataStore.questions) {
+      const r = Progress.get(q.id);
+      if (!r || r.attempts === 0) continue;
+      const key = q.chapterId + '|' + q.topicId + '|' + q.subtopicId;
+      let g = groups.get(key);
+      if (!g) {
+        g = { key: key, chapter: q.chapterName, topic: q.topicName, subtopic: q.subtopicName,
+          name: q.subtopicName || q.topicName, attempts: 0, correct: 0, incorrect: 0, overdue: 0, hard: 0, questions: 0 };
+        groups.set(key, g);
+      }
+      g.questions++;
+      g.attempts += r.attempts;
+      g.correct += r.correct;
+      g.incorrect += r.incorrect;
+      if (Progress.isDue(q.id)) g.overdue++;
+      if (q.difficulty === 'hard') g.hard++;
+    }
+    const minAtt = Storage.state.settings.weakMinAttempts;
+    const list = [];
+    groups.forEach((g) => {
+      if (g.attempts < minAtt) return;
+      const acc = g.attempts ? g.correct / g.attempts : 0;
+      const hardPct = g.questions ? g.hard / g.questions : 0;
+      g.accuracy = Math.round(acc * 100);
+      g.score = Math.round(((1 - acc) * 60 + Math.min(g.overdue, 20) * 1.6 + Math.min(g.incorrect, 20) * 0.8 + (hardPct > 0.5 ? 5 : 0)) * 10) / 10;
+      list.push(g);
+    });
+    list.sort((a, b) => b.score - a.score);
+    return limit ? list.slice(0, limit) : list;
+  },
+  streak() {
+    const act = Storage.state.meta.activity;
+    const days = Object.keys(act).filter((d) => act[d] && act[d].attempts > 0).sort();
+    if (!days.length) return { current: 0, best: 0 };
+    const set = new Set(days);
+    const key = (d) => U.todayStr(d);
+    const walk = (startKey) => {
+      let run = 0;
+      const cur = new Date(startKey + 'T12:00:00');
+      while (set.has(key(cur))) { run++; cur.setDate(cur.getDate() - 1); }
+      return run;
+    };
+    const today = key(new Date());
+    const prevDay = key(new Date(Date.now() - 86400000));
+    let current = 0;
+    if (set.has(today)) current = walk(today);
+    else if (set.has(prevDay)) current = walk(prevDay);
+    let best = 0;
+    days.forEach((d) => { best = Math.max(best, walk(d)); });
+    return { current: current, best: best };
+  },
+  activitySeries(daysCount) {
+    const out = [];
+    const set = Storage.state.meta.activity;
+    for (let i = daysCount - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      const k = U.todayStr(d);
+      const a = set[k] || { attempts: 0, correct: 0 };
+      out.push({ date: k, day: String(d.getDate()), attempts: a.attempts, correct: a.correct });
+    }
+    return out;
+  }
+};
+
+/* ============================================================
+   12. UI HELPERS (toasts, modals, navigation, clipboard)
+   ============================================================ */
+const UI = {
+  toasts: [],
+  toast(msg, kind) {
+    const id = Date.now() + Math.random();
+    UI.toasts.push({ id: id, msg: msg, kind: kind || 'info' });
+    setTimeout(() => {
+      const i = UI.toasts.findIndex((t) => t.id === id);
+      if (i !== -1) UI.toasts.splice(i, 1);
+    }, 3800);
+  },
+  confirm(opts) {
+    store.modal = {
+      title: opts.title || 'Are you sure?',
+      body: opts.body || '',
+      confirmText: opts.confirmText || 'Confirm',
+      cancelText: opts.cancelText || 'Cancel',
+      altText: opts.altText || null,
+      onAlt: opts.onAlt || null,
+      danger: !!opts.danger,
+      onConfirm: opts.onConfirm || function () {}
+    };
+  },
+  closeModal() {
+    store.modal = null;
+  },
+  doConfirm() {
+    const m = store.modal;
+    if (!m) return;
+    const fn = m.onConfirm;
+    store.modal = null;
+    fn();
+  },
+  go(view, param) {
+    store.view = view;
+    store.viewParam = param || null;
+    store.ui.sidebarOpen = false;
+    window.scrollTo(0, 0);
+  },
+  reload() {
+    window.location.reload();
+  },
+  toggleSidebar(force) {
+    store.ui.sidebarOpen = typeof force === 'boolean' ? force : !store.ui.sidebarOpen;
+  },
+  copy(text, msg) {
+    const done = () => UI.toast(msg || 'Copied to clipboard', 'ok');
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (e) { UI.toast('Copy failed — select the text manually', 'err'); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else fallback();
+  },
+  accClass(acc) {
+    return acc >= 80 ? 'ok' : acc >= 60 ? 'warn' : 'bad';
+  }
+};
+
+</script>
+
+<style>
+.grow { flex: 1; }
+.badge.warn { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-dim); }
+.flag-toggle {
+  background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 5px 10px; cursor: pointer; font-size: 12.5px; color: var(--t1);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.flag-toggle:hover { border-color: var(--line2); color: var(--t0); }
+#vue-fallback {
+  min-height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 30px; background: var(--bg0); color: var(--t0); font-family: var(--sans);
+}
+#vue-fallback h2 { margin-bottom: 8px; }
+#vue-fallback p { color: var(--t2); max-width: 460px; margin-bottom: 16px; }
+</style>
+
+<div id="vue-fallback">
+  <div style="font-size:34px; margin-bottom:10px">&#9888;</div>
+  <h2>Vue.js could not be loaded</h2>
+  <p>Networking Recall requires the Vue 3 library, loaded from a CDN. Check your internet connection (the CDN is only
+     needed once at startup), then reload this page.</p>
+  <button onclick="location.reload()" style="padding:10px 22px; font-size:14px; font-weight:700; background:#1f7a4e; border:1px solid #3ddc84; border-radius:6px; color:#eafff2; cursor:pointer">Retry</button>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   13. SESSION ENGINE (active-recall practice sessions)
+   ============================================================ */
+const Session = {
+  start(opts) {
+    const o = opts || {};
+    let pool = Query.apply(o.filters || {});
+    if (o.ids) pool = o.ids.map((id) => DataStore.byId[id]).filter(Boolean);
+    if (o.shuffle) pool = U.shuffle(pool);
+    if (o.cap > 0) pool = pool.slice(0, o.cap);
+    if (!pool.length) {
+      UI.toast('No questions match the selected criteria', 'warn');
+      return false;
+    }
+    const spec = {
+      mode: o.mode || 'review', title: o.title || 'Review',
+      filters: o.filters || {}, ids: o.ids || null, cap: o.cap || 0, shuffle: !!o.shuffle
+    };
+    store.session = Vue.reactive({
+      mode: spec.mode, title: spec.title, filterDesc: o.filterDesc || '',
+      queue: pool.map((q) => q.id), index: 0,
+      revealed: false, userAnswer: '', verdict: null,
+      results: [], startedAt: Date.now(), done: false, restartSpec: spec
+    });
+    store.sessionSummary = null;
+    return true;
+  },
+  current() {
+    const s = store.session;
+    if (!s || s.done) return null;
+    return DataStore.byId[s.queue[s.index]] || null;
+  },
+  reveal() {
+    const s = store.session;
+    if (!s || s.done || s.revealed) return;
+    const q = Session.current();
+    if (!q) return;
+    s.revealed = true;
+    s.verdict = Evaluator.evaluate(q, s.userAnswer);
+    store.ui.hintsVisible = false;
+  },
+  rate(rating) {
+    const s = store.session;
+    if (!s || s.done || !s.revealed) return;
+    const q = Session.current();
+    if (!q) return;
+    const ver = s.verdict || Evaluator.evaluate(q, s.userAnswer);
+    Progress.recordAttempt(q.id, ver.correct, rating);
+    s.results.push({ qid: q.id, correct: ver.correct, rating: rating, score: ver.score });
+    if (s.mode === 'random') { RandomMode.roll(); return; }
+    if (s.index >= s.queue.length - 1) { Session.finish(); return; }
+    s.index++;
+    s.revealed = false;
+    s.userAnswer = '';
+    s.verdict = null;
+  },
+  next() {
+    const s = store.session;
+    if (!s || s.done) return;
+    if (s.mode === 'random') { RandomMode.roll(); return; }
+    if (s.index >= s.queue.length - 1) { Session.finish(); return; }
+    s.index++;
+    s.revealed = false;
+    s.userAnswer = '';
+    s.verdict = null;
+  },
+  finish() {
+    const s = store.session;
+    if (!s || s.done) return;
+    s.done = true;
+    const total = s.results.length;
+    const correct = s.results.filter((r) => r.correct).length;
+    store.sessionSummary = {
+      mode: s.mode, title: s.title, total: total, correct: correct,
+      accuracy: total ? Math.round((correct / total) * 100) : 0,
+      missed: s.results.filter((r) => !r.correct).map((r) => r.qid),
+      durationMs: Date.now() - s.startedAt
+    };
+    if (total) Progress.recordSession(s.mode, total, correct, Date.now() - s.startedAt);
+  },
+  end() {
+    const s = store.session;
+    if (s && !s.done && s.results.length) {
+      const correct = s.results.filter((r) => r.correct).length;
+      Progress.recordSession(s.mode + '-partial', s.results.length, correct, Date.now() - s.startedAt);
+    }
+    store.session = null;
+    store.sessionSummary = null;
+  },
+  restart() {
+    const s = store.session;
+    if (!s) return;
+    const spec = s.restartSpec;
+    Session.end();
+    if (spec) Session.start(spec);
+  }
+};
+
+/* ============================================================
+   14. RANDOM MODE (single-question rolling session)
+   ============================================================ */
+const RandomMode = {
+  start(filters) {
+    const pool = Query.apply(filters || {});
+    if (!pool.length) {
+      UI.toast('No questions match the selected options', 'warn');
+      return false;
+    }
+    const q = U.pick(pool);
+    store.session = Vue.reactive({
+      mode: 'random', title: 'Random Question', filterDesc: '',
+      queue: [q.id], index: 0, revealed: false, userAnswer: '', verdict: null,
+      results: [], startedAt: Date.now(), done: false,
+      restartSpec: { mode: 'random', filters: filters || {}, ids: null, cap: 0, shuffle: false }
+    });
+    store.sessionSummary = null;
+    return true;
+  },
+  roll() {
+    const s = store.session;
+    if (!s || s.done) return;
+    const spec = s.restartSpec || {};
+    const pool = Query.apply(spec.filters || {});
+    if (!pool.length) { Session.finish(); return; }
+    const q = U.pick(pool);
+    s.queue = [q.id];
+    s.index = 0;
+    s.revealed = false;
+    s.userAnswer = '';
+    s.verdict = null;
+  }
+};
+
+/* ============================================================
+   15. EXAM ENGINE (timed, closed-book, navigable)
+   ============================================================ */
+const Exam = {
+  start(cfg) {
+    const c = cfg || {};
+    const pool = Query.apply({
+      difficulty: c.difficulty === 'mixed' ? '' : c.difficulty,
+      type: c.type === 'all' ? '' : c.type
+    });
+    if (!pool.length) { UI.toast('No questions match the exam configuration', 'warn'); return false; }
+    const picked = U.shuffle(pool).slice(0, c.count || 25);
+    if (store.exam && store.exam.timer) clearInterval(store.exam.timer);
+    store.exam = Vue.reactive({
+      cfg: { count: picked.length, difficulty: c.difficulty || 'mixed', type: c.type || 'all', timeLimit: c.timeLimit || 0 },
+      questions: picked,
+      current: 0,
+      answers: {},
+      marked: {},
+      elapsed: 0,
+      timer: null,
+      finished: false
+    });
+    store.examResults = null;
+    Exam.startTimer();
+    return true;
+  },
+  startTimer() {
+    if (store.exam.timer) clearInterval(store.exam.timer);
+    store.exam.timer = setInterval(() => {
+      if (!store.exam || store.exam.finished) { clearInterval(store.exam.timer); return; }
+      store.exam.elapsed++;
+      const limit = store.exam.cfg.timeLimit;
+      if (limit > 0 && store.exam.elapsed >= limit * 60) Exam.submit(true);
+    }, 1000);
+  },
+  current() {
+    return store.exam ? store.exam.questions[store.exam.current] : null;
+  },
+  go(i) {
+    if (store.exam && i >= 0 && i < store.exam.questions.length) store.exam.current = i;
+  },
+  next() { Exam.go(store.exam.current + 1); },
+  prev() { Exam.go(store.exam.current - 1); },
+  answeredCount() {
+    return store.exam ? Object.keys(store.exam.answers).length : 0;
+  },
+  submit(auto) {
+    const ex = store.exam;
+    if (!ex || ex.finished) return;
+    if (ex.timer) clearInterval(ex.timer);
+    ex.finished = true;
+    ex.auto = !!auto;
+    const results = [];
+    let correct = 0;
+    for (const q of ex.questions) {
+      const val = ex.answers[q.id] || '';
+      const ver = Evaluator.evaluate(q, val);
+      if (ver.correct) correct++;
+      Progress.recordAttempt(q.id, ver.correct, null);
+      results.push({ q: q, user: val, verdict: ver });
+    }
+    const groups = {};
+    results.forEach((r) => {
+      const k = r.q.topicName;
+      if (!groups[k]) groups[k] = { name: k, correct: 0, total: 0 };
+      groups[k].total++;
+      if (r.verdict.correct) groups[k].correct++;
+    });
+    const weakAreas = Object.keys(groups)
+      .map((k) => ({ name: k, accuracy: Math.round((groups[k].correct / groups[k].total) * 100) }))
+      .filter((g) => g.accuracy < 80)
+      .sort((a, b) => a.accuracy - b.accuracy)
+      .slice(0, 5);
+    store.examResults = {
+      total: ex.questions.length,
+      correct: correct,
+      incorrect: ex.questions.length - correct,
+      score: Math.round((correct / ex.questions.length) * 100),
+      weakAreas: weakAreas,
+      results: results,
+      elapsed: ex.elapsed
+    };
+    Progress.recordSession('exam', ex.questions.length, correct, ex.elapsed * 1000);
+    if (auto) UI.toast('Time is up — exam submitted automatically', 'warn');
+  },
+  reset() {
+    if (store.exam && store.exam.timer) clearInterval(store.exam.timer);
+    store.exam = null;
+    store.examResults = null;
+  }
+};
+
+/* ============================================================
+   16. TROUBLESHOOTING MODE (focused scenario practice)
+   ============================================================ */
+const TroubleFocus = [
+  { id: 'all', name: 'All Troubleshooting', tags: [] },
+  { id: 'vlan', name: 'VLANs', tags: ['vlan'] },
+  { id: 'trunk', name: 'Trunk / Native VLAN', tags: ['trunk', 'native-vlan'] },
+  { id: 'etherchannel', name: 'EtherChannel', tags: ['etherchannel'] },
+  { id: 'stp', name: 'STP', tags: ['stp'] },
+  { id: 'hsrp', name: 'HSRP', tags: ['hsrp'] },
+  { id: 'dhcp', name: 'DHCP', tags: ['dhcp'] },
+  { id: 'routing', name: 'Routing', tags: ['routing', 'static', 'route-selection'] },
+  { id: 'ospf', name: 'OSPF', tags: ['ospf'] },
+  { id: 'eigrp', name: 'EIGRP', tags: ['eigrp'] },
+  { id: 'acl', name: 'ACLs', tags: ['acl'] }
+];
+const Trouble = {
+  match(q, focusId) {
+    const f = TroubleFocus.find((x) => x.id === focusId) || TroubleFocus[0];
+    if (q.type !== 'troubleshooting') return false;
+    if (f.id === 'all') return true;
+    return q.tags.some((t) => f.tags.indexOf(t) !== -1);
+  },
+  pool(focusId) {
+    return DataStore.questions.filter((q) => Trouble.match(q, focusId));
+  },
+  start(focusId) {
+    const pool = Trouble.pool(focusId);
+    if (!pool.length) { UI.toast('No troubleshooting questions in this focus area yet', 'warn'); return false; }
+    const f = TroubleFocus.find((x) => x.id === focusId) || TroubleFocus[0];
+    return Session.start({
+      mode: 'trouble', title: 'Troubleshooting — ' + f.name, filterDesc: f.name,
+      ids: pool.map((q) => q.id), shuffle: true, cap: 0
+    });
+  }
+};
+
+/* ============================================================
+   17. VUE APPLICATION
+   ============================================================ */
+const NAV = [
+  { view: 'dashboard', icon: '\u25C8', label: 'Dashboard' },
+  { view: 'chapters', icon: '\u25A4', label: 'Chapters' },
+  { view: 'review', icon: '\u21BB', label: 'Review' },
+  { view: 'random', icon: '\u2684', label: 'Random Quiz' },
+  { view: 'exam', icon: '\u231B', label: 'Exam Mode' },
+  { view: 'trouble', icon: '\u25B2', label: 'Troubleshoot' },
+  { view: 'weak', icon: '\u26A0', label: 'Weak Topics' },
+  { view: 'progress', icon: '\u25A5', label: 'Progress' },
+  { view: 'browse', icon: '\u29C9', label: 'Browse' },
+  { view: 'search', icon: '\u2315', label: 'Search' },
+  { view: 'settings', icon: '\u2699', label: 'Settings' }
+];
+
+const store = Vue.reactive({
+  vueError: false,
+  appReady: false,
+  loadState: 'loading',
+  fileProtocol: false,
+  view: 'dashboard',
+  viewParam: null,
+  ui: { sidebarOpen: false, hintsVisible: false },
+  questions: [],
+  chapters: [],
+  loadErrors: [],
+  validationErrors: [],
+  fileStatus: {},
+  session: null,
+  sessionSummary: null,
+  exam: null,
+  examResults: null,
+  modal: null,
+  dueCount() {
+    let n = 0;
+    for (const q of DataStore.questions) if (Progress.isDue(q.id)) n++;
+    return n;
+  }
+});
+
+const G = {
+  store: store,
+  APP: APP,
+  U: U,
+  Storage: Storage,
+  DataStore: DataStore,
+  Validator: Validator,
+  Progress: Progress,
+  SR: SR,
+  Evaluator: Evaluator,
+  Query: Query,
+  Stats: Stats,
+  UI: UI,
+  Session: Session,
+  RandomMode: RandomMode,
+  Exam: Exam,
+  Trouble: Trouble,
+  TroubleFocus: TroubleFocus,
+  NAV: NAV
+};
+
+/* ---------- shared components ---------- */
+const CodeBlock = {
+  name: 'CodeBlock',
+  props: {
+    text: { type: [String, Array], default: '' },
+    title: { type: String, default: 'terminal' },
+    prompt: { type: String, default: '' }
+  },
+  computed: {
+    lines() {
+      const raw = Array.isArray(this.text) ? this.text.join('\n') : String(this.text || '');
+      const arr = raw.split(/\r?\n/).filter((l) => l.trim() !== '');
+      if (!arr.length) arr.push('');
+      const p = this.prompt || '';
+      return arr.map((line, i) => ({ p: i === 0 ? p : '', cmd: line }));
+    },
+    rawText() {
+      const raw = Array.isArray(this.text) ? this.text.join('\n') : String(this.text || '');
+      return raw.trim();
+    }
+  },
+  methods: {
+    copy() { G.UI.copy(this.rawText); }
+  },
+  template:
+    '<div class="terminal">' +
+      '<div class="terminal-head">' +
+        '<span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>' +
+        '<span class="terminal-title">{{ title }}</span>' +
+        '<button class="copy-btn" @click="copy" :disabled="!rawText">Copy</button>' +
+      '</div>' +
+      '<pre class="terminal-body"><template v-for="(l, i) in lines" :key="i"><span v-if="l.p" class="prompt">{{ l.p }} </span><span class="cmd">{{ l.cmd }}</span>{{ i < lines.length - 1 ? \'\n\' : \'\' }}</template></pre>' +
+    '</div>'
+};
+
+const QuestionPanel = {
+  name: 'QuestionPanel',
+  props: {
+    q: { type: Object, required: true },
+    mode: { type: String, default: 'practice' },
+    answer: { type: String, default: '' },
+    revealed: { type: Boolean, default: false },
+    verdict: { type: Object, default: null },
+    disabled: { type: Boolean, default: false }
+  },
+  emits: ['update:answer', 'reveal'],
+  computed: {
+    typeLabel() { return G.APP.typeLabels[this.q.type] || this.q.type; },
+    isTerminal() {
+      return this.q.type === 'command' || this.q.type === 'configuration' || this.q.type === 'show_command';
+    },
+    prompt() {
+      if (this.q.type === 'configuration') return 'R1(config)#';
+      if (this.q.type === 'show_command') return 'R1#';
+      if (this.q.type === 'command') return 'R1#';
+      return '';
+    },
+    answerText() { return this.q.answerText || ''; },
+    answerModel: {
+      get() { return this.answer; },
+      set(v) { this.$emit('update:answer', v); }
+    },
+    choiceState() {
+      const sel = Evaluator.normalize(this.answer);
+      const correct = Evaluator.normalize(this.q.answer);
+      return (this.q.choices || []).map((c) => {
+        const n = Evaluator.normalize(c);
+        let cls = '';
+        if (this.mode === 'practice' && this.revealed) {
+          if (n === correct) cls = 'right';
+          else if (n === sel && sel !== '') cls = 'wrong';
+          else cls = 'dim';
+        } else if (n === sel && sel !== '') {
+          cls = 'selected';
+        }
+        return { text: c, cls: cls };
+      });
+    },
+    hasScenario() { return !!this.q.hasScenario; },
+    showHintsToggle() {
+      return !!(this.q.hints && this.q.hints.length && G.Storage.state.settings.showHints);
+    },
+    cmdFeedback() {
+      if (!this.verdict) return null;
+      if (this.q.type !== 'command' && this.q.type !== 'configuration' && this.q.type !== 'show_command') return null;
+      return this.verdict;
+    },
+    showInput() {
+      if (this.mode === 'result') return false;
+      if (this.mode === 'exam') return true;
+      return true;
+    }
+  },
+  methods: {
+    letter(i) { return String.fromCharCode(65 + i); },
+    pickChoice(c) {
+      if (this.disabled) return;
+      if (this.mode === 'practice' && this.revealed) return;
+      this.$emit('update:answer', c);
+    },
+    pickTf(v) {
+      if (this.disabled) return;
+      if (this.mode === 'practice' && this.revealed) return;
+      this.$emit('update:answer', v);
+    },
+    onReveal() { this.$emit('reveal'); },
+    revealHint() { G.store.ui.hintsVisible = !G.store.ui.hintsVisible; }
+  },
+  template:
+    '<div class="q-panel">' +
+      '<div class="q-meta">' +
+        '<span class="q-crumb">{{ q.chapterName }} \u25B8 {{ q.topicName }} \u25B8 {{ q.subtopicName }}</span>' +
+        '<span class="badge" :class="\'type-\' + q.type">{{ typeLabel }}</span>' +
+        '<span class="badge" :class="\'diff-\' + q.difficulty">{{ q.difficulty }}</span>' +
+        '<span class="q-tags"><span class="q-tag" v-for="t in q.tags.slice(0, 6)" :key="t">#{{ t }}</span></span>' +
+      '</div>' +
+      '<div class="q-scenario" v-if="hasScenario">' +
+        '<h4 v-if="q.symptoms.length">Symptoms</h4>' +
+        '<ul class="sym-list" v-if="q.symptoms.length"><li v-for="(s, i) in q.symptoms" :key="i">{{ s }}</li></ul>' +
+        '<h4 v-if="q.topology">Topology</h4>' +
+        '<p class="topo-text" v-if="q.topology">{{ q.topology }}</p>' +
+        '<h4 v-if="q.config">Configuration</h4>' +
+        '<code-block v-if="q.config" :text="q.config" title="config"></code-block>' +
+        '<h4 v-if="q.showOutput">show output</h4>' +
+        '<code-block v-if="q.showOutput" :text="q.showOutput" title="output"></code-block>' +
+      '</div>' +
+      '<div class="q-text">{{ q.question }}</div>' +
+      '<template v-if="showInput">' +
+        '<div class="mc-list" v-if="q.type === \'multiple_choice\'">' +
+          '<button class="mc-opt" v-for="(c, i) in choiceState" :key="i" :class="c.cls" @click="pickChoice(c.text)">' +
+            '<span class="mc-letter">{{ letter(i) }}</span><span>{{ c.text }}</span>' +
+          '</button>' +
+        '</div>' +
+        '<div class="tf-row" v-else-if="q.type === \'true_false\'">' +
+          '<button class="tf-opt" :class="{ \'selected-true\': answer === \'true\' }" @click="pickTf(\'true\')">TRUE</button>' +
+          '<button class="tf-opt" :class="{ \'selected-false\': answer === \'false\' }" @click="pickTf(\'false\')">FALSE</button>' +
+        '</div>' +
+        '<div class="input-row" v-else-if="q.type === \'fill_blank\'">' +
+          '<input type="text" v-model="answerModel" :disabled="disabled" placeholder="Type the missing text...">' +
+        '</div>' +
+        '<div class="term-input" v-else-if="isTerminal">' +
+          '<textarea v-model="answerModel" :disabled="disabled" rows="5" spellcheck="false" ' +
+            ':placeholder="q.type === \'configuration\' ? \'Enter the configuration commands, one per line...\' : \'Enter the command(s) you would run, one per line...\'"></textarea>' +
+          '<div class="term-hint">{{ q.type === \'configuration\' ? \'Commands are compared order-insensitively; prompts are ignored.\' : \'Prompts are ignored; abbreviations like "sh ip ospf nei" are accepted.\' }}</div>' +
+        '</div>' +
+        '<div class="free-input" v-else>' +
+          '<textarea v-model="answerModel" :disabled="disabled" rows="5" placeholder="Write your answer..."></textarea>' +
+        '</div>' +
+      '</template>' +
+      '<div class="reveal-row" v-if="mode === \'practice\' && !revealed">' +
+        '<button class="btn btn-primary btn-lg" @click="onReveal">Show Answer <span class="key-hint">Space</span></button>' +
+      '</div>' +
+      '<div class="reveal-block" v-if="mode === \'practice\' && revealed">' +
+        '<div class="verdict" :class="verdict ? (verdict.correct ? \'ok\' : (verdict.score > 0 ? \'part\' : \'no\')) : \'no\'">' +
+          '<span>{{ verdict ? (verdict.correct ? \'\u2713 Correct\' : \'\u2717 Incorrect\') : \'\u2014\' }}</span>' +
+          '<span class="small" v-if="verdict && verdict.detail">\u00B7 {{ verdict.detail }}</span>' +
+        '</div>' +
+        '<div class="answer-box user">' +
+          '<h4>Your Answer</h4>' +
+          '<pre>{{ answer || \'(no answer given)\' }}</pre>' +
+        '</div>' +
+        '<div class="answer-box correct">' +
+          '<h4>Correct Answer</h4>' +
+          '<code-block v-if="isTerminal" :text="answerText" :prompt="prompt" title="answer"></code-block>' +
+          '<pre v-else>{{ answerText }}</pre>' +
+        '</div>' +
+        '<div class="cmd-compare" v-if="cmdFeedback && cmdFeedback.missing && cmdFeedback.missing.length">' +
+          '<span class="cm-missing">Missing: </span><code v-for="(m, i) in cmdFeedback.missing" :key="i" style="margin-right:6px">{{ m }}</code>' +
+        '</div>' +
+        '<div class="cmd-compare" v-if="cmdFeedback && cmdFeedback.extra && cmdFeedback.extra.length">' +
+          '<span class="cm-extra">Unexpected: </span><code v-for="(e, i) in cmdFeedback.extra" :key="i" style="margin-right:6px">{{ e }}</code>' +
+        '</div>' +
+        '<div class="explanation-box" v-if="q.explanation">' +
+          '<h4>Explanation</h4><p>{{ q.explanation }}</p>' +
+        '</div>' +
+        '<div class="answer-box" v-if="q.expectedOutput">' +
+          '<h4>Expected Output</h4>' +
+          '<code-block :text="q.expectedOutput" title="output"></code-block>' +
+        '</div>' +
+        '<div class="hints-box" v-if="showHintsToggle">' +
+          '<button class="btn btn-sm btn-ghost" @click="revealHint">{{ G.store.ui.hintsVisible ? \'Hide hint\' : \'Show hint\' }}</button>' +
+          '<ul v-if="G.store.ui.hintsVisible"><li v-for="(h, i) in q.hints" :key="i">{{ h }}</li></ul>' +
+        '</div>' +
+        '<div class="refs-box" v-if="q.references.length">' +
+          '<h4>References</h4>' +
+          '<ul><li v-for="(r, i) in q.references" :key="i">{{ r }}</li></ul>' +
+        '</div>' +
+      '</div>' +
+      '<div class="reveal-block" v-if="mode === \'result\'">' +
+        '<div class="verdict" :class="verdict ? (verdict.correct ? \'ok\' : \'no\') : \'no\'" style="margin-bottom:10px">' +
+          '{{ verdict ? (verdict.correct ? \'\u2713 Correct\' : \'\u2717 Incorrect\') : \'\u2717 Not answered\' }}' +
+        '</div>' +
+        '<div class="answer-box">' +
+          '<h4>Your Answer</h4>' +
+          '<pre>{{ answer || \'(no answer given)\' }}</pre>' +
+        '</div>' +
+        '<div class="answer-box">' +
+          '<h4>Correct Answer</h4>' +
+          '<pre>{{ answerText }}</pre>' +
+        '</div>' +
+        '<div class="explanation-box" v-if="q.explanation">' +
+          '<h4>Explanation</h4><p>{{ q.explanation }}</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const PracticeSession = {
+  name: 'PracticeSession',
+  computed: {
+    s() { return G.store.session; },
+    q() { return G.Session.current(); },
+    ratingPreview() {
+      if (!this.q) return {};
+      const rec = G.Progress.get(this.q.id);
+      return {
+        again: G.SR.intervalLabel(G.SR.previewInterval('again', rec)),
+        hard: G.SR.intervalLabel(G.SR.previewInterval('hard', rec)),
+        good: G.SR.intervalLabel(G.SR.previewInterval('good', rec)),
+        easy: G.SR.intervalLabel(G.SR.previewInterval('easy', rec))
+      };
+    }
+  },
+  methods: {
+    rate(r) { G.Session.rate(r); },
+    skip() { G.Session.next(); },
+    end() {
+      G.UI.confirm({
+        title: 'End this review session?',
+        body: 'Rated questions so far are saved; the rest will be skipped.',
+        confirmText: 'End session', danger: true,
+        onConfirm: function () { G.Session.end(); }
+      });
+    }
+  },
+  template:
+    '<div class="session">' +
+      '<div class="session-top">' +
+        '<span class="session-count">Question {{ s.index + 1 }} <span class="sc-total">/ {{ s.queue.length }}</span></span>' +
+        '<span class="session-mode">{{ s.title }}</span>' +
+        '<span class="grow"></span>' +
+        '<button class="btn btn-sm btn-ghost" @click="end">End session</button>' +
+      '</div>' +
+      '<div class="session-bar">' +
+        '<div class="bar-fill" :style="{ width: Math.round(((s.index + (s.revealed ? 1 : 0)) / s.queue.length) * 100) + \'%\' }"></div>' +
+      '</div>' +
+      '<div class="session-card" v-if="q">' +
+        '<question-panel :q="q" mode="practice" :answer="s.userAnswer" :revealed="s.revealed" :verdict="s.verdict"' +
+          '@update:answer="s.userAnswer = $event" @reveal="G.Session.reveal()"></question-panel>' +
+        '<div class="reveal-row" v-if="s.revealed">' +
+          '<button class="btn btn-ghost" @click="skip">Skip <span class="key-hint">N</span></button>' +
+        '</div>' +
+        '<div class="rating-row" v-if="s.revealed">' +
+          '<button class="rating-btn rating-again" @click="rate(\'again\')">Again<span class="rb-sub">next: {{ ratingPreview.again }} \u00B7 1</span></button>' +
+          '<button class="rating-btn rating-hard" @click="rate(\'hard\')">Hard<span class="rb-sub">next: {{ ratingPreview.hard }} \u00B7 2</span></button>' +
+          '<button class="rating-btn rating-good" @click="rate(\'good\')">Good<span class="rb-sub">next: {{ ratingPreview.good }} \u00B7 3</span></button>' +
+          '<button class="rating-btn rating-easy" @click="rate(\'easy\')">Easy<span class="rb-sub">next: {{ ratingPreview.easy }} \u00B7 4</span></button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const SessionSummary = {
+  name: 'SessionSummary',
+  computed: {
+    s() { return G.store.sessionSummary; },
+    missedQuestions() {
+      return (this.s && this.s.missed || []).map((qid) => G.DataStore.byId[qid]).filter(Boolean);
+    }
+  },
+  methods: {
+    reviewMissed(qid) {
+      G.Session.start({ mode: 'single', title: 'Missed question', ids: [qid] });
+    }
+  },
+  template:
+    '<div class="card">' +
+      '<div class="card-title"><h3>Session complete</h3><span class="muted small">{{ s.title }}</span></div>' +
+      '<div class="summary-grid">' +
+        '<div class="stat-card"><div class="stat-value" :class="G.UI.accClass(s.accuracy)">{{ s.accuracy }}%</div><div class="stat-label">Accuracy</div></div>' +
+        '<div class="stat-card"><div class="stat-value info">{{ s.correct }}</div><div class="stat-label">Correct</div></div>' +
+        '<div class="stat-card"><div class="stat-value" :class="s.total - s.correct ? \'bad\' : \'ok\'">{{ s.total - s.correct }}</div><div class="stat-label">Incorrect</div></div>' +
+        '<div class="stat-card"><div class="stat-value">{{ s.total }}</div><div class="stat-label">Total Questions</div></div>' +
+      '</div>' +
+      '<div class="summary-actions">' +
+        '<button class="btn btn-primary" @click="G.Session.restart()">Review again</button>' +
+        '<button class="btn" @click="G.Session.end()">Done</button>' +
+        '<button class="btn btn-ghost" @click="G.UI.go(\'weak\')">Weak topics</button>' +
+      '</div>' +
+      '<div class="missed-list" v-if="missedQuestions.length">' +
+        '<div class="missed-item" v-for="m in missedQuestions" :key="m.id" @click="reviewMissed(m.id)">' +
+          '<span class="mi-qid">{{ m.id }}</span>{{ m.question }}' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+/* ---------- views ---------- */
+const DashboardView = {
+  name: 'DashboardView',
+  computed: {
+    ov() { return G.Stats.overall(); },
+    chapters() { return G.Stats.perChapter(); },
+    weak() { return G.Stats.weakTopics(5); },
+    streak() { return G.Stats.streak(); },
+    sessions() { return G.Storage.state.meta.sessions.length; },
+    due() { return G.store.dueCount(); },
+    avgCompletion() {
+      const c = this.chapters;
+      return c.length ? Math.round(c.reduce((a, x) => a + x.completion, 0) / c.length) : 0;
+    },
+    lastReviewed() {
+      let last = null;
+      for (const q of G.DataStore.questions) {
+        const r = G.Progress.get(q.id);
+        if (r && r.lastReviewed && (!last || r.lastReviewed > last)) last = r.lastReviewed;
+      }
+      return last;
+    }
+  },
+  methods: {
+    continueReview() {
+      const ids = G.Progress.dueQuestions();
+      if (!ids.length) { G.UI.toast('Nothing due right now — try weak topics or a random quiz', 'info'); return; }
+      G.Session.start({ mode: 'review', title: 'Due questions', ids: ids, shuffle: true, cap: G.Storage.state.settings.queueCap });
+      G.UI.go('review');
+    },
+    randomQ() { G.UI.go('random'); },
+    startExam() { G.UI.go('exam'); }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Dashboard</h1>' +
+        '<p>Active recall &middot; spaced repetition &middot; your networking memory engine</p>' +
+      '</div>' +
+      '<div class="stat-grid">' +
+        '<div class="stat-card accent">' +
+          '<div class="stat-value" :class="G.UI.accClass(ov.accuracy)">{{ ov.accuracy }}%</div>' +
+          '<div class="stat-label">Overall Accuracy</div>' +
+          '<div class="stat-sub">{{ ov.correct }} / {{ ov.attempts }} correct attempts</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<div class="stat-value info">{{ ov.answered }} <span style="font-size:15px;color:var(--t2)">/ {{ ov.total }}</span></div>' +
+          '<div class="stat-label">Questions</div>' +
+          '<div class="stat-sub">{{ ov.remaining }} remaining</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<div class="stat-value" :class="due ? \'warn\' : \'ok\'">{{ due }}</div>' +
+          '<div class="stat-label">Due Today</div>' +
+          '<div class="stat-sub">next review reached</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<div class="stat-value ok">{{ streak.current }}<span style="font-size:15px">d</span></div>' +
+          '<div class="stat-label">Study Streak</div>' +
+          '<div class="stat-sub">best {{ streak.best }} days</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<div class="stat-value">{{ sessions }}</div>' +
+          '<div class="stat-label">Study Sessions</div>' +
+          '<div class="stat-sub" v-if="lastReviewed">last review {{ lastReviewed }}</div>' +
+        '</div>' +
+        '<div class="stat-card">' +
+          '<div class="stat-value" :class="avgCompletion === 100 ? \'ok\' : \'\'">{{ avgCompletion }}%</div>' +
+          '<div class="stat-label">Chapter Completion</div>' +
+          '<div class="stat-sub">average across chapters</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dash-actions">' +
+        '<button class="btn btn-primary" @click="continueReview">Continue Review <span class="key-hint">Space</span></button>' +
+        '<button class="btn" @click="randomQ">Random Question <span class="key-hint">R</span></button>' +
+        '<button class="btn" @click="startExam">Start Exam <span class="key-hint">E</span></button>' +
+      '</div>' +
+      '<div class="dash-cols">' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>Weak Topics</h3><button class="btn btn-sm btn-ghost" @click="G.UI.go(\'weak\')">See all</button></div>' +
+          '<div class="empty-state" v-if="!weak.length">' +
+            '<div class="es-icon">&#10003;</div>' +
+            '<div class="es-title">No weak topics yet</div>' +
+            '<div class="small">Answer some questions to get accuracy data.</div>' +
+          '</div>' +
+          '<template v-else>' +
+            '<div class="bar-row" v-for="w in weak" :key="w.key">' +
+              '<div class="bar-label" :title="w.topic">{{ w.name }}</div>' +
+              '<div class="bar"><div class="bar-fill" :class="G.UI.accClass(w.accuracy)" :style="{ width: w.accuracy + \'%\' }"></div></div>' +
+              '<div class="bar-num">{{ w.accuracy }}%</div>' +
+            '</div>' +
+          '</template>' +
+        '</div>' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>Chapter Completion</h3><button class="btn btn-sm btn-ghost" @click="G.UI.go(\'chapters\')">Browse</button></div>' +
+          '<div class="bar-row" v-for="c in chapters" :key="c.id">' +
+            '<div class="bar-label">{{ c.name }}</div>' +
+            '<div class="bar"><div class="bar-fill" :class="G.UI.accClass(c.accuracy)" :style="{ width: c.completion + \'%\' }"></div></div>' +
+            '<div class="bar-num">{{ c.completion }}%</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const ChaptersView = {
+  name: 'ChaptersView',
+  computed: {
+    chapters() { return G.Stats.perChapter(); },
+    totals() { return G.Stats.overall(); }
+  },
+  methods: {
+    open(c) { G.UI.go('topics', c.id); }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Chapters</h1>' +
+        '<p>{{ totals.total }} questions across {{ chapters.length }} chapters &middot; {{ totals.answered }} answered &middot; {{ totals.remaining }} to go</p>' +
+      '</div>' +
+      '<div class="chapter-grid">' +
+        '<div class="chapter-card" v-for="c in chapters" :key="c.id" @click="open(c)">' +
+          '<h3>{{ c.name }}</h3>' +
+          '<div class="ch-ids">{{ c.id }}</div>' +
+          '<div class="ch-meta">' +
+            '<span><b>{{ c.topics }}</b> topics</span>' +
+            '<span><b>{{ c.total }}</b> questions</span>' +
+            '<span v-if="c.due" style="color:var(--red)"><b>{{ c.due }}</b> due</span>' +
+          '</div>' +
+          '<div class="bar-row" style="margin-bottom:4px">' +
+            '<div class="bar-label" style="width:90px; flex-basis:90px">Progress</div>' +
+            '<div class="bar"><div class="bar-fill" :class="G.UI.accClass(c.completion)" :style="{ width: c.completion + \'%\' }"></div></div>' +
+            '<div class="bar-num">{{ c.completion }}%</div>' +
+          '</div>' +
+          '<div class="bar-row" style="margin-bottom:0">' +
+            '<div class="bar-label" style="width:90px; flex-basis:90px">Accuracy</div>' +
+            '<div class="bar"><div class="bar-fill purple" :style="{ width: c.accuracy + \'%\' }"></div></div>' +
+            '<div class="bar-num">{{ c.accuracy }}%</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const TopicsView = {
+  name: 'TopicsView',
+  data() {
+    return {
+      scope: 'chapter',
+      filters: { type: '', difficulty: '' },
+      cap: 0,
+      shuffle: true
+    };
+  },
+  computed: {
+    chapter() {
+      return G.DataStore.chapters.find((c) => c.chapter.id === G.store.viewParam) || null;
+    },
+    chapterCount() {
+      if (!this.chapter) return 0;
+      let n = 0;
+      this.chapter.topics.forEach((t) => t.subtopics.forEach((s) => { n += s.questions.length; }));
+      return n;
+    },
+    scopeOptions() {
+      const opts = [];
+      if (!this.chapter) return opts;
+      opts.push({ value: 'chapter', label: this.chapter.chapter.name + ' — all (' + this.chapterCount + ')' });
+      this.chapter.topics.forEach((t) => {
+        const n = this.countTopic(t);
+        opts.push({ value: 'topic:' + t.id, label: 'Topic — ' + t.name + ' (' + n + ')' });
+        t.subtopics.forEach((s) => {
+          opts.push({ value: 'subtopic:' + this.chapter.chapter.id + '|' + t.id + '|' + s.id,
+            label: 'Subtopic — ' + t.name + ' \u203A ' + s.name + ' (' + s.questions.length + ')' });
+        });
+      });
+      return opts;
+    },
+    scopeCount() {
+      if (!this.chapter) return 0;
+      if (this.scope === 'chapter') return this.chapterCount;
+      if (this.scope.indexOf('topic:') === 0) {
+        const t = this.chapter.topics.find((x) => x.id === this.scope.slice(6));
+        return t ? this.countTopic(t) : 0;
+      }
+      if (this.scope.indexOf('subtopic:') === 0) {
+        const parts = this.scope.slice(9).split('|');
+        const t = this.chapter.topics.find((x) => x.id === parts[1]);
+        if (!t) return 0;
+        const s = t.subtopics.find((x) => x.id === parts[2]);
+        return s ? s.questions.length : 0;
+      }
+      return 0;
+    },
+    typeOptions() {
+      return [{ v: '', l: 'All types' }].concat(G.APP.questionTypes.map((t) => ({ v: t, l: G.APP.typeLabels[t] })));
+    },
+    diffOptions() {
+      return [{ v: '', l: 'All difficulties' }].concat(G.APP.difficulties.map((d) => ({ v: d, l: G.U.cap(d) })));
+    }
+  },
+  methods: {
+    countTopic(t) {
+      let n = 0;
+      t.subtopics.forEach((s) => { n += s.questions.length; });
+      return n;
+    },
+    setScope(v) { this.scope = v; },
+    subProgress(s) {
+      let answered = 0;
+      s.questions.forEach((q) => { if (G.Progress.isAnswered(q.id)) answered++; });
+      return s.questions.length && answered ? Math.round((answered / s.questions.length) * 100) : null;
+    },
+    topicProgress(t) {
+      let answered = 0, total = 0;
+      t.subtopics.forEach((s) => {
+        s.questions.forEach((q) => { total++; if (G.Progress.isAnswered(q.id)) answered++; });
+      });
+      return total && answered ? Math.round((answered / total) * 100) : null;
+    },
+    scopeLabel() {
+      if (!this.chapter) return '';
+      if (this.scope === 'chapter') return this.chapter.chapter.name;
+      if (this.scope.indexOf('topic:') === 0) {
+        const t = this.chapter.topics.find((x) => x.id === this.scope.slice(6));
+        return t ? t.name : this.scope;
+      }
+      if (this.scope.indexOf('subtopic:') === 0) {
+        const parts = this.scope.slice(9).split('|');
+        const t = this.chapter.topics.find((x) => x.id === parts[1]);
+        const s = t && t.subtopics.find((x) => x.id === parts[2]);
+        return s ? s.name : this.scope;
+      }
+      return this.scope;
+    },
+    practice() {
+      const f = { type: this.filters.type, difficulty: this.filters.difficulty };
+      if (this.scope === 'chapter') f.chapterId = this.chapter.chapter.id;
+      else if (this.scope.indexOf('topic:') === 0) {
+        f.chapterId = this.chapter.chapter.id;
+        f.topicId = this.scope.slice(6);
+      } else if (this.scope.indexOf('subtopic:') === 0) {
+        const parts = this.scope.slice(9).split('|');
+        f.chapterId = parts[0];
+        f.topicId = parts[1];
+        f.subtopicId = parts[2];
+      }
+      const ok = G.Session.start({
+        mode: 'chapter', title: this.scopeLabel(),
+        filters: f, cap: this.cap, shuffle: this.shuffle
+      });
+      if (ok) G.UI.go('review');
+    },
+    practiceTopic(t) {
+      this.scope = 'topic:' + t.id;
+      this.practice();
+    },
+    practiceSubtopic(t, s) {
+      this.scope = 'subtopic:' + this.chapter.chapter.id + '|' + t.id + '|' + s.id;
+      this.practice();
+    },
+    goBack() { G.UI.go('chapters'); }
+  },
+  template:
+    '<div class="page">' +
+      '<button class="back-link" @click="goBack">&#8592; All chapters</button>' +
+      '<div class="page-head" v-if="chapter">' +
+        '<h1>{{ chapter.chapter.name }}</h1>' +
+        '<p>{{ chapter.chapter.description || \'Select a topic and start practicing.\' }}</p>' +
+      '</div>' +
+      '<div class="practice-bar" v-if="chapter">' +
+        '<span class="pb-label">Practice</span>' +
+        '<select :value="scope" @change="setScope($event.target.value)">' +
+          '<option v-for="o in scopeOptions" :key="o.value" :value="o.value">{{ o.label }}</option>' +
+        '</select>' +
+        '<select v-model="filters.type">' +
+          '<option v-for="o in typeOptions" :key="o.v" :value="o.v">{{ o.l }}</option>' +
+        '</select>' +
+        '<select v-model="filters.difficulty">' +
+          '<option v-for="o in diffOptions" :key="o.v" :value="o.v">{{ o.l }}</option>' +
+        '</select>' +
+        '<input type="number" v-model.number="cap" min="0" placeholder="limit" title="Question limit (0 = all)">' +
+        '<label class="checkbox-line"><input type="checkbox" v-model="shuffle"> Shuffle</label>' +
+        '<button class="btn btn-primary" @click="practice">Start ({{ scopeCount }})</button>' +
+      '</div>' +
+      '<template v-if="chapter">' +
+        '<div class="topic-block" v-for="t in chapter.topics" :key="t.id">' +
+          '<div class="topic-head">' +
+            '<span class="topic-name">{{ t.name }}</span>' +
+            '<span class="topic-count">{{ countTopic(t) }} questions' +
+              '<span v-if="topicProgress(t) !== null"> &middot; {{ topicProgress(t) }}% done</span></span>' +
+            '<span class="grow"></span>' +
+            '<button class="btn btn-sm" @click="practiceTopic(t)">Practice topic</button>' +
+          '</div>' +
+          '<div class="topic-body">' +
+            '<div class="subtopic-row" v-for="s in t.subtopics" :key="s.id">' +
+              '<span class="tree-glyph">&#9500;&#9472;</span>' +
+              '<span class="sub-name">{{ s.name }}</span>' +
+              '<span class="sub-count">{{ s.questions.length }} q</span>' +
+              '<span class="sub-count" v-if="subProgress(s) !== null" style="color:var(--green)">{{ subProgress(s) }}% done</span>' +
+              '<span class="sub-count" v-else style="color:var(--t3)">new</span>' +
+              '<button class="btn btn-sm btn-ghost" @click="practiceSubtopic(t, s)">Practice</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</template>' +
+    '</div>'
+};
+
+const ReviewView = {
+  name: 'ReviewView',
+  data() {
+    return {
+      sources: [
+        { id: 'due', label: 'Due questions' },
+        { id: 'weak', label: 'Weak topics' },
+        { id: 'unanswered', label: 'Unanswered' },
+        { id: 'incorrect', label: 'Incorrect' },
+        { id: 'all', label: 'All questions' }
+      ],
+      source: 'due',
+      chapterId: '',
+      type: '',
+      difficulty: '',
+      cap: 0,
+      shuffle: true
+    };
+  },
+  computed: {
+    hasSession() { return !!(G.store.session && !G.store.session.done); },
+    summary() { return G.store.sessionSummary; },
+    chapterOptions() {
+      return G.DataStore.chapters.map((c) => ({ id: c.chapter.id, name: c.chapter.name }));
+    },
+    typeOptions() {
+      return [{ v: '', l: 'All types' }].concat(G.APP.questionTypes.map((t) => ({ v: t, l: G.APP.typeLabels[t] })));
+    },
+    diffOptions() {
+      return [{ v: '', l: 'All difficulties' }].concat(G.APP.difficulties.map((d) => ({ v: d, l: G.U.cap(d) })));
+    },
+    sourceCount() {
+      return G.Query.apply(this.buildFilters()).length;
+    },
+    sourceInfo() {
+      return {
+        due: 'Questions whose spaced-repetition interval has elapsed (most effective to review next).',
+        weak: 'Subtopics with the lowest accuracy — see the Weak Topics page for details.',
+        unanswered: 'Questions you have never attempted.',
+        incorrect: 'Questions you have missed more often than answered correctly.',
+        all: 'The entire question bank.'
+      }[this.source] || '';
+    }
+  },
+  methods: {
+    buildFilters() {
+      const f = { chapterId: this.chapterId, type: this.type, difficulty: this.difficulty };
+      if (this.source === 'due') f.status = 'due';
+      else if (this.source === 'unanswered') f.status = 'unanswered';
+      else if (this.source === 'incorrect') f.status = 'incorrect';
+      return f;
+    },
+    weakIds() {
+      const ids = [];
+      const groups = G.Stats.weakTopics(100);
+      groups.forEach((g) => {
+        const parts = g.key.split('|');
+        G.DataStore.questions.forEach((q) => {
+          if (q.chapterId === parts[0] && q.topicId === parts[1] && q.subtopicId === parts[2]) ids.push(q.id);
+        });
+      });
+      return ids;
+    },
+    start() {
+      if (this.source === 'weak') {
+        const ids = this.weakIds();
+        if (!ids.length) { G.UI.toast('No weak topics available yet — answer a few questions first', 'warn'); return; }
+        G.Session.start({ mode: 'weak', title: 'Weak topics review', ids: ids, shuffle: this.shuffle, cap: this.cap });
+        return;
+      }
+      const label = this.sources.find((s) => s.id === this.source);
+      const ok = G.Session.start({
+        mode: 'review', title: 'Review — ' + (label ? label.label : this.source),
+        filters: this.buildFilters(), shuffle: this.shuffle, cap: this.cap
+      });
+      if (!ok) G.UI.toast('No questions match the selected criteria', 'warn');
+    }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Review</h1>' +
+        '<p>Active recall with spaced repetition — retrieve first, then check.</p>' +
+      '</div>' +
+      '<practice-session v-if="hasSession"></practice-session>' +
+      '<session-summary v-else-if="summary"></session-summary>' +
+      '<div class="card" v-else>' +
+        '<div class="card-title"><h3>Choose a queue</h3></div>' +
+        '<div class="seg" style="margin-bottom:10px">' +
+          '<button class="seg-btn" v-for="s in sources" :key="s.id" :class="{on: source === s.id}" @click="source = s.id">{{ s.label }}</button>' +
+        '</div>' +
+        '<p class="small muted" style="margin-bottom:14px">{{ sourceInfo }}</p>' +
+        '<div class="filter-bar" style="background:transparent; border:none; padding:0">' +
+          '<div class="fb-field">' +
+            '<span class="fb-label">Chapter</span>' +
+            '<select v-model="chapterId"><option value="">All chapters</option>' +
+              '<option v-for="c in chapterOptions" :key="c.id" :value="c.id">{{ c.name }}</option></select>' +
+          '</div>' +
+          '<div class="fb-field">' +
+            '<span class="fb-label">Type</span>' +
+            '<select v-model="type"><option v-for="o in typeOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select>' +
+          '</div>' +
+          '<div class="fb-field">' +
+            '<span class="fb-label">Difficulty</span>' +
+            '<select v-model="difficulty"><option v-for="o in diffOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select>' +
+          '</div>' +
+          '<div class="fb-field">' +
+            '<span class="fb-label">Limit (0 = all)</span>' +
+            '<input type="number" v-model.number="cap" min="0" style="width:80px">' +
+          '</div>' +
+          '<label class="checkbox-line"><input type="checkbox" v-model="shuffle"> Shuffle</label>' +
+          '<button class="btn btn-primary" @click="start">Start — {{ sourceCount }} questions</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const RandomView = {
+  name: 'RandomView',
+  data() {
+    return { chapterId: '', topicId: '', type: '', difficulty: '' };
+  },
+  computed: {
+    chapterOptions() {
+      return G.DataStore.chapters.map((c) => ({ id: c.chapter.id, name: c.chapter.name }));
+    },
+    topicOptions() {
+      const ch = G.DataStore.chapters.find((c) => c.chapter.id === this.chapterId);
+      if (!ch) return [];
+      const out = [];
+      ch.topics.forEach((t) => t.subtopics.forEach((s) => {
+        out.push({ id: s.id, name: t.name + ' \u203A ' + s.name });
+      }));
+      return out;
+    },
+    typeOptions() {
+      return [{ v: '', l: 'All types' }].concat(G.APP.questionTypes.map((t) => ({ v: t, l: G.APP.typeLabels[t] })));
+    },
+    diffOptions() {
+      return [{ v: '', l: 'Any difficulty' }].concat(G.APP.difficulties.map((d) => ({ v: d, l: G.U.cap(d) })));
+    },
+    hasSession() {
+      return !!(G.store.session && G.store.session.mode === 'random' && !G.store.session.done);
+    },
+    poolCount() {
+      return G.Query.apply(this.buildFilters()).length;
+    }
+  },
+  methods: {
+    buildFilters() {
+      return { chapterId: this.chapterId, topicId: this.topicId, type: this.type, difficulty: this.difficulty };
+    },
+    roll() { G.RandomMode.start(this.buildFilters()); },
+    next() { G.RandomMode.roll(); },
+    rate(r) { G.Session.rate(r); },
+    stop() { G.Session.end(); }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Random Quiz</h1>' +
+        '<p>One question at a time from any slice of the bank — rate it and roll the next.</p>' +
+      '</div>' +
+      '<template v-if="!hasSession">' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>Random options</h3></div>' +
+          '<div class="filter-bar" style="background:transparent; border:none; padding:0">' +
+            '<div class="fb-field">' +
+              '<span class="fb-label">Chapter</span>' +
+              '<select v-model="chapterId" @change="topicId = \'\'"><option value="">All chapters</option>' +
+                '<option v-for="c in chapterOptions" :key="c.id" :value="c.id">{{ c.name }}</option></select>' +
+            '</div>' +
+            '<div class="fb-field">' +
+              '<span class="fb-label">Topic</span>' +
+              '<select v-model="topicId"><option value="">All topics</option>' +
+                '<option v-for="t in topicOptions" :key="t.id" :value="t.id">{{ t.name }}</option></select>' +
+            '</div>' +
+            '<div class="fb-field">' +
+              '<span class="fb-label">Type</span>' +
+              '<select v-model="type"><option v-for="o in typeOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select>' +
+            '</div>' +
+            '<div class="fb-field">' +
+              '<span class="fb-label">Difficulty</span>' +
+              '<select v-model="difficulty"><option v-for="o in diffOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select>' +
+            '</div>' +
+            '<button class="btn btn-primary btn-lg" @click="roll">Roll — from {{ poolCount }} questions <span class="key-hint">R</span></button>' +
+          '</div>' +
+        '</div>' +
+      '</template>' +
+      '<practice-session v-else></practice-session>' +
+    '</div>'
+};
+
+const ExamView = {
+  name: 'ExamView',
+  data() {
+    return {
+      cfg: { count: 25, difficulty: 'mixed', type: 'all', timeLimit: 60 },
+      reviewResults: false,
+      typeChoices: [
+        { v: 'all', l: 'All types' }, { v: 'recall', l: 'Recall' }, { v: 'multiple_choice', l: 'Multiple Choice' },
+        { v: 'configuration', l: 'Configuration' }, { v: 'command', l: 'Command' },
+        { v: 'troubleshooting', l: 'Troubleshooting' }, { v: 'scenario', l: 'Scenario' }
+      ],
+      timeChoices: [
+        { v: 0, l: 'No limit' }, { v: 15, l: '15 min' }, { v: 30, l: '30 min' }, { v: 60, l: '60 min' }, { v: 90, l: '90 min' }
+      ]
+    };
+  },
+  computed: {
+    exam() { return G.store.exam; },
+    results() { return G.store.examResults; },
+    currentQ() { return G.Exam.current(); },
+    currentQid() { return this.currentQ ? this.currentQ.id : ''; },
+    remaining() {
+      if (!this.exam || !this.exam.cfg.timeLimit) return 0;
+      return Math.max(0, this.exam.cfg.timeLimit * 60 - this.exam.elapsed);
+    },
+    answeredCount() { return G.Exam.answeredCount(); },
+    marked() { return this.exam ? !!this.exam.marked[this.currentQid] : false; }
+  },
+  methods: {
+    start() { G.Exam.start(this.cfg); },
+    go(i) { G.Exam.go(i); },
+    next() { G.Exam.next(); },
+    prev() { G.Exam.prev(); },
+    toggleMark() { if (this.currentQid) G.Exam.mark(this.currentQid); },
+    setAnswer(qid, val) { if (this.exam) this.exam.answers[qid] = val; },
+    submit(auto) { G.Exam.submit(auto); },
+    confirmSubmit() {
+      const unanswered = this.exam ? this.exam.questions.length - Object.keys(this.exam.answers).length : 0;
+      G.UI.confirm({
+        title: 'Submit exam now?',
+        body: unanswered ? unanswered + ' question(s) are unanswered — they will count as incorrect.' : 'All questions answered — submit and see your score.',
+        confirmText: 'Submit exam',
+        onConfirm: function () { G.Exam.submit(false); }
+      });
+    },
+    reset() { G.Exam.reset(); },
+    showResults() { this.reviewResults = !this.reviewResults; }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Exam Mode</h1>' +
+        '<p>Closed-book simulator — answers stay hidden until you submit.</p>' +
+      '</div>' +
+      '<div v-if="!exam && !results">' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>Configure exam</h3></div>' +
+          '<h4>Number of questions</h4>' +
+          '<div class="seg" style="margin-bottom:14px">' +
+            '<button class="seg-btn" v-for="n in [10, 25, 50, 100]" :key="n" :class="{on: cfg.count === n}" @click="cfg.count = n">{{ n }}</button>' +
+          '</div>' +
+          '<h4>Difficulty</h4>' +
+          '<div class="seg" style="margin-bottom:14px">' +
+            '<button class="seg-btn" v-for="d in [\'easy\', \'medium\', \'hard\', \'mixed\']" :key="d" :class="{on: cfg.difficulty === d}" @click="cfg.difficulty = d">{{ d }}</button>' +
+          '</div>' +
+          '<h4>Question types</h4>' +
+          '<div class="seg" style="margin-bottom:14px">' +
+            '<button class="seg-btn" v-for="t in typeChoices" :key="t.v" :class="{on: cfg.type === t.v}" @click="cfg.type = t.v">{{ t.l }}</button>' +
+          '</div>' +
+          '<h4>Time limit</h4>' +
+          '<div class="seg" style="margin-bottom:18px">' +
+            '<button class="seg-btn" v-for="tl in timeChoices" :key="tl.v" :class="{on: cfg.timeLimit === tl.v}" @click="cfg.timeLimit = tl.v">{{ tl.l }}</button>' +
+          '</div>' +
+          '<button class="btn btn-primary btn-lg" @click="start">Start Exam <span class="key-hint">E</span></button>' +
+        '</div>' +
+      '</div>' +
+      '<template v-else-if="exam && !results">' +
+        '<div class="exam-head">' +
+          '<div class="eh-item"><span class="eh-label">Question</span><span class="eh-value">{{ exam.current + 1 }} <span class="muted" style="font-size:12px">/ {{ exam.questions.length }}</span></span></div>' +
+          '<div class="eh-item"><span class="eh-label">Elapsed</span><span class="eh-value timer">{{ G.U.fmtClock(exam.elapsed) }}</span></div>' +
+          '<div class="eh-item" v-if="exam.cfg.timeLimit"><span class="eh-label">Time left</span><span class="eh-value timer" :class="{urgent: remaining <= 300}">{{ G.U.fmtClock(remaining) }}</span></div>' +
+          '<span class="grow"></span>' +
+          '<button class="flag-toggle" :class="{on: marked}" @click="toggleMark"><span class="flag-dot"></span> Review later</button>' +
+        '</div>' +
+        '<div class="exam-head">' +
+          '<div class="palette">' +
+            '<span class="p-cell" v-for="(q, i) in exam.questions" :key="q.id"' +
+              ':class="{current: i === exam.current, answered: exam.answers[q.id], marked: exam.marked[q.id]}" @click="go(i)">{{ i + 1 }}</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:14px">' +
+          '<question-panel :q="currentQ" mode="exam" :answer="(exam.answers[currentQid] || \'\')"' +
+            '@update:answer="setAnswer(currentQid, $event)"></question-panel>' +
+        '</div>' +
+        '<div class="exam-foot">' +
+          '<button class="btn" :disabled="exam.current === 0" @click="prev">&#8592; Previous</button>' +
+          '<button class="btn" v-if="exam.current < exam.questions.length - 1" @click="next">Next &#8594;</button>' +
+          '<button class="btn btn-primary" v-else @click="confirmSubmit">Submit exam</button>' +
+          '<span class="grow"></span>' +
+          '<span class="muted small">{{ answeredCount }} of {{ exam.questions.length }} answered</span>' +
+          '<button class="btn btn-danger" @click="confirmSubmit">Finish</button>' +
+        '</div>' +
+      '</template>' +
+      '<div class="card" v-else-if="results">' +
+        '<div class="center">' +
+          '<div class="score-ring" :style="{ \'--score\': results.score }">' +
+            '<div class="score-val">{{ results.score }}%</div>' +
+            '<div class="score-sub">score</div>' +
+          '</div>' +
+          '<h2 style="margin-bottom:4px">{{ results.score >= 80 ? \'Passed\' : (results.score >= 60 ? \'Getting there\' : \'Keep studying\') }}</h2>' +
+          '<p class="muted small">Correct: {{ results.correct }} &middot; Incorrect: {{ results.incorrect }} &middot; Time: {{ G.U.fmtClock(results.elapsed) }}</p>' +
+          '<div class="weak-chips" v-if="results.weakAreas.length">' +
+            '<span class="weak-chip" v-for="w in results.weakAreas" :key="w.name">{{ w.name }} — {{ w.accuracy }}%</span>' +
+          '</div>' +
+          '<div class="summary-actions" style="justify-content:center">' +
+            '<button class="btn btn-primary" @click="reset">New exam</button>' +
+            '<button class="btn" @click="showResults">{{ reviewResults ? \'Hide answers\' : \'Review answers\' }}</button>' +
+            '<button class="btn btn-ghost" @click="reset">Close</button>' +
+          '</div>' +
+        '</div>' +
+        '<div v-if="reviewResults" style="margin-top:20px">' +
+          '<div class="exam-review-item" v-for="(r, i) in results.results" :key="i">' +
+            '<div class="eri-head">' +
+              '<span class="badge" :class="r.verdict.correct ? \'ok\' : \'bad\'">{{ r.verdict.correct ? \'Correct\' : \'Incorrect\' }}</span>' +
+              '<span class="badge" :class="\'type-\' + r.q.type">{{ r.q.type }}</span>' +
+              '<span class="muted small" style="margin-left:auto">{{ r.q.chapterName }} &middot; {{ r.q.topicName }}</span>' +
+            '</div>' +
+            '<div class="eri-q">{{ i + 1 }}. {{ r.q.question }}</div>' +
+            '<div class="eri-body">' +
+              '<div class="eri-ans"><span class="lbl">Your answer</span><pre>{{ r.user || \'(blank)\' }}</pre></div>' +
+              '<div class="eri-ans"><span class="lbl">Correct answer</span><pre>{{ r.q.answerText }}</pre></div>' +
+            '</div>' +
+            '<div class="eri-ans" style="margin-top:10px" v-if="r.q.explanation"><span class="lbl">Explanation</span>{{ r.q.explanation }}</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const TroubleView = {
+  name: 'TroubleView',
+  data() { return { focus: 'all' }; },
+  computed: {
+    focuses() { return G.TroubleFocus; },
+    focusCount() { return G.Trouble.pool(this.focus).length; },
+    hasSession() { return !!(G.store.session && G.store.session.mode === 'trouble' && !G.store.session.done); },
+    summary() { return G.store.sessionSummary; }
+  },
+  methods: {
+    start() { G.Trouble.start(this.focus); }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Troubleshooting</h1>' +
+        '<p>Scenario-first practice: symptoms, topology, show output — decide what to check and what to fix.</p>' +
+      '</div>' +
+      '<practice-session v-if="hasSession"></practice-session>' +
+      '<session-summary v-else-if="summary"></session-summary>' +
+      '<template v-else>' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>Focus area</h3></div>' +
+          '<div class="seg" style="margin-bottom:14px">' +
+            '<button class="seg-btn" v-for="f in focuses" :key="f.id" :class="{on: focus === f.id}" @click="focus = f.id">{{ f.name }}</button>' +
+          '</div>' +
+          '<p class="small muted" style="margin-bottom:14px">Prioritises troubleshooting questions with symptoms, topology and show-command output. ' +
+            'Answer like an engineer: what would you check first, which command would you run, what is the root cause?</p>' +
+          '<button class="btn btn-primary btn-lg" @click="start">Start — {{ focusCount }} questions</button>' +
+        '</div>' +
+      '</template>' +
+    '</div>'
+};
+
+const WeakView = {
+  name: 'WeakView',
+  computed: {
+    weak() { return G.Stats.weakTopics(100); },
+    settings() { return G.Storage.state.settings; },
+    hasSession() { return !!(G.store.session && G.store.session.mode === 'weak' && !G.store.session.done); },
+    summary() { return G.store.sessionSummary; }
+  },
+  methods: {
+    reviewGroup(g) {
+      const parts = g.key.split('|');
+      const ids = [];
+      G.DataStore.questions.forEach((q) => {
+        if (q.chapterId === parts[0] && q.topicId === parts[1] && q.subtopicId === parts[2]) ids.push(q.id);
+      });
+      G.Session.start({ mode: 'weak', title: 'Weak: ' + g.name, ids: ids, shuffle: true });
+      G.UI.go('review');
+    },
+    reviewAll() {
+      const ids = [];
+      G.DataStore.questions.forEach((q) => {
+        const acc = G.Progress.accuracyOf(q.id);
+        const r = G.Progress.get(q.id);
+        if (acc !== null && r.attempts >= this.settings.weakMinAttempts && acc < this.settings.weakMinAccuracy) ids.push(q.id);
+      });
+      if (!ids.length) { G.UI.toast('No weak questions right now', 'info'); return; }
+      G.Session.start({ mode: 'weak', title: 'All weak questions', ids: ids, shuffle: true });
+      G.UI.go('review');
+    }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head">' +
+        '<h1>Weak Topics</h1>' +
+        '<p>Subtopics ranked by a weak score: low accuracy, incorrect answers, overdue reviews, hard difficulty.</p>' +
+      '</div>' +
+      '<practice-session v-if="hasSession"></practice-session>' +
+      '<session-summary v-else-if="summary"></session-summary>' +
+      '<template v-else>' +
+        '<div class="notice info" style="font-size:12px">' +
+          'Weak score = (1 &minus; accuracy) &times; 60 + overdue &times; 1.6 + incorrect &times; 0.8 + hard-difficulty bonus. ' +
+          'Only subtopics with at least {{ settings.weakMinAttempts }} attempt(s) are considered; weak = accuracy below {{ settings.weakMinAccuracy }}%.' +
+        '</div>' +
+        '<div class="summary-actions" style="margin-bottom:14px" v-if="weak.length">' +
+          '<button class="btn btn-primary" @click="reviewAll">Review all weak questions</button>' +
+        '</div>' +
+        '<div class="card" v-if="!weak.length">' +
+          '<div class="empty-state">' +
+            '<div class="es-icon">&#10003;</div>' +
+            '<div class="es-title">Nothing weak right now</div>' +
+            '<div class="small">Keep reviewing — weak topics appear once you have answer history.</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="weak-list" v-else>' +
+          '<div class="weak-item" v-for="w in weak" :key="w.key">' +
+            '<div class="wi-info">' +
+              '<div class="wi-name">{{ w.name }}</div>' +
+              '<div class="wi-sub">{{ w.chapter }} &middot; {{ w.topic }} &middot; {{ w.questions }} questions &middot; {{ w.overdue }} overdue &middot; score {{ w.score }}</div>' +
+              '<div class="bar" style="margin-top:6px"><div class="bar-fill" :class="G.UI.accClass(w.accuracy)" :style="{ width: w.accuracy + \'%\' }"></div></div>' +
+            '</div>' +
+            '<div class="wi-stats">' +
+              '<div class="acc" :class="G.UI.accClass(w.accuracy)">{{ w.accuracy }}%</div>' +
+              '<div class="att">{{ w.attempts }} attempts</div>' +
+            '</div>' +
+            '<button class="btn btn-sm" @click="reviewGroup(w)">Review</button>' +
+          '</div>' +
+        '</div>' +
+      '</template>' +
+    '</div>'
+};
+
+const ProgressView = {
+  name: 'ProgressView',
+  computed: {
+    ov() { return G.Stats.overall(); },
+    chapters() { return G.Stats.perChapter(); },
+    types() { return G.Stats.perType(); },
+    diffs() { return G.Stats.perDifficulty(); },
+    activity() { return G.Stats.activitySeries(14); },
+    streak() { return G.Stats.streak(); },
+    sessions() { return G.Storage.state.meta.sessions.slice().reverse().slice(0, 20); },
+    due() { return G.store.dueCount(); },
+    maxActivity() { return Math.max(1, ...this.activity.map((a) => a.attempts)); },
+    weekAcc() {
+      let att = 0, cor = 0;
+      this.activity.forEach((a) => { att += a.attempts; cor += a.correct; });
+      return G.U.pct(cor, att);
+    }
+  },
+  methods: {
+    label(t) { return G.APP.typeLabels[t] || t; },
+    modeLabel(m) {
+      const map = {
+        review: 'Review', weak: 'Weak topics', trouble: 'Troubleshooting', chapter: 'Chapter practice',
+        search: 'Search practice', browse: 'Filtered practice', single: 'Single question',
+        random: 'Random quiz', exam: 'Exam', 'exam-partial': 'Exam (left early)',
+        'review-partial': 'Review (left early)', 'weak-partial': 'Weak (left early)',
+        'trouble-partial': 'Troubleshoot (left early)', 'chapter-partial': 'Chapter (left early)',
+        'search-partial': 'Search (left early)', 'browse-partial': 'Filtered (left early)',
+        'random-partial': 'Random (left early)', 'single-partial': 'Single (left early)'
+      };
+      return map[m] || m;
+    },
+    fmtTime(iso) { return G.U.fmtTime(iso); },
+    fmtSec(s) { return G.U.fmtClock(Math.round((s || 0) / 1000)); },
+    pct(p, t) { return G.U.pct(p, t); },
+    accClass(a) { return G.UI.accClass(a); },
+    accColor(a) { return a >= 80 ? 'var(--green)' : a >= 60 ? 'var(--amber)' : 'var(--red)'; }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head"><h1>Progress</h1><p>Learning statistics, stored locally in this browser (localStorage).</p></div>' +
+      '<div class="stat-grid">' +
+        '<div class="stat-card"><div class="stat-value info">{{ ov.answered }}</div><div class="stat-label">Answered</div><div class="stat-sub">{{ ov.remaining }} unanswered</div></div>' +
+        '<div class="stat-card"><div class="stat-value" :class="accClass(ov.accuracy)">{{ ov.accuracy }}%</div><div class="stat-label">Overall Accuracy</div><div class="stat-sub">{{ ov.correct }} correct of {{ ov.attempts }}</div></div>' +
+        '<div class="stat-card"><div class="stat-value ok">{{ streak.current }}d</div><div class="stat-label">Current Streak</div><div class="stat-sub">best {{ streak.best }}d</div></div>' +
+        '<div class="stat-card"><div class="stat-value">{{ sessions.length }}</div><div class="stat-label">Sessions</div><div class="stat-sub">{{ due }} questions due today</div></div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="card-title"><h3>Activity — last 14 days</h3>' +
+          '<div class="legend"><span class="lg"><span class="swatch" style="background:var(--blue)"></span> attempts</span>' +
+          '<span class="lg"><span class="swatch" style="background:var(--green)"></span> correct</span></div></div>' +
+        '<div class="activity-chart">' +
+          '<div class="ac-col" v-for="a in activity" :key="a.date" :title="a.date + \': \' + a.attempts + \' attempts, \' + a.correct + \' correct\'">' +
+            '<div class="ac-bar-wrap"><div class="ac-bar" :class="{correct: a.attempts > 0}" :style="{ height: Math.max(2, (a.correct / maxActivity) * 100) + \'%\' }"></div></div>' +
+            '<div class="ac-label">{{ a.day }}</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="bar-row" style="margin-top:14px; margin-bottom:0">' +
+          '<div class="bar-label">Correct rate (14d)</div>' +
+          '<div class="bar"><div class="bar-fill ok" :style="{width: weekAcc + \'%\'}"></div></div>' +
+          '<div class="bar-num">{{ weekAcc }}%</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="card-title"><h3>Chapters</h3></div>' +
+        '<table class="table">' +
+          '<thead><tr><th>Chapter</th><th>Answered</th><th>Completion</th><th>Accuracy</th><th>Due</th></tr></thead>' +
+          '<tbody>' +
+            '<tr v-for="c in chapters" :key="c.id">' +
+              '<td>{{ c.name }}</td>' +
+              '<td class="mono">{{ c.answered }} / {{ c.total }}</td>' +
+              '<td style="min-width:150px"><div class="bar"><div class="bar-fill" :class="accClass(c.completion)" :style="{width: c.completion + \'%\'}"></div></div></td>' +
+              '<td class="mono" :style="{color: accColor(c.accuracy)}">{{ c.accuracy }}%</td>' +
+              '<td class="mono" :style="{color: c.due ? \'var(--red)\' : \'\'}">{{ c.due }}</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>By question type</h3></div>' +
+          '<div class="bar-row" v-for="t in types" :key="t.type">' +
+            '<div class="bar-label" :title="t.type">{{ label(t.type) }}</div>' +
+            '<div class="bar"><div class="bar-fill purple" :style="{width: t.accuracy + \'%\'}"></div></div>' +
+            '<div class="bar-num">{{ t.accuracy }}%</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card">' +
+          '<div class="card-title"><h3>By difficulty</h3></div>' +
+          '<div class="bar-row" v-for="d in diffs" :key="d.difficulty">' +
+            '<div class="bar-label">{{ G.U.cap(d.difficulty) }}</div>' +
+            '<div class="bar"><div class="bar-fill" :class="accClass(d.accuracy)" :style="{width: d.accuracy + \'%\'}"></div></div>' +
+            '<div class="bar-num">{{ d.accuracy }}%</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="card-title"><h3>Recent sessions</h3></div>' +
+        '<table class="table" v-if="sessions.length">' +
+          '<thead><tr><th>When</th><th>Mode</th><th>Correct</th><th>Total</th><th>Accuracy</th><th>Duration</th></tr></thead>' +
+          '<tbody>' +
+            '<tr v-for="(s, i) in sessions" :key="i">' +
+              '<td class="muted">{{ fmtTime(s.ts) }}</td>' +
+              '<td>{{ modeLabel(s.mode) }}</td>' +
+              '<td class="mono">{{ s.correct }}</td>' +
+              '<td class="mono">{{ s.total }}</td>' +
+              '<td class="mono" :style="{color: accColor(pct(s.correct, s.total))}">{{ pct(s.correct, s.total) }}%</td>' +
+              '<td class="mono muted">{{ fmtSec(s.duration) }}</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div class="empty-state" v-else><div class="es-title">No sessions yet — do your first review</div></div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="card-title"><h3>Spaced repetition schedule</h3></div>' +
+        '<table class="table">' +
+          '<thead><tr><th>Rating</th><th>Next review</th></tr></thead>' +
+          '<tbody>' +
+            '<tr><td><span class="badge bad">Again</span></td><td class="mono">10 minutes</td></tr>' +
+            '<tr><td><span class="badge warn">Hard</span></td><td class="mono">1 day</td></tr>' +
+            '<tr><td><span class="badge ok">Good</span></td><td class="mono">3 &rarr; 7 &rarr; 14 &rarr; 30 &rarr; 60 days</td></tr>' +
+            '<tr><td><span class="badge ok">Easy</span></td><td class="mono">7 &rarr; 21 &rarr; 45 &rarr; 90 days</td></tr>' +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+    '</div>'
+};
+
+const BrowseView = {
+  name: 'BrowseView',
+  data() {
+    return { f: G.Query.defaultFilters(), open: {} };
+  },
+  computed: {
+    chapterOptions() {
+      return G.DataStore.chapters.map((c) => ({ id: c.chapter.id, name: c.chapter.name }));
+    },
+    topicOptions() {
+      const ch = G.DataStore.chapters.find((c) => c.chapter.id === this.f.chapterId);
+      return ch ? ch.topics.map((t) => ({ id: t.id, name: t.name })) : [];
+    },
+    subtopicOptions() {
+      const ch = G.DataStore.chapters.find((c) => c.chapter.id === this.f.chapterId);
+      if (!ch) return [];
+      const t = ch.topics.find((x) => x.id === this.f.topicId);
+      return t ? t.subtopics.map((s) => ({ id: s.id, name: s.name })) : [];
+    },
+    tagOptions() { return G.DataStore.allTags; },
+    typeOptions() {
+      return [{ v: '', l: 'All types' }].concat(G.APP.questionTypes.map((t) => ({ v: t, l: G.APP.typeLabels[t] })));
+    },
+    diffOptions() {
+      return [{ v: '', l: 'All difficulties' }].concat(G.APP.difficulties.map((d) => ({ v: d, l: G.U.cap(d) })));
+    },
+    statusOptions() {
+      return [
+        { v: '', l: 'Any status' }, { v: 'due', l: 'Due today' }, { v: 'unanswered', l: 'Unanswered' },
+        { v: 'incorrect', l: 'Incorrect' }, { v: 'completed', l: 'Completed' }, { v: 'weak', l: 'Weak' }
+      ];
+    },
+    results() { return G.Query.apply(this.f); },
+    resultStats() {
+      let att = 0, cor = 0;
+      this.results.forEach((q) => {
+        const r = G.Progress.get(q.id);
+        if (r) { att += r.attempts; cor += r.correct; }
+      });
+      return { accuracy: G.U.pct(cor, att), answered: this.results.filter((q) => G.Progress.isAnswered(q.id)).length };
+    }
+  },
+  methods: {
+    toggle(qid) { this.open[qid] = !this.open[qid]; },
+    isOpen(qid) { return !!this.open[qid]; },
+    onChapterChange() { this.f.topicId = ''; this.f.subtopicId = ''; },
+    onTopicChange() { this.f.subtopicId = ''; },
+    clearFilters() {
+      this.f = G.Query.defaultFilters();
+      this.open = {};
+    },
+    practice() {
+      const ids = this.results.map((q) => q.id);
+      if (!ids.length) { G.UI.toast('No questions match these filters', 'warn'); return; }
+      G.Session.start({ mode: 'browse', title: 'Filtered practice', ids: ids, shuffle: true, cap: G.Storage.state.settings.queueCap });
+      G.UI.go('review');
+    },
+    practiceOne(qid) {
+      G.Session.start({ mode: 'single', title: 'Single question', ids: [qid] });
+      G.UI.go('review');
+    }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head"><h1>Browse</h1><p>Combinable filters over the whole question bank — inspect questions or practice the match set.</p></div>' +
+      '<div class="filter-bar">' +
+        '<div class="fb-field"><span class="fb-label">Chapter</span>' +
+          '<select v-model="f.chapterId" @change="onChapterChange"><option value="">All</option>' +
+          '<option v-for="c in chapterOptions" :key="c.id" :value="c.id">{{ c.name }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Topic</span>' +
+          '<select v-model="f.topicId" @change="onTopicChange"><option value="">All</option>' +
+          '<option v-for="t in topicOptions" :key="t.id" :value="t.id">{{ t.name }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Subtopic</span>' +
+          '<select v-model="f.subtopicId"><option value="">All</option>' +
+          '<option v-for="s in subtopicOptions" :key="s.id" :value="s.id">{{ s.name }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Type</span>' +
+          '<select v-model="f.type"><option v-for="o in typeOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Difficulty</span>' +
+          '<select v-model="f.difficulty"><option v-for="o in diffOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Tag</span>' +
+          '<select v-model="f.tag"><option value="">Any tag</option>' +
+          '<option v-for="t in tagOptions" :key="t" :value="t">{{ t }}</option></select></div>' +
+        '<div class="fb-field"><span class="fb-label">Status</span>' +
+          '<select v-model="f.status"><option v-for="o in statusOptions" :key="o.v" :value="o.v">{{ o.l }}</option></select></div>' +
+        '<div class="fb-field grow"><span class="fb-label">Search text</span>' +
+          '<div class="search-box"><span class="search-glyph">&#8981;</span>' +
+          '<input type="text" v-model="f.search" placeholder="keyword..."></div></div>' +
+        '<button class="btn btn-ghost btn-sm" @click="clearFilters">Clear</button>' +
+      '</div>' +
+      '<div class="practice-bar">' +
+        '<span class="pb-label">{{ results.length }} questions' +
+          '<span v-if="resultStats.answered"> &middot; {{ resultStats.answered }} answered &middot; {{ resultStats.accuracy }}% accuracy</span></span>' +
+        '<span class="grow"></span>' +
+        '<button class="btn btn-primary" @click="practice">Practice matched ({{ results.length }})</button>' +
+      '</div>' +
+      '<div class="qlist-item" v-for="q in results" :key="q.id">' +
+        '<div class="qli-head" @click="toggle(q.id)">' +
+          '<span class="badge" :class="\'type-\' + q.type" style="flex:0 0 auto">{{ q.type }}</span>' +
+          '<span class="badge" :class="\'diff-\' + q.difficulty" style="flex:0 0 auto">{{ q.difficulty }}</span>' +
+          '<span class="qli-q">{{ q.question }}</span>' +
+          '<span class="q-crumb">{{ q.chapterName }} \u203A {{ q.topicName }} \u203A {{ q.subtopicName }}</span>' +
+        '</div>' +
+        '<div class="qli-body" v-if="isOpen(q.id)">' +
+          '<div class="answer-box"><h4>Answer</h4>' +
+            '<code-block v-if="q.type === \'command\' || q.type === \'configuration\' || q.type === \'show_command\'" :text="q.answerText" title="answer"></code-block>' +
+            '<pre v-else>{{ q.answerText }}</pre></div>' +
+          '<div class="explanation-box"><h4>Explanation</h4><p>{{ q.explanation }}</p></div>' +
+          '<div v-if="q.tags.length" class="q-tags" style="margin:0 0 10px"><span class="q-tag" v-for="t in q.tags" :key="t">#{{ t }}</span></div>' +
+          '<button class="btn btn-sm" @click="practiceOne(q.id)">Practice this question</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="empty-state" v-if="!results.length">' +
+        '<div class="es-icon">&#8981;</div><div class="es-title">No questions match</div>' +
+        '<div class="small">Loosen the filters or clear the search text.</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const SearchView = {
+  name: 'SearchView',
+  data() {
+    return { query: '', results: [], searched: false, open: {} };
+  },
+  computed: {
+    grouped() {
+      const groups = {};
+      this.results.forEach((q) => {
+        const k = q.chapterId + '|' + q.topicId + '|' + q.subtopicId;
+        if (!groups[k]) {
+          groups[k] = { chapter: q.chapterName, topic: q.topicName, subtopic: q.subtopicName, questions: [] };
+        }
+        groups[k].questions.push(q);
+      });
+      return groups;
+    }
+  },
+  methods: {
+    run() {
+      if (!this.query.trim()) { this.results = []; this.searched = true; return; }
+      this.results = G.Query.search(this.query);
+      this.searched = true;
+      this.open = {};
+    },
+    toggle(qid) { this.open[qid] = !this.open[qid]; },
+    isOpen(qid) { return !!this.open[qid]; },
+    practiceAll() {
+      if (!this.results.length) return;
+      G.Session.start({ mode: 'search', title: 'Search: ' + this.query.trim(), ids: this.results.map((q) => q.id), shuffle: false, cap: 0 });
+      G.UI.go('review');
+    },
+    practiceOne(qid) {
+      G.Session.start({ mode: 'single', title: 'Single question', ids: [qid] });
+      G.UI.go('review');
+    }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head"><h1>Search</h1><p>Searches question text, answers, explanations, tags, chapter, topic and subtopic.</p></div>' +
+      '<div class="filter-bar">' +
+        '<div class="search-box grow">' +
+          '<span class="search-glyph">&#8981;</span>' +
+          '<input type="text" v-model="query" placeholder=\'e.g. "feasible successor"\' @keyup.enter="run">' +
+        '</div>' +
+        '<button class="btn btn-primary" @click="run">Search</button>' +
+      '</div>' +
+      '<template v-if="searched">' +
+        '<div class="notice info" v-if="!results.length">No matches for "{{ query }}". Try a shorter phrase or a tag like "ospf" or "stp".</div>' +
+        '<template v-else>' +
+          '<div class="search-group" v-for="(g, gk) in grouped" :key="gk">' +
+            '<div class="sg-head"><b>{{ g.chapter }}</b> &rarr; <b>{{ g.topic }}</b> &rarr; {{ g.subtopic }} &middot; {{ g.questions.length }} question(s)</div>' +
+            '<div class="qlist-item" v-for="q in g.questions.slice(0, 8)" :key="q.id">' +
+              '<div class="qli-head" @click="toggle(q.id)">' +
+                '<span class="badge" :class="\'type-\' + q.type" style="flex:0 0 auto">{{ q.type }}</span>' +
+                '<span class="qli-q">{{ q.question }}</span>' +
+              '</div>' +
+              '<div class="qli-body" v-if="isOpen(q.id)">' +
+                '<div class="answer-box"><h4>Answer</h4><pre>{{ q.answerText }}</pre></div>' +
+                '<div class="explanation-box"><h4>Explanation</h4><p>{{ q.explanation }}</p></div>' +
+                '<button class="btn btn-sm" @click="practiceOne(q.id)">Practice this question</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="summary-actions">' +
+            '<button class="btn btn-primary" @click="practiceAll">Practice all {{ results.length }} matches</button>' +
+          '</div>' +
+        '</template>' +
+      '</template>' +
+    '</div>'
+};
+
+const SettingsView = {
+  name: 'SettingsView',
+  computed: {
+    s() { return G.Storage.state.settings; },
+    statuses() {
+      return G.APP.questionFiles.map((f) => ({
+        path: f.path,
+        state: G.store.fileStatus[f.path] || { state: 'unknown', message: '' },
+        count: G.DataStore.chapterCounts[f.chapterId] || 0
+      }));
+    },
+    storageKey() { return G.APP.storageKey; }
+  },
+  methods: {
+    setTheme(v) {
+      this.s.theme = v;
+      document.documentElement.setAttribute('data-theme', v);
+      G.Storage.save();
+    },
+    save() { G.Storage.save(); },
+    exportProgress() {
+      const payload = G.Storage.exportJson();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'networking-recall-progress-' + G.U.todayStr() + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      G.UI.toast('Progress exported', 'ok');
+    },
+    onImportFile(evt) {
+      const file = evt.target.files && evt.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      const self = this;
+      reader.onload = function () {
+        let data;
+        try { data = JSON.parse(reader.result); }
+        catch (e) { G.UI.toast('Import failed — the file is not valid JSON', 'err'); evt.target.value = ''; return; }
+        if (!data || typeof data !== 'object' || !data.progress) {
+          G.UI.toast('Import failed — no progress data found in this file', 'err');
+          evt.target.value = '';
+          return;
+        }
+        const n = Object.keys(data.progress).length;
+        G.UI.confirm({
+          title: 'Import progress',
+          body: 'This file contains records for ' + n + ' question(s). Merge combines it with your current data; Replace overwrites your progress entirely.',
+          confirmText: 'Merge',
+          altText: 'Replace',
+          onAlt: function () { self.doImport(data, 'replace'); },
+          onConfirm: function () { self.doImport(data, 'merge'); }
+        });
+        evt.target.value = '';
+      };
+      reader.readAsText(file);
+    },
+    doImport(data, mode) {
+      G.Storage.importData(data, mode);
+      G.UI.toast('Imported (' + mode + ')', 'ok');
+    },
+    resetProgress() {
+      G.UI.confirm({
+        title: 'Reset all progress?',
+        body: 'This permanently deletes all attempts, ratings, streaks and session history from this browser. The question bank JSON files are never touched.',
+        confirmText: 'Delete everything',
+        danger: true,
+        onConfirm: function () {
+          G.Storage.reset();
+          G.UI.toast('All progress has been reset', 'warn');
+        }
+      });
+    },
+    reloadData() {
+      G.store.appReady = false;
+      G.store.loadErrors = [];
+      G.store.validationErrors = [];
+      G.DataStore.loadAll().then(function () {
+        G.store.appReady = true;
+      });
+    }
+  },
+  template:
+    '<div class="page">' +
+      '<div class="page-head"><h1>Settings</h1><p>Preferences and data management — everything lives locally in this browser.</p></div>' +
+      '<div class="card settings-section">' +
+        '<div class="card-title"><h3>Appearance</h3></div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Theme<div class="sr-desc">Dark-first interface, tuned for network operations aesthetics.</div></div>' +
+          '<div class="seg">' +
+            '<button class="seg-btn" :class="{on: s.theme === \'dark\'}" @click="setTheme(\'dark\')">Dark</button>' +
+            '<button class="seg-btn" :class="{on: s.theme === \'light\'}" @click="setTheme(\'light\')">Light</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card settings-section">' +
+        '<div class="card-title"><h3>Review defaults</h3></div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Queue cap<div class="sr-desc">Maximum questions per review session (0 = no limit).</div></div>' +
+          '<input type="number" min="0" style="width:90px; background:var(--bg1); border:1px solid var(--line2); border-radius:6px; padding:5px 8px" v-model.number="s.queueCap" @change="save">' +
+        '</div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Show hints after reveal<div class="sr-desc">Display the optional hint button once the answer is shown.</div></div>' +
+          '<label class="switch"><input type="checkbox" v-model="s.showHints" @change="save"><span class="slider"></span></label>' +
+        '</div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Answer match threshold<div class="sr-desc">Free-text answers count as correct when token similarity is at or above this fraction.</div></div>' +
+          '<input type="number" min="0" max="1" step="0.05" style="width:90px; background:var(--bg1); border:1px solid var(--line2); border-radius:6px; padding:5px 8px" v-model.number="s.tokenThreshold" @change="save">' +
+        '</div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Weak topic filters<div class="sr-desc">Min attempts and max accuracy (%) for a subtopic to count as weak.</div></div>' +
+          '<div style="display:flex; gap:8px">' +
+            '<input type="number" min="1" style="width:80px; background:var(--bg1); border:1px solid var(--line2); border-radius:6px; padding:5px 8px" v-model.number="s.weakMinAttempts" @change="save" title="min attempts">' +
+            '<input type="number" min="0" max="100" style="width:80px; background:var(--bg1); border:1px solid var(--line2); border-radius:6px; padding:5px 8px" v-model.number="s.weakMinAccuracy" @change="save" title="max accuracy %">' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card settings-section">' +
+        '<div class="card-title"><h3>Data management</h3></div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Export progress<div class="sr-desc">Download all learning progress as a JSON file (question banks are never modified).</div></div>' +
+          '<button class="btn btn-sm" @click="exportProgress">Export</button>' +
+        '</div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Import progress<div class="sr-desc">Restore from an exported file. Merge combines; Replace overwrites.</div></div>' +
+          '<label class="btn btn-sm" style="cursor:pointer">Import<input type="file" accept="application/json,.json" style="display:none" @change="onImportFile"></label>' +
+        '</div>' +
+        '<div class="setting-row">' +
+          '<div class="sr-info">Reset progress<div class="sr-desc">Delete all attempts, ratings, streaks and sessions from this browser.</div></div>' +
+          '<button class="btn btn-sm btn-danger" @click="resetProgress">Reset</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card settings-section">' +
+        '<div class="card-title"><h3>Data sources</h3><button class="btn btn-sm btn-ghost" @click="reloadData">Reload all</button></div>' +
+        '<div class="data-source-row" v-for="st in statuses" :key="st.path">' +
+          '<span class="ds-status"><span v-if="st.state.state === \'ok\'" class="ok">&#10003;</span><span v-else-if="st.state.state === \'error\'" class="err">&#10007;</span><span v-else>&#8212;</span></span>' +
+          '<span class="mono">{{ st.path }}</span>' +
+          '<span class="muted small" v-if="st.state.state === \'ok\'">{{ st.count }} questions</span>' +
+          '<span class="ds-err" v-if="st.state.state === \'error\'">{{ st.state.message }}</span>' +
+        '</div>' +
+        '<p class="small muted" style="margin-top:10px">Question banks are loaded from JSON files under ./data/ — they are read-only. ' +
+          'Your progress lives in localStorage under the key "{{ storageKey }}".</p>' +
+      '</div>' +
+      '<div class="card settings-section">' +
+        '<div class="card-title"><h3>About</h3></div>' +
+        '<p class="small muted" style="margin-bottom:6px"><b>Networking Recall</b> v{{ G.APP.version }} &middot; active-recall + spaced-repetition study system for Obsidian vaults. ' +
+          'Works fully offline after the Vue CDN library has loaded once. Keyboard: Space = reveal, 1&ndash;4 = rating, N = next, R = random, E = exam, Esc = close dialog.</p>' +
+      '</div>' +
+    '</div>'
+};
+
+const ConfirmModal = {
+  name: 'ConfirmModal',
+  computed: {
+    m() { return G.store.modal; }
+  },
+  methods: {
+    cancel() { G.UI.closeModal(); },
+    confirm() { G.UI.doConfirm(); },
+    alt() {
+      const m = this.m;
+      if (!m || !m.onAlt) return;
+      const fn = m.onAlt;
+      G.store.modal = null;
+      fn();
+    }
+  },
+  template:
+    '<div class="modal-overlay" v-if="m" @click.self="cancel">' +
+      '<div class="modal-card">' +
+        '<h3>{{ m.title }}</h3>' +
+        '<p>{{ m.body }}</p>' +
+        '<div class="modal-actions">' +
+          '<button class="btn" @click="cancel">{{ m.cancelText || \'Cancel\' }}</button>' +
+          '<button class="btn" v-if="m.altText" @click="alt">{{ m.altText }}</button>' +
+          '<button class="btn" :class="m.danger ? \'btn-danger\' : \'btn-primary\'" @click="confirm">{{ m.confirmText || \'Confirm\' }}</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+};
+
+const ToastHost = {
+  name: 'ToastHost',
+  computed: {
+    toasts() { return G.UI.toasts; }
+  },
+  template:
+    '<div class="toast-host">' +
+      '<div v-for="t in toasts" :key="t.id" :class="\'toast \' + t.kind">{{ t.msg }}</div>' +
+    '</div>'
+};
+
+/* ---------- root application ---------- */
+const app = Vue.createApp({
+  name: 'NetworkingRecallApp',
+  mounted() {
+    window.addEventListener('keydown', this.onKey);
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.onKey);
+  },
+  methods: {
+    onKey(e) {
+      if (G.store.modal) {
+        if (e.key === 'Escape') G.UI.closeModal();
+        return;
+      }
+      const t = e.target;
+      const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+      if (typing) return;
+      if (!G.store.appReady) return;
+      const k = e.key.toLowerCase();
+
+      if (G.store.exam && !G.store.exam.finished) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); G.Exam.prev(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); G.Exam.next(); }
+        return;
+      }
+
+      const s = G.store.session;
+      if (e.key === ' ' || e.code === 'Space') {
+        if (s && !s.done && !s.revealed) {
+          e.preventDefault();
+          G.Session.reveal();
+        }
+        return;
+      }
+      if (k === '1' || k === '2' || k === '3' || k === '4') {
+        if (s && !s.done && s.revealed) {
+          e.preventDefault();
+          G.Session.rate({ '1': 'again', '2': 'hard', '3': 'good', '4': 'easy' }[k]);
+        }
+        return;
+      }
+      if (k === 'n') {
+        if (s && !s.done) {
+          e.preventDefault();
+          G.Session.next();
+        }
+        return;
+      }
+      if (k === 'r') { G.UI.go('random'); return; }
+      if (k === 'e') { G.UI.go('exam'); return; }
+      if (k === 'escape') { G.UI.closeModal(); }
+    }
+  }
+});
+app.config.globalProperties.$G = G;
+app.config.globalProperties.G = G;
+app.component('CodeBlock', CodeBlock);
+app.component('QuestionPanel', QuestionPanel);
+app.component('PracticeSession', PracticeSession);
+app.component('SessionSummary', SessionSummary);
+app.component('DashboardView', DashboardView);
+app.component('ChaptersView', ChaptersView);
+app.component('TopicsView', TopicsView);
+app.component('ReviewView', ReviewView);
+app.component('RandomView', RandomView);
+app.component('ExamView', ExamView);
+app.component('TroubleView', TroubleView);
+app.component('WeakView', WeakView);
+app.component('ProgressView', ProgressView);
+app.component('BrowseView', BrowseView);
+app.component('SearchView', SearchView);
+app.component('SettingsView', SettingsView);
+app.component('ConfirmModal', ConfirmModal);
+app.component('ToastHost', ToastHost);
+
+/* ============================================================
+   18. INITIALISATION
+   ============================================================ */
+function init() {
+  const saved = Storage.load();
+  document.documentElement.setAttribute('data-theme', saved.settings.theme);
+  store.fileProtocol = window.location.protocol === 'file:';
+  async function loadAll() {
+    store.loadState = 'loading';
+    try {
+      await DataStore.loadAll();
+    } catch (e) {
+      store.loadErrors.push({ file: '(loader)', message: String((e && e.message) || e) });
+    }
+    if (!DataStore.questions.length && !DataStore.loadErrors.length) {
+      store.loadErrors.push({ file: '(loader)', message: 'No questions were found in any data file.' });
+    }
+    store.loadState = DataStore.loadErrors.length ? 'error' : 'ok';
+    store.appReady = true;
+  }
+  loadAll();
+  app.mount('#app');
+}
+
+function tryMount() {
+  if (typeof Vue === 'undefined') {
+    setTimeout(function () {
+      if (typeof Vue === 'undefined') {
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('vue-fallback').style.display = 'flex';
+      } else {
+        init();
+      }
+    }, 2500);
+    return;
+  }
+  init();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', tryMount);
+} else {
+  tryMount();
+}
+</script>
+</body>
+</html>

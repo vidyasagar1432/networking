@@ -1,0 +1,1600 @@
+{
+  "chapter": {
+    "id": "switching",
+    "name": "Switching",
+    "description": "Layer 2 switching: VLANs, VTP, trunking/DTP, EtherChannel, STP/RSTP/MST, HSRP and stacking"
+  },
+  "topics": [
+    {
+      "id": "vlan",
+      "name": "VLAN",
+      "subtopics": [
+        {
+          "id": "vlan-basics",
+          "name": "Basics",
+          "questions": [
+            {
+              "id": "SW-VLAN-BASIC-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What problem does a VLAN solve?",
+              "answer": "VLANs divide a physical switch into multiple logical Layer 2 broadcast domains, so broadcast traffic and unknown-unicast flooding are contained within each VLAN instead of crossing the whole switch. This also allows separate subnets, security zones and policies on one switch.",
+              "explanation": "Without VLANs every port is in the same broadcast domain — one broadcast reaches all hosts. VLANs segment that domain and are the foundation for Layer 3 separation.",
+              "tags": ["vlan", "switching", "layer2", "broadcast"],
+              "acceptableAnswers": [
+                "divides a switch into multiple broadcast domains",
+                "creates logical layer 2 broadcast domains",
+                "segments broadcast domains"
+              ],
+              "hints": ["What traffic does a switch flood to all ports when it has no matching entry?"]
+            },
+            {
+              "id": "SW-VLAN-BASIC-002",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What happens to broadcast traffic inside a VLAN?",
+              "answer": "Broadcast frames are flooded to every switch port in the same VLAN — and only that VLAN. Ports in other VLANs never see the frames.",
+              "explanation": "The broadcast domain is bounded by the VLAN. VLANs block broadcasts between them, which is why inter-VLAN traffic requires Layer 3.",
+              "tags": ["vlan", "broadcast", "flooding"],
+              "acceptableAnswers": [
+                "flooded to all ports in the same vlan only",
+                "contained within the vlan"
+              ]
+            },
+            {
+              "id": "SW-VLAN-BASIC-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Can two hosts in different VLANs on the same switch communicate directly (without a router)?",
+              "choices": [
+                "Yes, if they are on the same switch",
+                "No, each VLAN is a separate Layer 2 broadcast domain and needs Layer 3 to communicate",
+                "Yes, but only for multicast",
+                "No, they can never communicate even with a router"
+              ],
+              "answer": "No, each VLAN is a separate Layer 2 broadcast domain and needs Layer 3 to communicate",
+              "explanation": "VLANs are isolated Layer 2 domains. Inter-VLAN traffic must be routed (router-on-a-stick, SVI, or a multilayer switch).",
+              "tags": ["vlan", "intervlan", "routing"]
+            },
+            {
+              "id": "SW-VLAN-BASIC-004",
+              "type": "fill_blank",
+              "difficulty": "easy",
+              "question": "VLANs are identified by a number in the range 1–4094, and by default all switch ports belong to VLAN __________.",
+              "answer": "1",
+              "explanation": "VLAN 1 is the default VLAN and also the default management and native VLAN — a reason it is a security best practice to move management off VLAN 1.",
+              "tags": ["vlan", "defaults"],
+              "acceptableAnswers": ["1", "vlan 1"]
+            }
+          ]
+        },
+        {
+          "id": "vlan-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-VLAN-CONF-001",
+              "type": "config",
+              "difficulty": "easy",
+              "question": "Configure VLAN 10 on SW1 and name it USERS.",
+              "answer": ["vlan 10", "name USERS"],
+              "commands": ["vlan 10", "name USERS"],
+              "explanation": "`vlan 10` creates the VLAN and enters VLAN configuration mode; `name USERS` labels it. VLANs are local to a switch unless trunking/VTP carries them.",
+              "tags": ["vlan", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["vlan 10", "name USERS"],
+                ["interface vlan 10"]
+              ]
+            },
+            {
+              "id": "SW-VLAN-CONF-002",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Assign interface GigabitEthernet0/1 to VLAN 20 in access mode.",
+              "answer": ["interface GigabitEthernet0/1", "switchport mode access", "switchport access vlan 20"],
+              "commands": ["interface GigabitEthernet0/1", "switchport mode access", "switchport access vlan 20"],
+              "explanation": "`switchport mode access` forces the port to access mode and `switchport access vlan 20` places it in VLAN 20. Ports left in dynamic mode may negotiate trunking.",
+              "tags": ["vlan", "configuration", "ios", "access-port"],
+              "acceptableAnswers": [
+                ["interface Gi0/1", "switchport mode access", "switchport access vlan 20"],
+                ["int g0/1", "switchport access vlan 20", "switchport mode access"]
+              ],
+              "hints": ["Ports are Layer 2 by default on most switches — no need to disable Layer 3."]
+            },
+            {
+              "id": "SW-VLAN-CONF-003",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "A user reports their host cannot communicate. Which single command shows which VLAN every port on SW1 is in?",
+              "answer": "show vlan brief",
+              "commands": ["show vlan brief"],
+              "explanation": "`show vlan brief` lists VLANs and every access port assigned to each. `show interfaces status` also shows access VLANs per interface, and `show interfaces switchport` shows detailed per-port state.",
+              "tags": ["vlan", "verification", "show-command", "ios"],
+              "acceptableAnswers": [
+                ["show vlan brief"],
+                ["show vlan"],
+                ["show interfaces switchport"]
+              ],
+              "expectedOutput": "VLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n1    default                          active    Gi0/3, Gi0/4\n10   USERS                            active    Gi0/1, Gi0/2"
+            }
+          ]
+        },
+        {
+          "id": "vlan-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-VLAN-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "VLAN 10 exists on SW1 but not on SW2. Hosts in VLAN 10 on SW1 cannot reach anything beyond SW2. What is the likely impact and what would you check first?",
+              "symptoms": [
+                "Hosts in VLAN 10 on SW1 cannot reach servers connected to SW2",
+                "SW2 has no VLAN 10 configured",
+                "The SW1–SW2 link is a trunk"
+              ],
+              "topology": "SW1 --- (trunk) --- SW2",
+              "answer": "SW2 silently drops 802.1Q frames for a VLAN it does not know, so traffic disappears. Check first that VLAN 10 exists on SW2 (`show vlan brief`), then verify VLAN 10 is allowed on the trunk (`show interfaces trunk`).",
+              "explanation": "A switch cannot forward frames for an unknown VLAN — they are dropped. Unlike a native VLAN mismatch (which is a bigger problem), a missing VLAN just drops that VLAN's traffic.",
+              "tags": ["vlan", "trunk", "troubleshooting"],
+              "acceptableAnswers": [
+                "check vlan 10 exists on sw2",
+                "sw2 drops frames for unknown vlan",
+                "verify vlan 10 is created and allowed on the trunk"
+              ],
+              "hints": ["Does SW2 even know about VLAN 10?", "Then check `show interfaces trunk` allowed list."],
+              "references": ["Cisco: VLAN troubleshooting guide"]
+            },
+            {
+              "id": "SW-VLAN-TROU-002",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "A host in VLAN 10 cannot ping its gateway, but other hosts in VLAN 10 work fine. What is the most likely cause and what command would you run?",
+              "symptoms": [
+                "Only one host is affected",
+                "The host is plugged into port Gi0/12",
+                "Other hosts in VLAN 10 are working"
+              ],
+              "answer": "The port is probably in the wrong VLAN or shut down. Run `show interfaces GigabitEthernet0/12 switchport` (or `show vlan brief`) to confirm the port's access VLAN, and check the port is not administratively down with `show interfaces status`.",
+              "explanation": "When exactly one host is broken, the problem is almost always port-level: wrong access VLAN, port disabled, or a cable/duplex issue — not the SVI or gateway.",
+              "tags": ["vlan", "access-port", "troubleshooting"],
+              "acceptableAnswers": [
+                "check the port access vlan with show interfaces switchport",
+                "the port is in the wrong vlan"
+              ],
+              "hints": ["Is the problem at the host, the port, or the SVI? Only one host fails, so start at the port."]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trunking",
+      "name": "Trunking",
+      "subtopics": [
+        {
+          "id": "trunk-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-TRUNK-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "How does a trunk carry multiple VLANs over a single link?",
+              "answer": "The trunk tags each frame with a VLAN identifier. 802.1Q inserts a 4-byte tag (TPID 0x8100, priority, and the 12-bit VLAN ID) between the source MAC and the EtherType, so the receiving switch knows which VLAN each frame belongs to.",
+              "explanation": "802.1Q is the standard trunking protocol. Frames on the native VLAN are carried untagged by default — a source of classic misconfiguration.",
+              "tags": ["trunk", "802.1q", "tagging", "vlan"],
+              "acceptableAnswers": [
+                "it adds a vlan tag to each frame",
+                "802.1q tagging",
+                "frames are tagged with the vlan id"
+              ],
+              "hints": ["What does 802.1Q add to the Ethernet frame?"]
+            },
+            {
+              "id": "SW-TRUNK-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "What is the native VLAN on an 802.1Q trunk?",
+              "choices": [
+                "A VLAN whose frames are carried untagged over the trunk",
+                "The VLAN with the lowest ID allowed on the trunk",
+                "A special VLAN used only for spanning-tree BPDUs",
+                "The management VLAN configured in global config"
+              ],
+              "answer": "A VLAN whose frames are carried untagged over the trunk",
+              "explanation": "Frames of the native VLAN (default 1) are not tagged on an 802.1Q trunk. The native VLAN must match on both ends — mismatches cause silent traffic mixing between VLANs.",
+              "tags": ["trunk", "native-vlan", "802.1q"]
+            },
+            {
+              "id": "SW-TRUNK-CON-003",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "By default, an 802.1Q trunk carries all configured VLANs unless the allowed list is restricted.",
+              "answer": "true",
+              "explanation": "By default `switchport trunk allowed vlan all` applies; `switchport trunk allowed vlan <list>` restricts which VLANs cross the trunk.",
+              "tags": ["trunk", "vlan", "allowed-list"]
+            }
+          ]
+        },
+        {
+          "id": "trunk-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-TRUNK-CONF-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure interface GigabitEthernet0/24 on SW1 as an 802.1Q trunk and allow only VLANs 10, 20 and 30.",
+              "answer": ["interface GigabitEthernet0/24", "switchport mode trunk", "switchport trunk allowed vlan 10,20,30"],
+              "commands": ["interface GigabitEthernet0/24", "switchport mode trunk", "switchport trunk allowed vlan 10,20,30"],
+              "explanation": "`switchport mode trunk` makes the port a trunk; the allowed list restricts which VLANs are carried. Native VLAN defaults to 1 (untagged) unless changed.",
+              "tags": ["trunk", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int g0/24", "switchport mode trunk", "switchport trunk allowed vlan 10,20,30"],
+                ["interface g0/24", "switchport trunk allowed vlan 10,20,30", "switchport mode trunk"]
+              ],
+              "hints": ["Use `switchport trunk allowed vlan remove 10` to strip VLANs one at a time on a busy trunk."]
+            },
+            {
+              "id": "SW-TRUNK-CONF-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command verifies that a trunk is up, shows its mode and the allowed/active VLAN lists on the link?",
+              "answer": "show interfaces trunk",
+              "commands": ["show interfaces trunk"],
+              "explanation": "`show interfaces trunk` shows trunk status, encapsulation, mode, allowed and active VLANs per trunk. `show interfaces Gi0/24 switchport` shows detailed per-port trunk settings.",
+              "tags": ["trunk", "verification", "show-command", "ios"],
+              "acceptableAnswers": [
+                ["show interfaces trunk"],
+                ["show interface trunk"]
+              ],
+              "expectedOutput": "Port        Mode         Encapsulation  Status        Native vlan\nGi0/24      on           802.1q         trunking      1\n\nPort        Vlans allowed on trunk\nGi0/24      10,20,30\n\nPort        Vlans allowed and active in management domain\nGi0/24      10,20,30"
+            }
+          ]
+        },
+        {
+          "id": "trunk-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-TRUNK-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "Hosts in VLAN 10 cannot reach hosts in VLAN 10 on the other switch, and you see flooding between VLAN 10 and VLAN 20. What is the most likely root cause?",
+              "symptoms": [
+                "VLAN 10 hosts across the trunk cannot communicate",
+                "You see traffic from VLAN 10 appearing in VLAN 20 and vice versa",
+                "All ports look up",
+                "show interfaces trunk works"
+              ],
+              "answer": "Native VLAN mismatch: one side has native VLAN 10, the other has native VLAN 20 (or one side default 1). Untagged frames from one side are placed in the other side's native VLAN, silently mixing VLANs.",
+              "explanation": "A native VLAN mismatch does not block the trunk — it causes untagged frames to be accepted into the wrong VLAN, creating invisible bridging between VLANs. Fix by matching `switchport trunk native vlan` on both ends (or both default).",
+              "tags": ["trunk", "native-vlan", "troubleshooting"],
+              "acceptableAnswers": [
+                "native vlan mismatch",
+                "native vlan mismatch causes traffic to be placed in the wrong vlan"
+              ],
+              "hints": ["Which VLAN travels the trunk untagged?", "Compare `show interfaces trunk` native vlan on both ends."],
+              "references": ["Cisco: Troubleshooting native VLAN mismatch"]
+            },
+            {
+              "id": "SW-TRUNK-TROU-002",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "VLAN 30 traffic does not cross the trunk, but VLAN 10 and 20 do. What would you check first?",
+              "symptoms": [
+                "VLAN 10 and 20 pass across the trunk normally",
+                "VLAN 30 is configured on both switches",
+                "Ports are up"
+              ],
+              "answer": "Check the trunk's allowed VLAN list — VLAN 30 may have been pruned or removed. Run `show interfaces trunk` on both ends and verify 30 is in the allowed and active lists.",
+              "explanation": "When some VLANs work and one does not, the likely cause is `switchport trunk allowed vlan` filtering on one end, or the VLAN not existing on one switch (it will show as not active).",
+              "tags": ["trunk", "allowed-list", "vlan", "troubleshooting"],
+              "acceptableAnswers": [
+                "check allowed vlan list with show interfaces trunk",
+                "vlan 30 is not allowed on the trunk"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "etherchannel",
+      "name": "EtherChannel",
+      "subtopics": [
+        {
+          "id": "etherchannel-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-ETH-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Why not just connect two switches with two parallel cables instead of using EtherChannel?",
+              "answer": "STP would block one of the links to prevent loops, so you gain no bandwidth and no redundancy. EtherChannel bundles up to 8 links into one logical link, so STP sees a single interface and all member links forward traffic.",
+              "explanation": "EtherChannel provides load balancing (per flow, based on hash of MAC/IP/port fields) and redundancy: if one member fails, traffic shifts to the others without STP reconvergence.",
+              "tags": ["etherchannel", "stp", "loop-avoidance"],
+              "acceptableAnswers": [
+                "stp blocks the redundant link",
+                "stp would block one of the parallel links creating a loop"
+              ],
+              "hints": ["What does STP do to redundant paths?"]
+            },
+            {
+              "id": "SW-ETH-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "How does traffic get load-balanced across EtherChannel member links?",
+              "choices": [
+                "Round-robin on every frame",
+                "A hash of frame fields (e.g. source/destination MAC, IP, ports) mapped to a member link per flow",
+                "By VLAN ID only, in strict order",
+                "It is not load balanced — one link carries all traffic"
+              ],
+              "answer": "A hash of frame fields (e.g. source/destination MAC, IP, ports) mapped to a member link per flow",
+              "explanation": "The hash distributes flows across members; a single flow stays on one link (no reordering). The default hash uses source-destination MAC on switches; it can be tuned with `port-channel load-balance`.",
+              "tags": ["etherchannel", "load-balancing", "hashing"]
+            },
+            {
+              "id": "SW-ETH-CON-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "An EtherChannel can bundle links from two different switches into a single logical link to another pair of switches.",
+              "answer": "false",
+              "explanation": "All members of an EtherChannel must terminate on the same pair of devices. Members can span different line cards of the same device, but not different devices.",
+              "tags": ["etherchannel", "concepts"]
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-lacp",
+          "name": "LACP",
+          "questions": [
+            {
+              "id": "SW-ETH-LACP-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Which protocol is the open-standard (IEEE 802.3ad/802.1AX) EtherChannel negotiation protocol, and what do the two modes (active/passive) mean?",
+              "answer": "LACP (Link Aggregation Control Protocol). Active mode actively sends LACP PDUs and forms a channel with either active or passive neighbors; passive mode only responds to PDUs and forms a channel only with an active neighbor.",
+              "explanation": "LACP is the IEEE standard: active + active or active + passive forms a channel; passive + passive stays down. PAgP is Cisco-proprietary and uses desirable/auto modes.",
+              "tags": ["etherchannel", "lacp", "802.3ad"],
+              "acceptableAnswers": [
+                "lacp, active initiates and passive waits",
+                "lacp active passive"
+              ]
+            },
+            {
+              "id": "SW-ETH-LACP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "You connect a Cisco switch (active mode) to a third-party switch. Which mode on the other side reliably forms an EtherChannel?",
+              "choices": [
+                "passive (LACP)",
+                "auto (PAgP)",
+                "off",
+                "desirable (PAgP)"
+              ],
+              "answer": "passive (LACP)",
+              "explanation": "Third-party switches support LACP, not PAgP. LACP active + passive forms a channel; PAgP modes only negotiate with other PAgP-capable devices.",
+              "tags": ["etherchannel", "lacp", "interoperability"]
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-pagp",
+          "name": "PAgP",
+          "questions": [
+            {
+              "id": "SW-ETH-PAGP-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is PAgP and how does it differ from LACP?",
+              "answer": "PAgP (Port Aggregation Protocol) is Cisco-proprietary EtherChannel negotiation using desirable/auto modes. It cannot form channels with non-Cisco equipment; LACP is the open standard that can.",
+              "explanation": "PAgP desirable+auto or desirable+desirable form a channel; auto+auto does not. Use LACP for interoperability.",
+              "tags": ["etherchannel", "pagp", "cisco"],
+              "acceptableAnswers": [
+                "cisco proprietary port aggregation protocol",
+                "pagp is cisco proprietary, lacp is open standard"
+              ]
+            },
+            {
+              "id": "SW-ETH-PAGP-002",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "A PAgP channel forms when one side is in auto mode and the other side is also in auto mode.",
+              "answer": "false",
+              "explanation": "Auto + auto never forms a channel — neither side sends PDUs to initiate. You need desirable on at least one side (desirable+desirable or desirable+auto).",
+              "tags": ["etherchannel", "pagp", "modes"]
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-ETH-CONF-001",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "Configure LACP EtherChannel on GigabitEthernet0/1 and GigabitEthernet0/2 of SW1 using channel-group 1 in active mode.",
+              "answer": [
+                "interface range GigabitEthernet0/1-2",
+                "channel-group 1 mode active"
+              ],
+              "commands": [
+                "interface range GigabitEthernet0/1-2",
+                "channel-group 1 mode active"
+              ],
+              "explanation": "The interface range command applies the same configuration to both members; `channel-group 1 mode active` creates PortChannel1 and sets LACP active mode. Verify with `show etherchannel summary`.",
+              "tags": ["etherchannel", "lacp", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int range g0/1-2", "channel-group 1 mode active"],
+                ["interface GigabitEthernet0/1", "channel-group 1 mode active", "interface GigabitEthernet0/2", "channel-group 1 mode active"]
+              ],
+              "hints": ["Which mode starts the LACP negotiation? (active)", "Use interface range for both ports."]
+            },
+            {
+              "id": "SW-ETH-CONF-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the EtherChannel status, member ports and protocol in a single-line summary?",
+              "answer": "show etherchannel summary",
+              "commands": ["show etherchannel summary"],
+              "explanation": "`show etherchannel summary` shows the channel (e.g. Po1(SU)), protocol (LACP/PAgP), member ports and their state — the first command for any EtherChannel issue.",
+              "tags": ["etherchannel", "verification", "show-command", "ios"],
+              "acceptableAnswers": [["show etherchannel summary"]],
+              "expectedOutput": "Flags:  D - down        P - bundled in port-channel\n        I - stand-alone s - suspended\n        H - Hot-standby (LACP only)\n\nNumber of channel-groups in use: 1\nNumber of aggregators:           1\n\nGroup  Port-channel  Protocol    Ports\n------+-------------+-----------+-----------------------------------------------\n1      Po1(SU)         LACP      Gi0/1(P)  Gi0/2(P)"
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-ETH-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "EtherChannel Po1 shows only Gi0/1 as bundled; Gi0/2 stays standalone. Both ports are up. What are the two most common causes?",
+              "symptoms": [
+                "show etherchannel summary shows Gi0/1(P) and Gi0/2(I)",
+                "Both physical ports are up",
+                "Configuration looks identical on both ends"
+              ],
+              "answer": "1) The interfaces on the two switches are not connected pairwise — the cables are crossed, so the pairs do not match across the link. 2) The channel-group modes do not match (e.g. active vs. desirable, or PAgP vs LACP), so negotiation fails. Verify cabling and `show etherchannel detail` for the protocol/mode.",
+              "explanation": "LACP bundles pairs of same-numbered ports (Gi0/1 ↔ Gi0/1, Gi0/2 ↔ Gi0/2) — a crossed cable prevents bundling. Protocol mismatch (LACP vs PAgP) also keeps the port standalone.",
+              "tags": ["etherchannel", "lacp", "troubleshooting"],
+              "acceptableAnswers": [
+                "crossed cables or protocol mode mismatch",
+                "ports are not paired on the other side",
+                "lacp pagp mismatch or wrong cabling"
+              ],
+              "hints": ["Are the member ports connected to the matching ports on the peer?", "What does 'I' mean in the summary flags?"]
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-advanced",
+          "name": "Load Balancing and Tuning",
+          "questions": [
+            {
+              "id": "SW-ETH-ADV-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Which global command changes how an EtherChannel distributes traffic, and what options does it have?",
+              "answer": "'port-channel load-balance <method>' — methods include src-mac, dst-mac, src-dst-mac, src-ip, dst-ip, src-dst-ip, src-port, dst-port and src-dst-port. Source/destination combinations mix the fields (e.g. src-dst-ip XOR hashes both addresses) for better distribution.",
+              "explanation": "The hash decides which member link each flow uses; one flow always stays on one member (no reordering). Routed/bridged L3 traffic usually tunes to src-dst-ip.",
+              "tags": ["etherchannel", "load-balancing", "hash"],
+              "acceptableAnswers": [
+                "port-channel load-balance with mac or ip fields",
+                "port-channel load-balance src-dst-ip"
+              ],
+              "hints": ["Which command shows the current policy on the device?"]
+            },
+            {
+              "id": "SW-ETH-ADV-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "What does 'lacp min-links 4' on a port-channel accomplish?",
+              "choices": [
+                "The channel stays operational only while at least 4 member links are up, guaranteeing minimum bandwidth",
+                "The channel bundles a maximum of 4 links",
+                "It forces 4 links to bundle before negotiation starts",
+                "It raises the LACP system priority to 4"
+              ],
+              "answer": "The channel stays operational only while at least 4 member links are up, guaranteeing minimum bandwidth",
+              "explanation": "If the bundle drops below the minimum, the whole channel goes down so upstream routing/STP can find another path instead of running starved.",
+              "tags": ["etherchannel", "lacp", "min-links"]
+            },
+            {
+              "id": "SW-ETH-ADV-003",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure a static (no negotiation) EtherChannel as Port-Channel 2 using Gi0/1 and Gi0/2.",
+              "answer": ["interface range GigabitEthernet0/1-2", "channel-group 2 mode on"],
+              "commands": ["interface range GigabitEthernet0/1-2", "channel-group 2 mode on"],
+              "explanation": "'mode on' creates a channel with no LACP/PAgP PDUs — both sides must be 'on' or the link will not bundle. Useful when the peer is not negotiable.",
+              "tags": ["etherchannel", "configuration", "static"],
+              "acceptableAnswers": [
+                ["int range g0/1-2", "channel-group 2 mode on"],
+                ["interface GigabitEthernet0/1", "channel-group 2 mode on", "interface GigabitEthernet0/2", "channel-group 2 mode on"]
+              ],
+              "hints": ["Which mode skips negotiation completely?"]
+            },
+            {
+              "id": "SW-ETH-ADV-004",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the load-balancing algorithm currently in use?",
+              "answer": "show etherchannel load-balance",
+              "commands": ["show etherchannel load-balance"],
+              "explanation": "Also visible with 'show etherchannel detail'. The output states the hash fields and frame distribution method.",
+              "tags": ["etherchannel", "verification", "show"],
+              "acceptableAnswers": ["show etherchannel load-balance", "show etherchannel detail"],
+              "expectedOutput": "EtherChannel Load-Balancing Configuration:\n        src-dst-ip\nEtherChannel Load-Balancing Operational State:\n        src-dst-ip"
+            }
+          ]
+        },
+        {
+          "id": "etherchannel-loadtrouble",
+          "name": "Load-Related Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-ETH-TROU-002",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "A 4-port EtherChannel shows one member link saturated at 95% while the other three sit below 10%, yet the bundle is fully up. What causes this and how do you fix it?",
+              "symptoms": [
+                "show etherchannel summary shows all ports bundled (P)",
+                "Interface counters show one member heavily utilized",
+                "No errors on any member link"
+              ],
+              "topology": "SW1 -- Po1 (4x1G) -- SW2, few very large flows (backup jobs between two servers)",
+              "answer": "The hash spreads flows, not bytes: with only a handful of elephant flows between few MAC/IP pairs, the hash maps them all onto the same member. Change the load-balance method to include more fields (e.g. 'port-channel load-balance src-dst-ip' or src-dst-port) or accept that few flows cannot be spread — this is not a bundling failure.",
+              "explanation": "With 2 servers, src-dst-mac hashes to the same bucket. L3/L4 fields (IP addresses, ports) differentiate flows better; appliances that split TCP streams can help too.",
+              "tags": ["etherchannel", "load-balancing", "troubleshooting"],
+              "acceptableAnswers": [
+                "hash imbalance from too few flows",
+                "change the load balance method to spread the flows",
+                "only a few flows map to the same member link"
+              ],
+              "hints": ["Does the hash distribute bytes or flows?", "Which command changes the algorithm?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stp",
+      "name": "STP",
+      "subtopics": [
+        {
+          "id": "stp-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-STP-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What problem does Spanning Tree Protocol solve, and what is its fundamental method?",
+              "answer": "STP prevents Layer 2 loops in redundant topologies. It builds a loop-free logical tree by electing a root bridge and then blocking redundant ports, so there is exactly one active path between any two switches while physical redundancy remains.",
+              "explanation": "Without STP, broadcast frames loop forever between switches (broadcast storm), and MAC tables thrash. STP puts redundant links into blocking state, re-enabling them when a primary path fails.",
+              "tags": ["stp", "loops", "broadcast-storm"],
+              "acceptableAnswers": [
+                "prevents layer 2 loops by blocking redundant ports",
+                "creates a loop free tree from the root bridge"
+              ],
+              "hints": ["What happens to a broadcast frame in a loop?", "How does STP create exactly one path to the root?"]
+            },
+            {
+              "id": "SW-STP-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which type of frame does STP exchange between switches to determine the topology?",
+              "choices": [
+                "BPDU (Bridge Protocol Data Unit)",
+                "ARP request",
+                "CDP hello",
+                "ICMP redirect"
+              ],
+              "answer": "BPDU (Bridge Protocol Data Unit)",
+              "explanation": "Switches exchange BPDUs containing bridge ID, root ID, path cost and port ID to elect the root and compute port roles.",
+              "tags": ["stp", "bpdu"]
+            },
+            {
+              "id": "SW-STP-CON-003",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is a broadcast storm and how does STP prevent it?",
+              "answer": "A broadcast storm is uncontrolled retransmission of broadcast/multicast frames around a Layer 2 loop: each switch keeps flooding copies, saturating links and consuming CPU. STP blocks redundant ports so no forwarding loop exists to multiply frames.",
+              "explanation": "Even one loop can multiply a single broadcast indefinitely. STP guarantees a loop-free topology; storm control is an additional protection.",
+              "tags": ["stp", "broadcast-storm", "loops"],
+              "acceptableAnswers": [
+                "uncontrolled frame retransmission around a loop",
+                "broadcast frames circling the loop forever"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stp-root-bridge",
+          "name": "Root Bridge",
+          "questions": [
+            {
+              "id": "SW-STP-ROOT-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "How is the root bridge elected?",
+              "answer": "The switch with the lowest Bridge ID wins. The Bridge ID is priority (default 32768) + MAC address. If priorities are equal, the lowest MAC breaks the tie.",
+              "explanation": "Elect the root by lowest BID: compare priority first, then MAC. Administrators set a lower priority on the intended root: `spanning-tree vlan 1 root primary` or explicit priority.",
+              "tags": ["stp", "root-bridge", "election"],
+              "acceptableAnswers": [
+                "lowest bridge id wins",
+                "lowest priority then lowest mac",
+                "the switch with the lowest bridge id becomes root"
+              ],
+              "hints": ["Bridge ID = priority + MAC. Which one wins?"]
+            },
+            {
+              "id": "SW-STP-ROOT-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Two switches have STP priority 32768. SW1 MAC = 0050.7966.6800, SW2 MAC = 0050.7966.6810. Who is the root?",
+              "choices": [
+                "SW2, because it has the higher MAC",
+                "SW1, because it has the lowest MAC as the tie-breaker",
+                "Neither — they alternate every 2 seconds",
+                "Both are roots until one fails"
+              ],
+              "answer": "SW1, because it has the lowest MAC as the tie-breaker",
+              "explanation": "Equal priority → lowest MAC wins. 0050.7966.6800 < 0050.7966.6810, so SW1 is root.",
+              "tags": ["stp", "root-bridge", "election"]
+            },
+            {
+              "id": "SW-STP-ROOT-003",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Make SW1 the root bridge for VLAN 10 with a manually set priority of 4096.",
+              "answer": ["spanning-tree vlan 10 priority 4096"],
+              "commands": ["spanning-tree vlan 10 priority 4096"],
+              "explanation": "On PVST+ platforms the effective priority includes the sys-id-ext, so 4096 = 4096 + 10 = 4106 in 'show spanning-tree'. 'spanning-tree vlan 10 root primary' achieves the same by picking the right priority automatically.",
+              "tags": ["stp", "root-bridge", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["spanning-tree vlan 10 priority 4096"],
+                ["spanning-tree vlan 10 root primary"]
+              ],
+              "hints": ["Which keyword directly sets the bridge priority per VLAN?"]
+            }
+          ]
+        },
+        {
+          "id": "stp-port-roles",
+          "name": "Port Roles",
+          "questions": [
+            {
+              "id": "SW-STP-ROLES-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Name the three port roles in classic STP and what each does.",
+              "answer": "Root port — the best (lowest cost) path toward the root bridge, and the only forwarding port on non-root switches toward the root. Designated port — the best port on each segment; forwarding. Blocking port (alternate) — a redundant port that does not forward, waiting as backup.",
+              "explanation": "Root port: one per non-root switch. Designated: one per segment (the neighbor with the best path). All other ports block to prevent loops.",
+              "tags": ["stp", "port-roles"],
+              "acceptableAnswers": [
+                "root port designated port and blocking port",
+                "root, designated, alternate"
+              ],
+              "hints": ["Which port faces the root bridge?", "Which port is the single forwarder per segment?"]
+            },
+            {
+              "id": "SW-STP-ROLES-002",
+              "type": "multiple_choice",
+              "difficulty": "hard",
+              "question": "Every non-root switch has exactly one port in which role?",
+              "choices": [
+                "Designated port",
+                "Root port",
+                "Blocking port",
+                "Alternate port"
+              ],
+              "answer": "Root port",
+              "explanation": "A root port is the port with the best path to the root — one per non-root switch. Designated ports exist per segment (a switch can have many), and blocking ports are redundant.",
+              "tags": ["stp", "port-roles", "root-port"]
+            },
+            {
+              "id": "SW-STP-ROLES-003",
+              "type": "scenario",
+              "difficulty": "hard",
+              "question": "SW2 has two paths to the root: Gi0/1 with cost 19 and Gi0/2 with cost 38. STP sees a better upstream BPDU arriving on Gi0/1. What roles do Gi0/1 and Gi0/2 take?",
+              "answer": "Gi0/1 becomes the root port (best path to root, forwarding). Gi0/2 becomes the alternate (blocking) port — it is the redundant path and must not forward.",
+              "explanation": "The root port is the port with the lowest root path cost; the second-best path becomes alternate and blocks, providing backup when the root port fails.",
+              "tags": ["stp", "port-roles", "path-cost"],
+              "acceptableAnswers": [
+                "g0/1 root port and g0/2 blocking alternate",
+                "lowest cost port becomes root port"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stp-port-states",
+          "name": "Port States",
+          "questions": [
+            {
+              "id": "SW-STP-STATE-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "List the port states of classic STP in the order a port transitions through them.",
+              "answer": "Blocking → Listening → Learning → Forwarding (and Disabled for administratively down ports).",
+              "explanation": "Blocking (no forwarding, no MAC learning, ~20s timer) → Listening (2× hello = 15s) → Learning (15s, builds MAC table) → Forwarding. Classic STP can take 30–50 seconds to converge.",
+              "tags": ["stp", "port-states", "convergence"],
+              "acceptableAnswers": [
+                "blocking listening learning forwarding",
+                "block, listen, learn, forward"
+              ],
+              "hints": ["Which state learns MAC addresses without forwarding?"]
+            },
+            {
+              "id": "SW-STP-STATE-002",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "In the Learning state, the port builds its MAC address table but does not forward user frames.",
+              "answer": "true",
+              "explanation": "Learning fills the MAC table (so forwarding is efficient) while still not forwarding frames — the port has not yet reached Forwarding.",
+              "tags": ["stp", "port-states"]
+            }
+          ]
+        },
+        {
+          "id": "stp-rstp",
+          "name": "RSTP",
+          "questions": [
+            {
+              "id": "SW-STP-RSTP-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "Compare classic STP (802.1D) with RSTP (802.1w) convergence.",
+              "answer": "RSTP converges in seconds (typically < 1-2s) using explicit handshakes: alternate ports take over root-port failures immediately, and backup ports replace designated ports. Classic STP relies on 30-50s of timers (listening/learning) before forwarding. RSTP also folds blocking+listening into a single discarding state and adds edge-port designation.",
+              "explanation": "RSTP is backwards compatible, uses the same root election and port roles, adds roles (alternate/backup) and is the modern default on most switches.",
+              "tags": ["stp", "rstp", "802.1w", "convergence"],
+              "acceptableAnswers": [
+                "rstp converges in seconds with handshakes, stp takes 30 50 seconds with timers",
+                "rstp fast, 802.1d slow"
+              ],
+              "hints": ["What happens when a root port fails in RSTP? (alternate takes over instantly)"]
+            },
+            {
+              "id": "SW-STP-RSTP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Which port should be configured as an edge port (portfast) in RSTP?",
+              "choices": [
+                "A port connecting to another switch",
+                "A port connecting to an end host (PC, printer, server)",
+                "A trunk port",
+                "A port in the management VLAN"
+              ],
+              "answer": "A port connecting to an end host (PC, printer, server)",
+              "explanation": "Edge ports connect to hosts, skip the listening/learning states and transition to forwarding immediately. Never set edge on ports facing switches — it can create loops.",
+              "tags": ["stp", "rstp", "portfast", "edge-port"]
+            }
+          ]
+        },
+        {
+          "id": "stp-protection",
+          "name": "STP Protection",
+          "questions": [
+            {
+              "id": "SW-STP-PROT-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "What do PortFast, BPDU Guard and Root Guard protect against?",
+              "answer": "PortFast makes access ports forward immediately (no 30-50s wait). BPDU Guard shuts down a port that receives a BPDU — protecting against rogue switches plugged into access ports. Root Guard prevents a port from becoming/announcing a superior root — protecting the root position from a rogue switch.",
+              "explanation": "PortFast + BPDU Guard on access ports; Root Guard on ports facing untrusted switches. UplinkFast/BackboneFast are legacy and rarely needed.",
+              "tags": ["stp", "portfast", "bpdu-guard", "root-guard", "security"],
+              "acceptableAnswers": [
+                "portfast fast forwarding, bpdu guard shuts down on bpdu, root guard protects root election"
+              ],
+              "hints": ["Which one reacts to a rogue switch sending BPDUs on an access port?"]
+            },
+            {
+              "id": "SW-STP-PROT-002",
+              "type": "scenario",
+              "difficulty": "hard",
+              "question": "A technician plugs a small unmanaged switch into an access port to extend a conference room. The whole network becomes unstable with constant topology changes. What two protections would have prevented this?",
+              "answer": "PortFast (immediate forwarding for host ports) and BPDU Guard (shut down the port when it receives a BPDU from the rogue switch). Root Guard would additionally stop the rogue switch from becoming root.",
+              "explanation": "The unmanaged switch sends BPDUs → BPDU Guard err-disables the port, containing the problem. PortFast alone would not prevent the instability; BPDU Guard does.",
+              "tags": ["stp", "bpdu-guard", "portfast", "troubleshooting"],
+              "acceptableAnswers": [
+                "portfast and bpdu guard",
+                "bpdu guard shuts the port down",
+                "enable portfast and bpdu guard on access ports"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stp-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-STP-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "Users report intermittent connectivity during business hours. `show spanning-tree` shows frequent topology changes. What would you check?",
+              "symptoms": [
+                "Intermittent drops during business hours",
+                "High CPU on the switches",
+                "show spanning-tree shows frequent topology change notices"
+              ],
+              "answer": "Find which ports flap in and out of forwarding. Check for end hosts generating BPDUs (unmanaged switch/loop) via `show spanning-tree detail` or `show logging` for topology change messages, and verify PortFast/BPDU Guard on all access ports. Also check for physical issues (duplex mismatch, flapping links) that trigger reconvergence.",
+              "explanation": "Every topology change causes MAC-table flush and reconvergence — frequent changes = flapping BPDUs, usually from a rogue device or unstable link. BPDU Guard contains rogue devices.",
+              "tags": ["stp", "troubleshooting", "topology-change"],
+              "acceptableAnswers": [
+                "check for rogue switches with bpdu guard",
+                "find which port is flapping and causing topology changes",
+                "enable bpdu guard on access ports"
+              ],
+              "hints": ["Topology change notices = MAC table flushes. What device could inject BPDUs?"]
+            },
+            {
+              "id": "SW-STP-TROU-002",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "An upstream link flapped for 2 seconds during maintenance. Since then, show spanning-tree shows Gi0/24 in the Inconsistent state on one switch even though the link is up and BPDUs are flowing again. What feature caused this and how is it cleared?",
+              "symptoms": [
+                "Gi0/24 is administratively up and physically up",
+                "show spanning-tree vlan 10 shows Gi0/24 as Alt. / Inconsistent",
+                "Logs show a Loop Guard block event",
+                "Traffic through Gi0/24 has stopped"
+              ],
+              "topology": "SW1 Gi0/24 -- SW2 (backup path with Loop Guard enabled)",
+              "answer": "Loop Guard: the port missed the expected BPDUs during the flap and was moved to the inconsistent (blocking) state to avoid a loop. It recovers automatically once BPDUs arrive consistently again, or manually with 'clear spanning-tree detected-protocols' (or a 'shutdown'/'no shutdown' on the port).",
+              "explanation": "Loop Guard reacts to the absence of BPDUs on a non-designated port; UDLD would instead show an err-disabled port with a UDLD cause. Check 'show spanning-tree inconsistentports'.",
+              "tags": ["stp", "loop-guard", "troubleshooting", "inconsistent"],
+              "acceptableAnswers": [
+                "loop guard blocked the port on missing bpdu",
+                "loop guard inconsistent state clears when bpdu resumes"
+              ],
+              "hints": ["Which feature places the port in 'inconsistent'?", "What does the log message say about the cause?"]
+            }
+          ]
+        },
+        {
+          "id": "stp-versions",
+          "name": "Versions and Timers",
+          "questions": [
+            {
+              "id": "SW-STP-VER-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What are PVST+, Rapid PVST+ and MST and which command enables each?",
+              "answer": "PVST+ is classic 802.1D running one spanning-tree instance per VLAN (Cisco's default for many years). Rapid PVST+ is RSTP (802.1w) with one instance per VLAN — sub-second convergence. MST (Multiple Spanning Tree, 802.1s) maps many VLANs onto fewer instances to scale. Enable: 'spanning-tree mode rapid-pvst' or 'spanning-tree mode mst'.",
+              "explanation": "Per-VLAN instances allow different root bridges per VLAN (load sharing). MST saves resources in designs with hundreds of VLANs.",
+              "tags": ["stp", "pvst", "mst", "rapid-pvst"],
+              "acceptableAnswers": [
+                "pvst is one instance per vlan, rapid pvst adds rstp, mst maps vlans to fewer instances"
+              ],
+              "hints": ["Which mode reduces the number of instances?", "Which one gives instant convergence?"]
+            },
+            {
+              "id": "SW-STP-VER-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which STP variant combines per-VLAN instances with RSTP-class convergence?",
+              "choices": [
+                "Rapid PVST+",
+                "Classic PVST+",
+                "MST",
+                "STP over VTP"
+              ],
+              "answer": "Rapid PVST+",
+              "explanation": "Rapid PVST+ runs an RSTP instance per VLAN; MST runs RSTP under the hood but merges VLANs into fewer instances.",
+              "tags": ["stp", "rapid-pvst", "rstp"]
+            },
+            {
+              "id": "SW-STP-VER-003",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "State the three classic STP timers, their defaults and what each does.",
+              "answer": "Hello time 2 seconds (how often the switch sends BPDUs); Max Age 20 seconds (how long a port believes a superior BPDU's root info is valid before discarding it); Forward Delay 15 seconds (duration of the listening and learning states, 30 seconds total before forwarding).",
+              "explanation": "Defaults assume a network diameter of 7. 'spanning-tree vlan 10 root primary' automatically adjusts timers; manual tuning risks loops.",
+              "tags": ["stp", "timers", "hello", "max-age", "forward-delay"],
+              "acceptableAnswers": [
+                "hello 2, max age 20, forward delay 15",
+                "hello 2s max age 20s forward delay 15s"
+              ]
+            },
+            {
+              "id": "SW-STP-VER-004",
+              "type": "config",
+              "difficulty": "easy",
+              "question": "Change SW1's global STP mode to Rapid PVST+.",
+              "answer": ["spanning-tree mode rapid-pvst"],
+              "commands": ["spanning-tree mode rapid-pvst"],
+              "explanation": "One command switches the whole switch. Verify with 'show spanning-tree' (protocol: rstp) or 'show spanning-tree summary'.",
+              "tags": ["stp", "configuration", "rapid-pvst"],
+              "acceptableAnswers": ["spanning-tree mode rapid-pvst"]
+            },
+            {
+              "id": "SW-STP-VER-005",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the STP root and bridge IDs, and every port role/state for a specific VLAN?",
+              "answer": "show spanning-tree vlan 10",
+              "commands": ["show spanning-tree vlan 10"],
+              "explanation": "Shows root ID (priority + MAC, path cost), bridge ID, and per-port role/state with costs. 'show spanning-tree root' shows roots across VLANs; 'show spanning-tree summary' gives an overview.",
+              "tags": ["stp", "verification", "show"],
+              "acceptableAnswers": ["show spanning-tree vlan 10", "show spanning-tree"],
+              "expectedOutput": "VLAN0010\n  Spanning tree enabled protocol rstp\n  Root ID    Priority    32778\n             Address     0050.7966.6800\n             Cost        19\n  Bridge ID  Priority    32778  (priority 32768 sys-id-ext 10)\n             Address     0050.7966.6810\n  Interface        Role Sts Cost      Prio.Nbr Type\n  Gi0/1            Root FWD 19        128.1    Shr\n  Gi0/2            Altn BLK 19        128.2    Shr"
+            }
+]
+        },
+        {
+          "id": "stp-udld",
+          "name": "UDLD and Loop Guard",
+          "questions": [
+            {
+              "id": "SW-STP-PROT-003",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What does UDLD detect and what happens to an affected port?",
+              "answer": "UDLD detects unidirectional links — where frames travel in only one direction — that STP cannot see and that can create Layer 2 loops. It exchanges neighbor probes on enabled ports; in normal mode it marks the link undetermined and logs (and can shut the port), and in aggressive mode it err-disables the port when a neighbor stops answering.",
+              "explanation": "Enable globally with 'udld enable' or per port with 'udld port' (aggressive per port: 'udld port aggressive'). Fiber links especially need it.",
+              "tags": ["stp", "udld", "unidirectional", "err-disable"],
+              "acceptableAnswers": [
+                "detects one way links that stp cannot see and disables the port",
+                "udld probes neighbors and err disables on failure"
+              ],
+              "hints": ["Which feature detects the 'one-way' link failure mode?"]
+            },
+            {
+              "id": "SW-STP-PROT-004",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which feature keeps a redundant port in the blocking state when the root's BPDUs stop arriving, instead of letting it forward with stale information?",
+              "choices": [
+                "Loop Guard",
+                "UDLD",
+                "BPDU Guard",
+                "Root Guard"
+              ],
+              "answer": "Loop Guard",
+              "explanation": "Loop Guard puts the port into 'inconsistent' (blocking) when no BPDU is received; UDLD err-disables on unidirectional links; BPDU Guard shuts ports that receive BPDUs; Root Guard blocks superior BPDUs.",
+              "tags": ["stp", "loop-guard", "inconsistent"]
+            }
+          ]
+        },
+        {
+          "id": "stp-mst",
+          "name": "MST",
+          "questions": [
+            {
+              "id": "SW-STP-MST-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "What must match between switches for them to form a single MST region, and what happens when it does not match?",
+              "answer": "The region name, configuration revision number, and the instance-to-VLAN mapping must be identical. If they differ, the switches treat each other as external: MST runs boundary ports between the regions, effectively interoperating with per-VLAN STP on shared links.",
+              "explanation": "MST (802.1s) runs RSTP internally with one IST (instance 0) spanning the region plus additional instances mapped from VLANs.",
+              "tags": ["stp", "mst", "region"],
+              "acceptableAnswers": [
+                "region name, revision and vlan mapping must match",
+                "mst region configuration must be identical"
+              ]
+            },
+            {
+              "id": "SW-STP-MST-002",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "By default MST places every VLAN in its own spanning-tree instance.",
+              "answer": "false",
+              "explanation": "MST collapses VLANs into a few instances — instance 0 (the internal spanning tree) carries all VLANs that are not explicitly mapped to another instance.",
+              "tags": ["stp", "mst", "instances"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hsrp",
+      "name": "HSRP",
+      "subtopics": [
+        {
+          "id": "hsrp-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-HSRP-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What problem does HSRP solve?",
+              "answer": "HSRP (First Hop Redundancy Protocol) provides a virtual default gateway: two or more routers share a virtual IP + virtual MAC, and one is active while others stand by. If the active router fails, a standby takes over in seconds — hosts keep their configured gateway.",
+              "explanation": "Without FHRP, a single router failure strands every host that has it as default gateway. HSRP: active/standby roles, virtual IP/MAC (0000.0c07.acXX), hello/3-second and hold/10-second timers by default.",
+              "tags": ["hsrp", "fhrp", "gateway", "redundancy"],
+              "acceptableAnswers": [
+                "provides a virtual gateway with automatic failover",
+                "redundant default gateway between routers"
+              ],
+              "hints": ["What happens to hosts when their only default gateway router dies?"]
+            },
+            {
+              "id": "SW-HSRP-CON-002",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "The HSRP virtual IP address is configured on the hosts as their default gateway, not on the router interfaces.",
+              "answer": "false",
+              "explanation": "The virtual IP is configured on the router interfaces (the standby group), and the SAME virtual IP is what hosts use as their default gateway. The virtual MAC 0000.0c07.acXX is answered by the active router.",
+              "tags": ["hsrp", "virtual-ip"]
+            },
+            {
+              "id": "SW-HSRP-CON-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which of these is a First Hop Redundancy Protocol?",
+              "choices": [
+                "HSRP",
+                "STP",
+                "VTP",
+                "EtherChannel"
+              ],
+              "answer": "HSRP",
+              "explanation": "FHRPs: HSRP (Cisco), VRRP (standard), GLBP (Cisco, load-balancing). STP, VTP and EtherChannel are Layer 2 technologies.",
+              "tags": ["hsrp", "fhrp"]
+            },
+            {
+              "id": "SW-HSRP-CON-004",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Can a single interface pair run more than one HSRP group at the same time, and what is the benefit?",
+              "choices": [
+                "Yes — different groups can have different active routers, letting hosts split traffic across both routers",
+                "No — only one group may exist on an interface",
+                "Yes — but all groups must elect the same active router",
+                "Only with HSRP version 3"
+              ],
+              "answer": "Yes — different groups can have different active routers, letting hosts split traffic across both routers",
+              "explanation": "Each group has its own virtual IP/MAC (e.g. group 10 active on R1, group 20 active on R2). Point half the hosts at each virtual IP for load sharing. Same interface IP applies to all groups.",
+              "tags": ["hsrp", "groups", "load-sharing"]
+            }
+          ]
+        },
+        {
+          "id": "hsrp-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-HSRP-CONF-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure HSRP group 10 with virtual IP 192.168.10.1 on interface GigabitEthernet0/1 of R1.",
+              "answer": [
+                "interface GigabitEthernet0/1",
+                "standby 10 ip 192.168.10.1"
+              ],
+              "commands": [
+                "interface GigabitEthernet0/1",
+                "standby 10 ip 192.168.10.1"
+              ],
+              "explanation": "`standby <group> ip <virtual-ip>` activates the group. The same virtual IP must be configured on the peer. Hosts use 192.168.10.1 as gateway.",
+              "tags": ["hsrp", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int g0/1", "standby 10 ip 192.168.10.1"],
+                ["interface g0/1", "standby 10 ip 192.168.10.1", "standby 10 version 2"]
+              ]
+            },
+            {
+              "id": "SW-HSRP-CONF-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command verifies HSRP state, virtual IP and active/standby roles?",
+              "answer": "show standby",
+              "commands": ["show standby"],
+              "explanation": "`show standby` shows group state (Active/Standby), virtual IP/MAC, timers, and local priority per interface. `show standby brief` gives a compact table.",
+              "tags": ["hsrp", "verification", "show-command", "ios"],
+              "acceptableAnswers": [["show standby"], ["show standby brief"]],
+              "expectedOutput": "GigabitEthernet0/1 - Group 10\n  State is Active\n    2 state changes, last state change 00:04:11\n  Virtual IP address is 192.168.10.1\n  Active virtual MAC address is 0000.0c07.ac0a\n  Hello time 3 sec, hold time 10 sec\n  Priority 100 (default 100)"
+            }
+          ]
+        },
+        {
+          "id": "hsrp-priority",
+          "name": "Priority",
+          "questions": [
+            {
+              "id": "SW-HSRP-PRI-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "How does HSRP decide which router becomes active?",
+              "answer": "The router with the highest HSRP priority wins (default 100); ties are broken by the highest configured IP address. Optionally, preemption lets a higher-priority router take over when it returns.",
+              "explanation": "Priority 0-255, default 100. Without preemption, a returning preferred router will NOT retake the active role until the current active fails.",
+              "tags": ["hsrp", "priority", "election"],
+              "acceptableAnswers": [
+                "highest priority wins, tie broken by highest ip",
+                "the router with the highest priority"
+              ]
+            },
+            {
+              "id": "SW-HSRP-PRI-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "R1 has priority 150, R2 has priority 100. R2 is active because R1 was offline when the group formed. What must happen for R1 to take over now that it is back?",
+              "choices": [
+                "Nothing — R1 automatically takes over since its priority is higher",
+                "R1 must be configured with preemption so it can take over the active role",
+                "R2 must be reloaded",
+                "R1 must wait for the hello timer to expire"
+              ],
+              "answer": "R1 must be configured with preemption so it can take over the active role",
+              "explanation": "Without preemption, HSRP does not switch roles when a higher-priority router appears. Configure `standby 10 preempt` on R1 (and typically R2).",
+              "tags": ["hsrp", "preemption", "priority"]
+            }
+          ]
+        },
+        {
+          "id": "hsrp-preemption",
+          "name": "Preemption",
+          "questions": [
+            {
+              "id": "SW-HSRP-PRE-001",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "With preemption enabled, a higher-priority HSRP router takes over the active role from a lower-priority router that is currently active.",
+              "answer": "true",
+              "explanation": "Preemption enables role take-over when a router with higher priority (or, on ties, higher IP) appears. Without it the current active keeps the role until failure.",
+              "tags": ["hsrp", "preemption"]
+            },
+            {
+              "id": "SW-HSRP-PRE-002",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "On R1's interface GigabitEthernet0/1, enable HSRP group 10 preemption so R1 can reclaim the active role when it returns.",
+              "answer": ["interface GigabitEthernet0/1", "standby 10 preempt"],
+              "commands": ["interface GigabitEthernet0/1", "standby 10 preempt"],
+              "explanation": "Add `standby 10 preempt` to the interface. Without it, failback never occurs automatically. Add `standby 10 priority 150` to make R1 preferred.",
+              "tags": ["hsrp", "preemption", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int g0/1", "standby 10 preempt"],
+                ["interface g0/1", "standby 10 preempt", "standby 10 priority 150"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hsrp-versions",
+          "name": "Versions",
+          "questions": [
+            {
+              "id": "SW-HSRP-VER-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "Compare HSRP version 1 and version 2.",
+              "answer": "v1 (RFC 2281): groups 0-255, multicast 224.0.0.2 (all routers), virtual MAC 0000.0c07.acXX. v2: groups 0-4095, multicast 224.0.0.102, virtual MAC 0000.0c9f.fXXX (0000.0c9f.f + 3 hex digits of the group), supports IPv6 and millisecond timers.",
+              "explanation": "Both ends of a group must run the same version — a mismatch leaves the group in Listen/Init. Enable per interface: 'standby version 2'.",
+              "tags": ["hsrp", "versions", "multicast", "virtual-mac"],
+              "acceptableAnswers": [
+                "v1 groups 0-255 multicast 224.0.0.2, v2 groups 0-4095 multicast 224.0.0.102",
+                "v2 adds more groups and ipv6 support"
+              ],
+              "hints": ["Which version supports more than 255 groups?", "Which multicast does v2 use?"]
+            },
+            {
+              "id": "SW-HSRP-VER-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which multicast address do HSRP version 2 hellos use?",
+              "choices": [
+                "224.0.0.102",
+                "224.0.0.2",
+                "224.0.0.22",
+                "224.0.0.5"
+              ],
+              "answer": "224.0.0.102",
+              "explanation": "224.0.0.2 is HSRPv1 (and some legacy multicast), 224.0.0.22 is IGMP, 224.0.0.5 is OSPF.",
+              "tags": ["hsrp", "versions", "multicast"]
+            },
+            {
+              "id": "SW-HSRP-VER-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "On a segment where one router runs HSRP version 1 and the other version 2, the two routers form the group normally.",
+              "answer": "false",
+              "explanation": "The versions use different multicast groups and packet formats — the pair ends up in Listen/Init and never elects an active router. Match 'standby version' on both sides.",
+              "tags": ["hsrp", "versions", "mismatch"]
+            }
+          ]
+        },
+        {
+          "id": "hsrp-tracking",
+          "name": "Tracking",
+          "questions": [
+            {
+              "id": "SW-HSRP-TRACK-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is HSRP object tracking and which two commands configure it?",
+              "answer": "Tracking monitors an object — usually an upstream interface's line state or an IP route — and automatically lowers the local HSRP priority by a configured amount when the object fails, so the standby router takes over. Commands: 'track 1 interface GigabitEthernet0/0' (or 'track 1 ip route 0.0.0.0/0 reachability') and 'standby 10 track 1 decrement 20'.",
+              "explanation": "Without tracking, HSRP only reacts to LAN-interface failure — a router that loses its WAN stays Active and strands its hosts. The peer needs preemption (or the priority drop to flip the roles) to benefit.",
+              "tags": ["hsrp", "tracking", "priority"],
+              "acceptableAnswers": [
+                "track an interface or route and decrement priority when it fails",
+                "track 1 interface plus standby track decrement"
+              ],
+              "hints": ["Which failure does plain HSRP miss?", "Where does the decrement get applied?"]
+            },
+            {
+              "id": "SW-HSRP-TRACK-002",
+              "type": "multiple_choice",
+              "difficulty": "hard",
+              "question": "R1 is Active for group 10 with priority 110; R2 stands by with priority 100. R1 has 'track 1 interface Gi0/0' + 'standby 10 track 1 decrement 20'. R1's WAN interface Gi0/0 fails while the LAN interface stays up. What happens?",
+              "choices": [
+                "R1's priority drops to 90 and R2 becomes Active",
+                "R1 stays Active because the LAN link is still up",
+                "Both routers go into Init state",
+                "R1 reloads automatically"
+              ],
+              "answer": "R1's priority drops to 90 and R2 becomes Active",
+              "explanation": "The tracked object failure lowers R1 to 90, below R2's 100 — the role moves to R2 (preemption applies to priority changes when configured). This is exactly what keeps hosts online when the WAN dies.",
+              "tags": ["hsrp", "tracking", "priority", "failover"]
+            },
+            {
+              "id": "SW-HSRP-TRACK-003",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "On R1, write the commands to track the line state of Gi0/0 and decrement HSRP group 10's priority by 20 when it goes down.",
+              "answer": ["track 1 interface GigabitEthernet0/0", "standby 10 track 1 decrement 20"],
+              "commands": ["track 1 interface GigabitEthernet0/0", "standby 10 track 1 decrement 20"],
+              "explanation": "The 'standby <group> track <object> decrement <value>' line goes on the same interface as the HSRP group. Verify with 'show standby', which lists the tracked objects and their status.",
+              "tags": ["hsrp", "tracking", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["track 1 interface g0/0", "standby 10 track 1 decrement 20"],
+                ["track 1 interface GigabitEthernet0/0", "standby 10 track 1 decrement 20"]
+              ],
+              "hints": ["Which object number must link the two commands?"]
+            }
+          ]
+        },
+        {
+          "id": "hsrp-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-HSRP-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "Hosts use the HSRP virtual IP 192.168.10.1 as gateway, but after a router reload, traffic stalls even though both routers are up. What is the likely cause?",
+              "symptoms": [
+                "Both HSRP routers are up and reachable",
+                "After R1 reloaded, hosts lose connectivity",
+                "show standby shows R1 in Standby state, R2 Active"
+              ],
+              "answer": "R1 lacks preemption: it was the preferred (higher priority) router, but R2 took over while R1 was down and keeps the active role because R1 cannot preempt. Fix: enable `standby 10 preempt` (and verify priority) on R1.",
+              "explanation": "This is the classic missing-preemption failback problem. Traffic works (R2 active) but load/path expectations are violated, and troubleshooting often confuses operators.",
+              "tags": ["hsrp", "preemption", "troubleshooting"],
+              "acceptableAnswers": [
+                "missing preemption, r1 cannot take over from r2",
+                "r1 needs standby preempt"
+              ],
+              "hints": ["Which router SHOULD be active?", "Why does the active role not switch back?"]
+            },
+            {
+              "id": "SW-HSRP-TROU-002",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "HSRP shows the group in Listen/Init state instead of Active/Standby. What would you check?",
+              "symptoms": [
+                "Group never becomes active",
+                "show standby shows state Listen or Init",
+                "Hosts cannot reach the gateway"
+              ],
+              "answer": "Check that the interface is up and has a real IP configured, that the virtual IP matches between routers, and that HSRP multicast (224.0.0.2, UDP 1985) is not blocked between the peers.",
+              "explanation": "Init = no usable interface IP or group not started. Listen = heard hellos but never saw an active/standby speaker — typically version mismatch (v1 vs v2) or unicast-blocked multicast.",
+              "tags": ["hsrp", "troubleshooting", "states"],
+              "acceptableAnswers": [
+                "check interface is up with an ip address",
+                "check virtual ip and multicast reachability between routers"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vtp",
+      "name": "VTP",
+      "subtopics": [
+        {
+          "id": "vtp-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-VTP-CON-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is VTP and what does it propagate across a domain?",
+              "answer": "VTP (VLAN Trunking Protocol) keeps VLAN configuration consistent across a VTP domain: it propagates VLAN creation, deletion, and names over 802.1Q trunks using advertisements carrying a 32-bit revision number. Port-to-VLAN assignments always stay local.",
+              "explanation": "VTP sends summaries every 5 minutes or immediately on change; the advertisement with the highest revision number wins on the receiver. Domain name and password must match (v1/v2 use an MD5 digest).",
+              "tags": ["vtp", "vlan", "domain"],
+              "acceptableAnswers": [
+                "propagates vlan creation deletion and names over trunks",
+                "keeps vlan configuration consistent across the domain"
+              ],
+              "hints": ["Which field decides which advertisement wins?", "What does VTP never carry across the trunk?"]
+            },
+            {
+              "id": "SW-VTP-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which of these does a VTP advertisement actually carry between switches?",
+              "choices": [
+                "VLAN IDs, names and the revision number",
+                "Port-to-VLAN assignments",
+                "STP port roles",
+                "The routing table"
+              ],
+              "answer": "VLAN IDs, names and the revision number",
+              "explanation": "VTP synchronizes only VLAN identity and configuration. Port membership is configured locally on every switch and never propagates.",
+              "tags": ["vtp", "advertisements"]
+            },
+            {
+              "id": "SW-VTP-CON-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "A VTP server with revision 40 in a domain will overwrite the VLAN configuration of a server with revision 5 in the same domain and with the same password.",
+              "answer": "true",
+              "explanation": "VTP compares revision numbers: the highest revision replaces the receiver's config. This is exactly why a recycled switch with a stale high revision can wipe a whole domain.",
+              "tags": ["vtp", "revision"]
+            },
+            {
+              "id": "SW-VTP-CON-004",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is the default VTP state of a fresh Catalyst switch?",
+              "answer": "Server mode with no domain name (displayed as NULL or blank), revision 0, until it hears a domain advertisement naming the domain.",
+              "explanation": "With an empty domain the switch does not join any VTP domain until the domain name matches an advertisement it receives. Best practice on modern networks: set mode off or transparent, or use VTPv3 with a password.",
+              "tags": ["vtp", "defaults"],
+              "acceptableAnswers": [
+                "server mode with no domain and revision 0",
+                "vtp server domain null revision 0"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vtp-modes",
+          "name": "Modes",
+          "questions": [
+            {
+              "id": "SW-VTP-MODE-001",
+              "type": "recall",
+              "difficulty": "hard",
+              "question": "Describe VTP server, client, transparent and off modes.",
+              "answer": "Server: can create/modify/delete VLANs, advertises them, and accepts synchronization to the highest revision. Client: cannot create VLANs locally — it only applies synced configuration from advertisements. Transparent: VLAN configuration is local only; it forwards VTP summaries through but never syncs or advertises its own. Off (where supported): ignores and drops advertisements entirely.",
+              "explanation": "Clients cannot store VLAN config for other domains; on older IOS anything but server cannot keep VLAN info in NVRAM properly. Use VTP only with careful revision control, or disable it.",
+              "tags": ["vtp", "modes", "server", "client", "transparent"],
+              "acceptableAnswers": [
+                "server modifies and advertises, client applies only, transparent is local only",
+                "server client transparent off"
+              ]
+            },
+            {
+              "id": "SW-VTP-MODE-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which VTP mode lets you change VLANs locally without affecting the rest of the domain?",
+              "choices": [
+                "Transparent",
+                "Server",
+                "Client",
+                "None — every change propagates"
+              ],
+              "answer": "Transparent",
+              "explanation": "Transparent mode ignores incoming advertisements (except forwarding them) and never publishes its own config, so local VLAN edits stay local.",
+              "tags": ["vtp", "transparent", "modes"]
+            },
+            {
+              "id": "SW-VTP-MODE-003",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "A switch in VTP client mode can create VLANs locally without involving any other switch.",
+              "answer": "false",
+              "explanation": "Client mode does not allow local VLAN creation — the client only learns VLAN configuration from a server or higher-revision advertisement.",
+              "tags": ["vtp", "client", "modes"]
+            }
+          ]
+        },
+        {
+          "id": "vtp-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-VTP-CONF-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to put SW1 into VTP transparent mode in the CORP domain with VTP version 2.",
+              "answer": ["vtp mode transparent", "vtp domain CORP", "vtp version 2"],
+              "commands": ["vtp mode transparent", "vtp domain CORP", "vtp version 2"],
+              "explanation": "Transparent isolation keeps local VLANs safe; domain CORP names the domain; version 2 enables v2 features such as pruning.",
+              "tags": ["vtp", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["vtp mode transparent", "vtp domain CORP"],
+                ["vtp mode transparent", "vtp domain CORP", "vtp version 2"]
+              ]
+            },
+            {
+              "id": "SW-VTP-CONF-002",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the VTP domain, operating mode, revision number and pruning state?",
+              "answer": "show vtp status",
+              "commands": ["show vtp status"],
+              "explanation": "Watch the Configuration Revision (0 in transparent mode normally) and VTP Operating Mode. VTPv3 output adds V3 domain status and version-in-use fields.",
+              "tags": ["vtp", "verification", "show"],
+              "acceptableAnswers": ["show vtp status"],
+              "expectedOutput": "VTP Version                     : 2\nConfiguration Revision          : 0\nMaximum VLANs supported locally : 1005\nVTP Operating Mode              : Transparent\nVTP Domain Name                 : CORP\nPruning Mode                    : Disabled"
+            }
+          ]
+        },
+        {
+          "id": "vtp-troubleshooting",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SW-VTP-TROU-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "A technician connects a recovered switch to the network and within seconds every VLAN 10-40 disappears from all servers and clients in the domain. What happened and how do you prevent it?",
+              "symptoms": [
+                "VLANs vanish across multiple switches right after connecting the new switch",
+                "show vtp status on the new switch shows a very high revision number",
+                "All links are healthy trunks"
+              ],
+              "topology": "SW-OLD (recovered, revision 42) -- trunk -- CORP domain switches (revision 5)",
+              "answer": "The recovered switch carried a stale VTP revision of 42 from its previous life; being in the same domain with the same password, its higher-revision advertisement deleted the VLAN configuration of the whole domain. Fix: reset the revision before connecting (set the switch to transparent or off, or change the domain name and back), re-create the VLANs, then protect the domain with a VTP password and prefer VTPv3 or no VTP at all.",
+              "explanation": "VTP trusts the highest revision unconditionally — this is the classic VTP wipeout. Never connect a switch whose VTP history is unknown to a production domain.",
+              "tags": ["vtp", "troubleshooting", "revision"],
+              "acceptableAnswers": [
+                "stale high revision wiped the domain",
+                "the new switch advertised revision 42 and deleted the vlans",
+                "reset the vtp revision before connecting the switch"
+              ],
+              "hints": ["Which value decides whose config wins?", "Which command shows the revision before connecting?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dtp",
+      "name": "DTP",
+      "subtopics": [
+        {
+          "id": "dtp-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-DTP-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is DTP and which modes can it negotiate trunks with?",
+              "answer": "DTP (Dynamic Trunking Protocol) is Cisco's port-mode negotiation protocol. Dynamic desirable actively asks the peer to trunk; dynamic auto trunks only if the peer asks; trunk forces trunking while still negotiating; access forces access mode; nonegotiate disables DTP entirely.",
+              "explanation": "DTP is on by default on every switchport. dynamic desirable + dynamic auto/desirable/trunk forms a trunk; auto + auto stays access.",
+              "tags": ["dtp", "trunk", "negotiation"],
+              "acceptableAnswers": [
+                "desirable asks, auto waits, trunk forces, nonegotiate disables",
+                "dynamic desirable and dynamic auto negotiate trunks"
+              ],
+              "hints": ["Which mode actively initiates instead of waiting?"]
+            },
+            {
+              "id": "SW-DTP-CON-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "SW1 is set to 'switchport mode dynamic auto', SW2 to 'switchport mode dynamic desirable'. What results on the link between them?",
+              "choices": [
+                "The link trunks (one side proposed)",
+                "Both sides stay access ports",
+                "The port is err-disabled",
+                "Only the desirable side becomes a trunk"
+              ],
+              "answer": "The link trunks (one side proposed)",
+              "explanation": "desirable + auto forms a trunk; only auto + auto stays access. Trunking to non-Cisco equipment requires 'switchport mode trunk' and usually 'switchport nonegotiate'.",
+              "tags": ["dtp", "modes", "trunk"]
+            },
+            {
+              "id": "SW-DTP-CON-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "DTP frames are normally sent on every switchport, including access ports, unless negotiation is disabled.",
+              "answer": "true",
+              "explanation": "By default DTP runs on all ports — which is why 'switchport nonegotiate' (or explicit mode access with DTP off) is recommended on untrusted ports.",
+              "tags": ["dtp", "security", "negotiation"]
+            }
+          ]
+        },
+        {
+          "id": "dtp-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SW-DTP-CONF-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure Gi0/24 as a static trunk that never generates DTP frames.",
+              "answer": ["interface GigabitEthernet0/24", "switchport mode trunk", "switchport nonegotiate"],
+              "commands": ["interface GigabitEthernet0/24", "switchport mode trunk", "switchport nonegotiate"],
+              "explanation": "'switchport nonegotiate' suppresses DTP — the port becomes a mandatory trunk. Also used when connecting to non-Cisco switches that do not speak DTP.",
+              "tags": ["dtp", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int g0/24", "switchport mode trunk", "switchport nonegotiate"],
+                ["interface g0/24", "switchport nonegotiate", "switchport mode trunk"]
+              ]
+            },
+            {
+              "id": "SW-DTP-CONF-002",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows a port's administrative mode (desirable/auto/trunk), operational mode and whether DTP negotiation is on?",
+              "answer": "show interfaces switchport",
+              "commands": ["show interfaces switchport"],
+              "explanation": "Shows Administrative Mode, Operational Mode and 'Negotiation of Trunking: On/Off'. 'show dtp interface Gi0/24' details DTP counters and state.",
+              "tags": ["dtp", "verification", "show"],
+              "acceptableAnswers": ["show interfaces switchport", "show interfaces g0/24 switchport"],
+              "expectedOutput": "Name: Gi0/24\nSwitchport: Enabled\nAdministrative Mode: trunk\nOperational Mode: trunk\nAdministrative Trunking Encapsulation: dot1q\nOperational Trunking Encapsulation: dot1q\nNegotiation of Trunking: Off"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stacking",
+      "name": "Switch Stacking",
+      "subtopics": [
+        {
+          "id": "stacking-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SW-STACK-CON-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is a switch stack and which switch becomes the stack master?",
+              "answer": "A stack (e.g. StackWise) makes several switches act as one logical switch with a single management plane and ring backplane. The stack master (active) runs the control plane; it is elected by the highest stack priority (1-15, default 1), then by the lowest MAC address.",
+              "explanation": "Up to 8-9 switches (StackWise-160/480, StackWise Virtual/VSS for pairs of chassis). One config applies to the stack; member switches keep forwarding while the master reloads.",
+              "tags": ["stacking", "stackwise", "stack-master"],
+              "acceptableAnswers": [
+                "several switches act as one logical switch",
+                "highest priority then lowest mac wins master election"
+              ],
+              "hints": ["Which two values decide the stack master?"]
+            },
+            {
+              "id": "SW-STACK-CON-002",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "In a switch stack, spanning tree and EtherChannel configurations operate across member switches as if they were one chassis.",
+              "answer": "true",
+              "explanation": "Members share one STP instance domain, and an EtherChannel can bundle ports from different members of the same stack — a key reason to stack at the access layer.",
+              "tags": ["stacking", "stp", "etherchannel"]
+            },
+            {
+              "id": "SW-STACK-CON-003",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "Which role in a switch stack runs the switch management plane and the network services?",
+              "choices": [
+                "Stack master (active)",
+                "Stack standby",
+                "Any member switch",
+                "The switch with the lowest switch number"
+              ],
+              "answer": "Stack master (active)",
+              "explanation": "The stack master runs the control plane and management (CLI, SNMP, routing protocols); members forward traffic based on the master's decisions. The standby takes over if the master fails.",
+              "tags": ["stacking", "roles"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

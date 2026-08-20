@@ -1,0 +1,394 @@
+{
+  "chapter": {
+    "id": "services",
+    "name": "Network Services",
+    "description": "DHCP, NAT/PAT, NTP and DNS operations on Cisco devices"
+  },
+  "topics": [
+    {
+      "id": "svc-dhcp",
+      "name": "DHCP",
+      "subtopics": [
+        {
+          "id": "dhcp-server",
+          "name": "DHCP Server",
+          "questions": [
+            {
+              "id": "SVC-DHCP-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What are the four DHCP lease messages a client and server exchange?",
+              "answer": "DHCP Discover (client broadcast), DHCP Offer (server proposes an IP), DHCP Request (client accepts specific offer), and DHCP ACK (server confirms the lease).",
+              "explanation": "RENEW at 50% of lease uses unicast Request directly to the server; REBIND at 87.5% falls back to broadcast. NAK and DECLINE can also appear in troubleshooting.",
+              "tags": ["dhcp", "dora", "lease"],
+              "acceptableAnswers": [
+                "discover offer request ack",
+                "dora"
+              ],
+              "hints": ["What does DORA stand for?"]
+            },
+            {
+              "id": "SVC-DHCP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "At what point of the lease does a DHCP client attempt RENEW (unicast to the server)?",
+              "choices": [
+                "50% of the lease duration",
+                "87.5% of the lease duration",
+                "25% of the lease duration",
+                "Only when the lease expires"
+              ],
+              "answer": "50% of the lease duration",
+              "explanation": "50% renew, then 87.5% rebind via broadcast, then the lease expires and the client restarts Discover. Timers: T1 (renewal), T2 (rebinding).",
+              "tags": ["dhcp", "lease", "timers"]
+            },
+            {
+              "id": "SVC-DHCP-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "What is the default DHCP pool lease duration on IOS routers?",
+              "choices": [
+                "1 day",
+                "7 days",
+                "6 hours",
+                "Unlimited"
+              ],
+              "answer": "1 day",
+              "explanation": "Default lease is 24 hours; change it with 'lease days hours minutes' inside the pool, e.g. 'lease 7'.",
+              "tags": ["dhcp", "lease"]
+            }
+          ]
+        },
+        {
+          "id": "dhcp-config",
+          "name": "DHCP Configuration",
+          "questions": [
+            {
+              "id": "SVC-DHCP-CFG-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to create a DHCP pool LAN-POOL handing out 10.1.1.100-10.1.1.200 with gateway 10.1.1.1 and DNS 8.8.8.8.",
+              "answer": "R1(config)# ip dhcp excluded-address 10.1.1.1 10.1.1.99\nR1(config)# ip dhcp pool LAN-POOL\nR1(dhcp-config)# network 10.1.1.0 /24\nR1(dhcp-config)# default-router 10.1.1.1\nR1(dhcp-config)# dns-server 8.8.8.8",
+              "explanation": "The excluded-address keeps the router, servers and static hosts out of the pool; 'domain-name' can be added too. The pool takes effect as soon as configured.",
+              "tags": ["dhcp", "configuration", "pool"],
+              "commands": [
+                "ip dhcp excluded-address 10.1.1.1 10.1.1.99",
+                "ip dhcp pool LAN-POOL",
+                "network 10.1.1.0 /24",
+                "default-router 10.1.1.1",
+                "dns-server 8.8.8.8"
+              ],
+              "acceptableAnswers": [
+                "excluded addresses then pool with network, default router, dns"
+              ]
+            },
+            {
+              "id": "SVC-DHCP-RELAY-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "A client on VLAN 30 must get DHCP from a server on another subnet. Write the command on the VLAN 30 SVI that makes DHCP work across subnets.",
+              "answer": "SW1(config)# interface Vlan30\nSW1(config-if)# ip helper-address 10.9.9.5",
+              "explanation": "The helper receives broadcast DORA messages, changes the source to the relay agent address (giaddr), and unicasts them to the server. The server replies to the giaddr — so the relay must be reachable and the SVI for the client subnet must exist.",
+              "tags": ["dhcp", "relay", "helper-address"],
+              "commands": ["interface Vlan30", "ip helper-address 10.9.9.5"],
+              "acceptableAnswers": [
+                "ip helper address on the vlan 30 svi",
+                "dhcp relay with giaddr"
+              ],
+              "hints": ["Which interface facing the clients carries the command?", "What is the role of the giaddr field?"]
+            }
+          ]
+        },
+        {
+          "id": "dhcp-verify",
+          "name": "DHCP Verification",
+          "questions": [
+            {
+              "id": "SVC-DHCP-VER-001",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the DHCP bindings the router has handed out (IP, client ID/MAC, lease expiry)?",
+              "answer": "show ip dhcp binding",
+              "explanation": "Columns: IP address, client-ID, lease expiration, type (Automatic/Manual). An empty table usually means clients never completed DORA with this router.",
+              "tags": ["dhcp", "verification", "show"],
+              "commands": ["show ip dhcp binding"],
+              "acceptableAnswers": [
+                "show ip dhcp binding"
+              ]
+            },
+            {
+              "id": "SVC-DHCP-VER-002",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which command shows the DHCP pool statistics — number of addresses available and in use?",
+              "answer": "show ip dhcp pool",
+              "explanation": "Shows utilization per pool: total addresses, leased, exclusions. Useful to spot exhaustion.",
+              "tags": ["dhcp", "verification", "show"],
+              "commands": ["show ip dhcp pool"],
+              "acceptableAnswers": [
+                "show ip dhcp pool"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dhcp-troubleshoot",
+          "name": "Troubleshooting",
+          "questions": [
+            {
+              "id": "SVC-DHCP-TS-001",
+              "type": "troubleshooting",
+              "difficulty": "medium",
+              "question": "Clients on VLAN 30 cannot get an IP; the DHCP server is on the core and sees no requests. What is the most likely misconfiguration?",
+              "answer": "Missing or wrongly placed 'ip helper-address' on the VLAN 30 SVI (or on the wrong interface/VLAN), or the helper is configured but the SVI is down — DHCP broadcasts are never forwarded without a relay on the client-facing routed interface.",
+              "explanation": "Also check the giaddr returned routes back to the relay and that DHCP snooping is not dropping messages (untrusted port toward a legitimate relay).",
+              "tags": ["dhcp", "troubleshooting", "relay"],
+              "symptoms": [
+                "Clients receive no DHCP offers",
+                "The DHCP server log shows zero requests",
+                "Other VLANs served by relays work fine"
+              ],
+              "topology": "SW1 (L3) with SVI 10.1.30.1/24 for VLAN 30; DHCP server 10.9.9.5 on a different subnet",
+              "showOutput": "SW1# show running-config interface Vlan30\ninterface Vlan30\n ip address 10.1.30.1 255.255.255.0\n!",
+              "acceptableAnswers": [
+                "no ip helper address on the vlan 30 svi",
+                "relay is missing"
+              ],
+              "hints": ["How do broadcasts cross subnets?", "Which line is absent from the running config?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svc-nat",
+      "name": "NAT and PAT",
+      "subtopics": [
+        {
+          "id": "nat-concepts",
+          "name": "Concepts",
+          "questions": [
+            {
+              "id": "SVC-NAT-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is the difference between static NAT, dynamic NAT, and PAT?",
+              "answer": "Static NAT maps one inside address to one fixed outside address (bidirectional, for servers). Dynamic NAT maps a pool of public addresses to inside hosts on demand, one-to-one. PAT (overload) maps many inside addresses to a single public address, distinguishing flows by port number.",
+              "explanation": "Dynamic NAT fails when the pool is exhausted; PAT is the standard Internet access method. NAT terms: inside local, inside global, outside local, outside global.",
+              "tags": ["nat", "pat", "overload"],
+              "acceptableAnswers": [
+                "static is one to one fixed, dynamic is one to one from a pool, pat is many to one with ports"
+              ],
+              "hints": ["Which one preserves the port number?", "Which one is for inbound server access?"]
+            },
+            {
+              "id": "SVC-NAT-002",
+              "type": "multiple_choice",
+              "difficulty": "hard",
+              "question": "In the translation table, what exactly does the inside global address represent?",
+              "choices": [
+                "The public/outside-in-view address of an inside host",
+                "The private address of an inside host",
+                "The source address of the outside host",
+                "The destination the server is listening on"
+              ],
+              "answer": "The public/outside-in-view address of an inside host",
+              "explanation": "Inside local = host's own private IP seen inside; inside global = the translated address seen from outside (e.g. a PAT public IP). Outside terms mirror this for remote hosts.",
+              "tags": ["nat", "inside-global", "translation"]
+            }
+          ]
+        },
+        {
+          "id": "nat-config",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "SVC-NAT-CFG-001",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "Write the full configuration to PAT all inside users (10.1.0.0/16) out of public address 203.0.113.5 on Gi0/0.",
+              "answer": "R1(config)# ip nat pool PUB 203.0.113.5 203.0.113.5 netmask 255.255.255.255\nR1(config)# access-list 1 permit 10.1.0.0 0.0.255.255\nR1(config)# ip nat inside source list 1 pool PUB overload\nR1(config)# interface GigabitEthernet0/0\nR1(config-if)# ip nat outside\nR1(config-if)# ip address dhcp\nR1(config)# interface GigabitEthernet0/1\nR1(config-if)# ip nat inside",
+              "explanation": "Alternative with single public IP: 'ip nat inside source list 1 interface GigabitEthernet0/0 overload'. The ACL identifies inside-local networks; interfaces must be marked inside/outside correctly.",
+              "tags": ["nat", "pat", "configuration"],
+              "commands": [
+                "access-list 1 permit 10.1.0.0 0.0.255.255",
+                "ip nat inside source list 1 interface GigabitEthernet0/0 overload",
+                "interface GigabitEthernet0/0",
+                "ip nat outside",
+                "interface GigabitEthernet0/1",
+                "ip nat inside"
+              ],
+              "acceptableAnswers": [
+                "acl for inside networks, overload command, inside and outside interface marks"
+              ]
+            },
+            {
+              "id": "SVC-NAT-CFG-002",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Publish a web server 192.168.1.10:80 as public 203.0.113.10:80 using static NAT.",
+              "answer": "R1(config)# ip nat inside source static tcp 192.168.1.10 80 203.0.113.10 80",
+              "explanation": "Follow with interface marking (inside on the LAN, outside on the WAN). For a single host: 'ip nat inside source static 192.168.1.10 203.0.113.10'.",
+              "tags": ["nat", "static", "configuration"],
+              "commands": [],
+              "acceptableAnswers": [
+                "ip nat inside source static tcp private ip 80 public ip 80"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nat-verify",
+          "name": "Verification and Troubleshooting",
+          "questions": [
+            {
+              "id": "SVC-NAT-VER-001",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows active NAT translations and which shows only plain/static ones?",
+              "answer": "show ip nat translations (all) ; show ip nat translations static (or 'show ip nat translations verbose' for timers/internal details)",
+              "explanation": "PAT translations show as 'inside global -> inside local' with an outside address/port; an empty dynamic section while users browse indicates no traffic matching the ACL.",
+              "tags": ["nat", "verification", "show"],
+              "commands": ["show ip nat translations"],
+              "acceptableAnswers": [
+                "show ip nat translations"
+              ]
+            },
+            {
+              "id": "SVC-NAT-TS-001",
+              "type": "troubleshooting",
+              "difficulty": "hard",
+              "question": "Users on the inside can browse the web, but only sporadically — connections stall for minutes. 'show ip nat translations' shows the pool exhausted with many entries for unused IPs. What is wrong?",
+              "answer": "Dynamic NAT (without overload) is running out of pool addresses; PAT/overload is missing — OR the overload keyword was left off, so each host burns a whole pool address and NAT drops new sessions when exhausted.",
+              "explanation": "Add 'overload' to use ports and shrink the pool need; also watch inside-local uniqueness after DHCP expiry (stale bindings).",
+              "tags": ["nat", "troubleshooting", "pat"],
+              "symptoms": [
+                "Intermittent total loss of outbound connectivity",
+                "Users' sessions time out without errors",
+                "show ip nat translations shows pool exhaustion"
+              ],
+              "topology": "R1 Gi0/1 = inside (10.1.0.0/16), Gi0/0 = outside, pool PUBLIC 203.0.113.1-10",
+              "showOutput": "R1# show ip nat translations\nPro Inside global      Inside local       Outside local\n--- 203.0.113.3        10.1.0.5           ---\n--- 203.0.113.4        10.1.0.12          ---\nR1# show running-config | include nat\n ip nat inside source list 1 pool PUBLIC",
+              "acceptableAnswers": [
+                "pat overload is missing so the pool exhausted",
+                "no overload keyword on the nat statement"
+              ],
+              "hints": ["What keyword multiplies the pool capacity by ~64k?", "What does each line of the show output represent?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svc-ntp-dns",
+      "name": "NTP and DNS",
+      "subtopics": [
+        {
+          "id": "ntp-concepts",
+          "name": "NTP",
+          "questions": [
+            {
+              "id": "SVC-NTP-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is NTP, on which port does it run, and why do routers and switches need it?",
+              "answer": "NTP (UDP 123) synchronizes device clocks off a stratum hierarchy: stratum 0 = atomic/radio clocks, stratum 1 = directly connected to them, each hop adds one stratum. Accurate timestamps are vital for log correlation, certificates, routing protocols (e.g. EIGRP SIA timestamps), and auditing.",
+              "explanation": "'ntp master' serves time locally; 'ntp server X' makes the device a client. Use 'ntp source' to bind the source interface, improving reachability through ACLs.",
+              "tags": ["ntp", "stratum", "time-sync"],
+              "acceptableAnswers": [
+                "udp 123, layers called stratum, keeps logs and protocols in sync",
+                "network time protocol"
+              ],
+              "hints": ["Which transport and port?", "What do we call the hierarchy levels?"]
+            },
+            {
+              "id": "SVC-NTP-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "A router configured with two NTP servers picks time from which one?",
+              "choices": [
+                "The server with the best stratum (lowest number), then by distance/jitter among equals",
+                "The most recently configured server",
+                "The one reachable first",
+                "The server with the highest stratum number"
+              ],
+              "answer": "The server with the best stratum (lowest number), then by distance/jitter among equals",
+              "explanation": "NTP prefers lower stratum; equal stratum compares synchronization distance. Only one server is used at a time; 'ntp peer' can also be used between hotspots.",
+              "tags": ["ntp", "stratum", "selection"]
+            }
+          ]
+        },
+        {
+          "id": "ntp-config",
+          "name": "NTP Configuration",
+          "questions": [
+            {
+              "id": "SVC-NTP-CFG-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Write the commands to make a switch sync to NTP server 192.168.99.50 and ensure NTP packets source from Loopback0.",
+              "answer": "SW1(config)# ntp server 192.168.99.50\nSW1(config)# ntp source Loopback0",
+              "explanation": "'show ntp status' verifies sync and stratum; 'show ntp associations' shows peers. On some platforms also 'ntp update-calendar' to persist the time into the hardware calendar.",
+              "tags": ["ntp", "configuration"],
+              "commands": [
+                "ntp server 192.168.99.50",
+                "ntp source Loopback0"
+              ],
+              "acceptableAnswers": [
+                "ntp server 192.168.99.50 and ntp source loopback 0"
+              ]
+            },
+            {
+              "id": "SVC-NTP-VER-001",
+              "type": "show_command",
+              "difficulty": "medium",
+              "question": "Which two commands show NTP sync state (stratum, offset, ref clock) and the known NTP peers/associations?",
+              "answer": "show ntp status ; show ntp associations",
+              "explanation": "'show ntp status' shows clock state, stratum, reference id; 'show ntp associations' lists server/peer IPs with reachability. Add 'detail' for rich debugging.",
+              "tags": ["ntp", "verification", "show"],
+              "commands": ["show ntp status", "show ntp associations"],
+              "acceptableAnswers": [
+                "show ntp status and show ntp associations"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dns-ops",
+          "name": "DNS on Routers",
+          "questions": [
+            {
+              "id": "SVC-DNS-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "How does a Cisco router use DNS and what command configures the name server?",
+              "answer": "Routers resolve hostnames for commands like 'ping server1' or 'telnet server1' if DNS is enabled: 'ip name-server 8.8.8.8' (up to 6 servers) and 'ip domain-lookup' (or 'ip domain-name' to append a domain suffix).",
+              "explanation": "Without 'ip domain-name' and lookup enabled, an unknown command is treated as a hostname attempt (the famous 'Translating ... domain server' delays from default lookup on).",
+              "tags": ["dns", "name-resolution"],
+              "acceptableAnswers": [
+                "ip name-server and ip domain lookup",
+                "resolve hostnames for ping and telnet"
+              ],
+              "hints": ["Which command lists the servers?", "What enables the translation attempt at all?"]
+            },
+            {
+              "id": "SVC-DNS-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Typing a bogus command like 'sdgfdg' on a router with default settings produces a long delay and then 'Translating ... domain server (255.255.255.255)'. Why?",
+              "choices": [
+                "The router treats it as an unknown hostname and attempts DNS resolution by default",
+                "The router is running a debug of ARP",
+                "A malicious DNS server responded",
+                "The parser is waiting for the SNMP community"
+              ],
+              "answer": "The router treats it as an unknown hostname and attempts DNS resolution by default",
+              "explanation": "Disable with 'no ip domain-lookup' or speed it up by configuring real name servers. It waits until the DNS timeout (default 3 s, 3 retries) before saying 'Translating...'.",
+              "tags": ["dns", "hostname", "behavior"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

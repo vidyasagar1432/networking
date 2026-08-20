@@ -1,0 +1,380 @@
+{
+  "chapter": {
+    "id": "routing",
+    "name": "Routing",
+    "description": "Static routing, dynamic protocols, path selection and inter-VLAN routing"
+  },
+  "topics": [
+    {
+      "id": "static-routing",
+      "name": "Static Routing",
+      "subtopics": [
+        {
+          "id": "static-basics",
+          "name": "Basics",
+          "questions": [
+            {
+              "id": "RT-STATIC-BAS-001",
+              "type": "recall",
+              "difficulty": "easy",
+              "question": "What is a static route and when is it appropriate?",
+              "answer": "A static route is a manually configured route. Use it in small/stub networks, for default routes, or when you want deterministic path control. It never adapts to link failures unless you add tracking or floating routes.",
+              "explanation": "Static routes have no overhead and no convergence delay, but they do not react to topology changes by themselves.",
+              "tags": ["routing", "static", "fundamentals"],
+              "acceptableAnswers": [
+                "a manually configured route",
+                "manual route entry for small networks"
+              ]
+            },
+            {
+              "id": "RT-STATIC-BAS-002",
+              "type": "true_false",
+              "difficulty": "easy",
+              "question": "A static route automatically adapts when the link to its next hop fails.",
+              "answer": "false",
+              "explanation": "Static routes stay in the table until removed or the connected route used by the next hop disappears. A floating static route (higher AD) can act as a backup.",
+              "tags": ["routing", "static", "failover"]
+            },
+            {
+              "id": "RT-STATIC-BAS-003",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "What is the administrative distance of a static route by default?",
+              "choices": [
+                "1",
+                "0",
+                "120",
+                "110"
+              ],
+              "answer": "1",
+              "explanation": "AD values: connected 0, static 1, EIGRP 90, OSPF 110, RIP 120. A static route is preferred over any dynamic route to the same prefix.",
+              "tags": ["routing", "static", "administrative-distance"]
+            }
+          ]
+        },
+        {
+          "id": "static-configuration",
+          "name": "Configuration",
+          "questions": [
+            {
+              "id": "RT-STATIC-CONF-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure a static route on R1 for network 10.10.20.0/24 via next-hop 192.168.1.2.",
+              "answer": ["ip route 10.10.20.0 255.255.255.0 192.168.1.2"],
+              "commands": ["ip route 10.10.20.0 255.255.255.0 192.168.1.2"],
+              "explanation": "Syntax: `ip route <network> <mask> <next-hop>` in global config. You may also use an exit interface (e.g. `ip route 10.10.20.0 255.255.255.0 Gi0/1`), but a next hop is generally safer with multi-access links.",
+              "tags": ["routing", "static", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["ip route 10.10.20.0 255.255.255.0 192.168.1.2"],
+                ["ip route 10.10.20.0 /24 192.168.1.2"]
+              ],
+              "hints": ["Order: network, mask, next-hop."]
+            },
+            {
+              "id": "RT-STATIC-CONF-002",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Configure a default route on R1 pointing to ISP router 203.0.113.1.",
+              "answer": ["ip route 0.0.0.0 0.0.0.0 203.0.113.1"],
+              "commands": ["ip route 0.0.0.0 0.0.0.0 203.0.113.1"],
+              "explanation": "0.0.0.0/0 is the catch-all route. Packets with no more specific match are sent to the ISP. Alternative shorthand: `ip route 0.0.0.0 0.0.0.0 Gi0/0`.",
+              "tags": ["routing", "default-route", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["ip route 0.0.0.0 0.0.0.0 203.0.113.1"],
+                ["ip route 0.0.0.0 0.0.0.0 203.0.113.1 1"],
+                ["ip route 0.0.0.0 0.0.0.0 gigabitethernet0/0"]
+              ],
+              "hints": ["A default route matches everything — which prefix is that?"]
+            },
+            {
+              "id": "RT-STATIC-CONF-003",
+              "type": "show_command",
+              "difficulty": "easy",
+              "question": "Which command shows the IPv4 routing table?",
+              "answer": "show ip route",
+              "commands": ["show ip route"],
+              "explanation": "`show ip route` lists all routes with codes (C=connected, S=static, O=OSPF, D=EIGRP...), plus `show ip route <prefix>` for one prefix.",
+              "tags": ["routing", "verification", "show-command", "ios"],
+              "acceptableAnswers": [["show ip route"], ["sh ip route"]],
+              "expectedOutput": "Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP\n       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area\n       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2\n\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\n\nS*    0.0.0.0/0 [1/0] via 203.0.113.1\nC     192.168.1.0/24 is directly connected, GigabitEthernet0/1"
+            }
+          ]
+        },
+        {
+          "id": "static-default-routes",
+          "name": "Default Routes",
+          "questions": [
+            {
+              "id": "RT-STATIC-DFL-001",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "A stub network has one router with a single path to the internet. Why is a default route the right design, and where do you configure it?",
+              "answer": "The stub router should have `ip route 0.0.0.0 0.0.0.0 <ISP-next-hop>` so any unknown destination goes upstream, avoiding hundreds of static entries. Configure the default route on the stub router; the ISP side needs a static route for the stub's own prefix back.",
+              "explanation": "Stub networks only need a default route; the upstream must know how to return packets to the stub's networks (a static route or dynamic protocol).",
+              "tags": ["routing", "default-route", "stub"],
+              "acceptableAnswers": [
+                "stub networks only need a default route",
+                "configure default route on the stub router and a static back on the isp"
+              ],
+              "hints": ["Does the stub need to know every internet prefix?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dynamic-routing",
+      "name": "Dynamic Routing",
+      "subtopics": [
+        {
+          "id": "routing-protocols",
+          "name": "Routing Protocols",
+          "questions": [
+            {
+              "id": "RT-DYNA-BAS-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is the difference between distance-vector and link-state routing protocols?",
+              "answer": "Distance-vector protocols (RIP, EIGRP) share their entire routing table with neighbors — 'route by rumor'. Link-state protocols (OSPF, IS-IS) flood link-state information so every router builds the same complete map and runs SPF to compute shortest paths.",
+              "explanation": "Distance vector: only neighbor views, slow convergence risk of loops. Link state: complete topology view, fast and loop-free convergence (SPF), more memory/CPU.",
+              "tags": ["routing", "distance-vector", "link-state"],
+              "acceptableAnswers": [
+                "distance vector shares routes by rumor, link state shares a complete topology map",
+                "dv sends full tables, ls floods link states and runs spf"
+              ],
+              "hints": ["What does each protocol share with its neighbors?"]
+            },
+            {
+              "id": "RT-DYNA-BAS-002",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "Which protocol type does OSPF use?",
+              "choices": [
+                "Link-state",
+                "Distance-vector",
+                "Path-vector",
+                "Hybrid"
+              ],
+              "answer": "Link-state",
+              "explanation": "OSPF floods LSAs and runs the Dijkstra SPF algorithm. EIGRP is a hybrid/advanced distance-vector, BGP is path-vector.",
+              "tags": ["routing", "ospf", "link-state"]
+            },
+            {
+              "id": "RT-DYNA-BAS-003",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "RIP and OSPF both support VLSM and are classless.",
+              "answer": "true",
+              "explanation": "RIPv2 (unlike RIPv1) and OSPF are classless — they carry subnet masks and support VLSM and CIDR. RIPv1 is classful and unusable in modern networks.",
+              "tags": ["routing", "vlsm", "rip", "ospf"]
+            }
+          ]
+        },
+        {
+          "id": "ad-metric",
+          "name": "AD & Metric",
+          "questions": [
+            {
+              "id": "RT-DYNA-ADM-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "Explain the difference between administrative distance (AD) and metric in route selection.",
+              "answer": "AD is the trustworthiness of the route source (protocol): lower AD wins when two protocols advertise the SAME prefix (e.g. static 1 vs OSPF 110). The metric is the cost of the path within one protocol (e.g. OSPF cost, EIGRP composite metric): the lowest metric wins among routes from the same protocol.",
+              "explanation": "First compare AD (source trust), then metric (path cost). Connected 0, static 1, EIGRP 90, OSPF 110, RIP 120.",
+              "tags": ["routing", "administrative-distance", "metric"],
+              "acceptableAnswers": [
+                "ad selects between protocols, metric selects within a protocol",
+                "ad is trust of the source, metric is the path cost"
+              ],
+              "hints": ["Two routes to the same prefix from different protocols — which value decides?", "Two OSPF routes — which value decides?"]
+            },
+            {
+              "id": "RT-DYNA-ADM-002",
+              "type": "multiple_choice",
+              "difficulty": "medium",
+              "question": "R1 learns 10.0.0.0/8 via EIGRP (AD 90) and via OSPF (AD 110). Which route enters the routing table?",
+              "choices": [
+                "OSPF, because it has the lower metric",
+                "EIGRP, because it has the lower administrative distance",
+                "Both — they are load-balanced",
+                "Neither — the routes cancel out"
+              ],
+              "answer": "EIGRP, because it has the lower administrative distance",
+              "explanation": "Same prefix from different protocols → lower AD wins, so EIGRP (90 < 110). Metric comparison only happens between routes from the same protocol.",
+              "tags": ["routing", "administrative-distance"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route-selection",
+      "name": "Route Selection",
+      "subtopics": [
+        {
+          "id": "longest-match",
+          "name": "Longest Match",
+          "questions": [
+            {
+              "id": "RT-SEL-LONG-001",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "A router has 0.0.0.0/0, 10.0.0.0/8 and 10.1.0.0/16. Which route wins for a packet destined to 10.1.2.3 and why?",
+              "answer": "10.1.0.0/16 wins because it has the longest prefix match — the most specific route always wins regardless of AD or metric.",
+              "explanation": "Longest-match first: /16 > /8 > /0 for this destination. Default routes only serve destinations with no more specific match.",
+              "tags": ["routing", "longest-match", "route-selection"],
+              "acceptableAnswers": [
+                "10.1.0.0/16 because it is the most specific",
+                "the longest prefix match wins"
+              ]
+            },
+            {
+              "id": "RT-SEL-LONG-002",
+              "type": "true_false",
+              "difficulty": "medium",
+              "question": "A route with a better metric but a shorter prefix wins over a route with a worse metric but a longer prefix for the same destination.",
+              "answer": "false",
+              "explanation": "Prefix length is compared FIRST. Longer prefixes always win over shorter ones, before any AD/metric comparison.",
+              "tags": ["routing", "longest-match", "metric"]
+            }
+          ]
+        },
+        {
+          "id": "administrative-distance",
+          "name": "Administrative Distance",
+          "questions": [
+            {
+              "id": "RT-SEL-AD-001",
+              "type": "multiple_choice",
+              "difficulty": "easy",
+              "question": "What is the default administrative distance of OSPF?",
+              "choices": [
+                "90",
+                "110",
+                "120",
+                "200"
+              ],
+              "answer": "110",
+              "explanation": "EIGRP internal 90, OSPF 110, RIP 120, external EIGRP 170, iBGP 200.",
+              "tags": ["routing", "administrative-distance", "ospf"]
+            },
+            {
+              "id": "RT-SEL-AD-002",
+              "type": "scenario",
+              "difficulty": "hard",
+              "question": "You want a static backup route to 10.10.20.0/24 that only becomes active if the OSPF path fails. How do you configure it?",
+              "answer": "Use a floating static route with a higher AD than OSPF: `ip route 10.10.20.0 255.255.255.0 192.168.9.9 120` (AD 120 > OSPF's 110). It stays in the table only when OSPF has no valid route.",
+              "explanation": "Floating static = static route with a manually raised AD so it loses to the preferred dynamic route but appears when that route is removed.",
+              "tags": ["routing", "floating-static", "administrative-distance"],
+              "acceptableAnswers": [
+                "ip route with ad higher than 110",
+                "floating static route with ad 120"
+              ],
+              "hints": ["Static default AD is 1 — how do you make it lose to OSPF (AD 110)?"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intervlan-routing",
+      "name": "Inter-VLAN Routing",
+      "subtopics": [
+        {
+          "id": "router-on-a-stick",
+          "name": "Router-on-a-Stick",
+          "questions": [
+            {
+              "id": "RT-IVR-ROAS-001",
+              "type": "config",
+              "difficulty": "hard",
+              "question": "Configure subinterfaces on R1's GigabitEthernet0/1 to route VLANs 10 (192.168.10.1/24) and 20 (192.168.20.1/24) with 802.1Q encapsulation (router-on-a-stick).",
+              "answer": [
+                "interface GigabitEthernet0/1.10",
+                "encapsulation dot1Q 10",
+                "ip address 192.168.10.1 255.255.255.0",
+                "interface GigabitEthernet0/1.20",
+                "encapsulation dot1Q 20",
+                "ip address 192.168.20.1 255.255.255.0"
+              ],
+              "commands": [
+                "interface GigabitEthernet0/1.10",
+                "encapsulation dot1Q 10",
+                "ip address 192.168.10.1 255.255.255.0",
+                "interface GigabitEthernet0/1.20",
+                "encapsulation dot1Q 20",
+                "ip address 192.168.20.1 255.255.255.0"
+              ],
+              "explanation": "Each VLAN gets a tagged subinterface acting as its gateway. The physical port must be a trunk toward the switch. Inter-VLAN traffic now routes through R1.",
+              "tags": ["intervlan", "router-on-a-stick", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["int g0/1.10", "encapsulation dot1q 10", "ip address 192.168.10.1 255.255.255.0", "int g0/1.20", "encapsulation dot1q 20", "ip address 192.168.20.1 255.255.255.0"],
+                ["interface gi0/1.10", "encapsulation dot1Q 10", "ip address 192.168.10.1/24", "interface gi0/1.20", "encapsulation dot1Q 20", "ip address 192.168.20.1/24"]
+              ],
+              "hints": ["Which encapsulation command ties a subinterface to a VLAN?", "Don't forget the trunk between router and switch."]
+            },
+            {
+              "id": "RT-IVR-ROAS-002",
+              "type": "recall",
+              "difficulty": "medium",
+              "question": "What is a router-on-a-stick design and its main limitation?",
+              "answer": "A single physical router link, split into tagged subinterfaces, routes between VLANs on the attached switch. The limitation is bandwidth: all inter-VLAN traffic crosses that one trunk — a bottleneck.",
+              "explanation": "Classic when you have a router and no Layer 3 switch. The trunk carries all inter-VLAN traffic on one link, so throughput is capped by the link.",
+              "tags": ["intervlan", "router-on-a-stick"],
+              "acceptableAnswers": [
+                "one trunk link with subinterfaces for each vlan",
+                "bottleneck on a single trunk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "svi",
+          "name": "SVI (Switch Virtual Interface)",
+          "questions": [
+            {
+              "id": "RT-IVR-SVI-001",
+              "type": "config",
+              "difficulty": "medium",
+              "question": "Create a gateway for VLAN 10 (192.168.10.1/24) on the multilayer switch SW1 and enable routing.",
+              "answer": [
+                "ip routing",
+                "interface Vlan 10",
+                "ip address 192.168.10.1 255.255.255.0",
+                "no shutdown"
+              ],
+              "commands": [
+                "ip routing",
+                "interface Vlan 10",
+                "ip address 192.168.10.1 255.255.255.0",
+                "no shutdown"
+              ],
+              "explanation": "SVIs route on the switch itself: `ip routing` enables Layer 3 forwarding; the SVI provides the VLAN gateway. SVIs are up only when the VLAN exists and has at least one active port.",
+              "tags": ["intervlan", "svi", "configuration", "ios"],
+              "acceptableAnswers": [
+                ["ip routing", "interface vlan 10", "ip address 192.168.10.1 255.255.255.0"],
+                ["ip routing", "int vlan 10", "ip add 192.168.10.1 255.255.255.0", "no shutdown"]
+              ],
+              "hints": ["Which global command turns on Layer 3 on a switch?"]
+            },
+            {
+              "id": "RT-IVR-SVI-002",
+              "type": "scenario",
+              "difficulty": "medium",
+              "question": "The SVI for VLAN 10 shows down/down even though the gateway worked yesterday. What are the two most common reasons?",
+              "answer": "The VLAN no longer has any active access or trunk ports on this switch, or the SVI was administratively shut down. SVIs come up only when the VLAN exists and has at least one active port carrying it.",
+              "explanation": "SVI line state depends on the VLAN's port presence. Check `show vlan brief` (VLAN exists?) and `show interfaces status` (any active port in VLAN 10?).",
+              "tags": ["intervlan", "svi", "troubleshooting"],
+              "acceptableAnswers": [
+                "no active ports in the vlan",
+                "vlan has no ports or svi is shutdown"
+              ],
+              "hints": ["What does an SVI's line state depend on?"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
