@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/02. Administrative Distance.md",
+                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "02. Administrative Distance"
+              "title": "Dynamic Routing Protocols"
             }
           }
         ],
@@ -187,7 +187,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/02. Administrative Distance.md",
+                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -229,13 +229,21 @@
   },
   "active": "543c649fb701f61d",
   "lastOpenFiles": [
-    "CCNP/Level 09 - Routing Fundamentals/01. Routing Table.md",
-    "CCNP/Level 09 - Routing Fundamentals/09. Floating Static.md",
-    "CCNP/Level 09 - Routing Fundamentals/08. Static Routing.md",
+    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing.md",
+    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
     "CCNP/Level 09 - Routing Fundamentals/11. Route Summarization.md",
-    "CCNP/Level 09 - Routing Fundamentals/10. Default Route.md",
+    "CCNP/Level 11 - EIGRP/01. DUAL.md",
+    "CCNP/Level 09 - Routing Fundamentals/09. Floating Static.md",
+    "CCNP/Level 14 - First Hop Redundancy/04. Object Tracking.md",
+    "CCNP/Level 09 - Routing Fundamentals/08. Static Routing.md",
+    "CCNP/Level 09 - Routing Fundamentals/07. CEF.md",
+    "CCNP/Level 09 - Routing Fundamentals/06. RIB.md",
     "CCNP/Level 09 - Routing Fundamentals/05. FIB.md",
+    "CCNP/Level 09 - Routing Fundamentals/04. Recursive Lookup.md",
+    "CCNP/Level 09 - Routing Fundamentals/03. Metrics.md",
     "CCNP/Level 09 - Routing Fundamentals/02. Administrative Distance.md",
+    "CCNP/Level 09 - Routing Fundamentals/01. Routing Table.md",
+    "CCNP/Level 09 - Routing Fundamentals/10. Default Route.md",
     "CCNP/Level 05 - IPv4/04. Classes.md",
     "CCNP/Level 05 - IPv4/02. Binary.md",
     "CCNP/Level 05 - IPv4/01. Address Structure.md",
@@ -247,14 +255,6 @@
     "CCNP/Level 06 - IPv6/04. Unique Local.md",
     "CCNP/Level 06 - IPv6/03. Link Local.md",
     "CCNP/Level 05 - IPv4/14. Summarization.md",
-    "CCNP/Level 05 - IPv4/13. FLSM.md",
-    "CCNP/Level 05 - IPv4/12. VLSM.md",
-    "CCNP/Level 05 - IPv4/11. CIDR.md",
-    "CCNP/Level 05 - IPv4/10. Multicast.md",
-    "CCNP/Level 05 - IPv4/09. Broadcast.md",
-    "CCNP/Level 05 - IPv4/08. Loopback.md",
-    "CCNP/Level 05 - IPv4/06. Private IP.md",
-    "CCNP/Level 05 - IPv4/05. Public IP.md",
     "CCNP/Level 99 - Recall/data/switching_study_guide.json",
     "CCNP/Level 99 - Recall/data/Unconfirmed 998170.crdownload",
     "CCNP/Level 99 - Recall/data/services.json",
