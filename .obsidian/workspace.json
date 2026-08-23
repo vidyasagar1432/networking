@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
+                "file": "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Dynamic Routing Protocols"
+              "title": "1. Why do we need IP Subnetting"
             }
           }
         ],
@@ -187,7 +187,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
+                "file": "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -229,8 +229,22 @@
   },
   "active": "543c649fb701f61d",
   "lastOpenFiles": [
-    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing.md",
+    "99. Labs/02 - Switching/VLAN.md",
+    "99. Labs/02 - Switching/Access Port.md",
+    "99. Labs/00 - Dashboard/Network Engineering Dashboard.md",
+    "Config/ACL Configuration.md",
+    "notes/protocol/FHRP/HSRP.md",
+    "notes/protocol/Core/NAT.md",
+    "notes/protocol/Routing/OSPF.md",
+    "notes/protocol/Routing/EIGRP.md",
+    "notes/protocol/Security/802.1X.md",
+    "REF/4. Data Link Layer/4.5 Trunking 802.1Q, native VLAN mismatch issues.md",
+    "REF/9. Network Security Fundamentals/9.6 NAT, PAT static, dynamic, overload.md",
+    "REF/4. Data Link Layer/4.10 PortFast, BPDU Guard, Root Guard, Loop Guard.md",
+    "REF/4. Data Link Layer/4.9 Root bridge election, port roles states, BPDUs.md",
+    "REF/7. Application Layer & Core Services/7.1 DNS recording types (A, AAAA, CNAME, MX, PTR), resolution process.md",
     "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
+    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing.md",
     "CCNP/Level 09 - Routing Fundamentals/11. Route Summarization.md",
     "CCNP/Level 11 - EIGRP/01. DUAL.md",
     "CCNP/Level 09 - Routing Fundamentals/09. Floating Static.md",
@@ -241,20 +255,6 @@
     "CCNP/Level 09 - Routing Fundamentals/05. FIB.md",
     "CCNP/Level 09 - Routing Fundamentals/04. Recursive Lookup.md",
     "CCNP/Level 09 - Routing Fundamentals/03. Metrics.md",
-    "CCNP/Level 09 - Routing Fundamentals/02. Administrative Distance.md",
-    "CCNP/Level 09 - Routing Fundamentals/01. Routing Table.md",
-    "CCNP/Level 09 - Routing Fundamentals/10. Default Route.md",
-    "CCNP/Level 05 - IPv4/04. Classes.md",
-    "CCNP/Level 05 - IPv4/02. Binary.md",
-    "CCNP/Level 05 - IPv4/01. Address Structure.md",
-    "CCNP/Level 06 - IPv6/10. ICMPv6.md",
-    "CCNP/Level 06 - IPv6/09. Neighbor Discovery.md",
-    "CCNP/Level 06 - IPv6/08. DHCPv6.md",
-    "CCNP/Level 06 - IPv6/07. SLAAC.md",
-    "CCNP/Level 06 - IPv6/06. Multicast.md",
-    "CCNP/Level 06 - IPv6/04. Unique Local.md",
-    "CCNP/Level 06 - IPv6/03. Link Local.md",
-    "CCNP/Level 05 - IPv4/14. Summarization.md",
     "CCNP/Level 99 - Recall/data/switching_study_guide.json",
     "CCNP/Level 99 - Recall/data/Unconfirmed 998170.crdownload",
     "CCNP/Level 99 - Recall/data/services.json",
