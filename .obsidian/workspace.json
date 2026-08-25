@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
+                "file": "20. Certification Path/20.2 CCNP ENCOR (350-401).md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "1. Why do we need IP Subnetting"
+              "title": "20.2 CCNP ENCOR (350-401)"
             }
           }
         ],
@@ -187,7 +187,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
+                "file": "20. Certification Path/20.2 CCNP ENCOR (350-401).md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -229,6 +229,9 @@
   },
   "active": "543c649fb701f61d",
   "lastOpenFiles": [
+    "20. Certification Path/20.1 CCNA (200-301).md",
+    "20. Certification Path/20.2 CCNP ENCOR (350-401).md",
+    "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
     "99. Labs/02 - Switching/VLAN.md",
     "99. Labs/02 - Switching/Access Port.md",
     "99. Labs/00 - Dashboard/Network Engineering Dashboard.md",
@@ -252,9 +255,6 @@
     "CCNP/Level 09 - Routing Fundamentals/08. Static Routing.md",
     "CCNP/Level 09 - Routing Fundamentals/07. CEF.md",
     "CCNP/Level 09 - Routing Fundamentals/06. RIB.md",
-    "CCNP/Level 09 - Routing Fundamentals/05. FIB.md",
-    "CCNP/Level 09 - Routing Fundamentals/04. Recursive Lookup.md",
-    "CCNP/Level 09 - Routing Fundamentals/03. Metrics.md",
     "CCNP/Level 99 - Recall/data/switching_study_guide.json",
     "CCNP/Level 99 - Recall/data/Unconfirmed 998170.crdownload",
     "CCNP/Level 99 - Recall/data/services.json",
