@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
+                "file": "98. How/Wireless Fundamentals/2. Wireless Infrastructure/3. Lightweight AP architecture.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Dynamic Routing Protocols"
+              "title": "3. Lightweight AP architecture"
             }
           }
         ],
@@ -109,7 +109,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 227.140625
   },
   "right": {
     "id": "08d36eee6bc88c5b",
@@ -187,7 +187,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
+                "file": "98. How/Wireless Fundamentals/2. Wireless Infrastructure/3. Lightweight AP architecture.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -205,13 +205,23 @@
               "icon": "git-pull-request",
               "title": "Source Control"
             }
+          },
+          {
+            "id": "0648247d43cd9e9c",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-agent-chat-view",
+              "state": {},
+              "icon": "copilot-agent",
+              "title": "Copilot Agent"
+            }
           }
         ],
         "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 299.32421875
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -230,6 +240,26 @@
   },
   "active": "543c649fb701f61d",
   "lastOpenFiles": [
+    "98. How/Wireless Fundamentals/1. Wireless Basics/2. Amplitude, Power, and dB.md",
+    "98. How/Wireless Fundamentals/1. Wireless Basics/3. RF effects in Real World.md",
+    "98. How/Network Fundamentals/2. Network Components/5. Proxy Servers.md",
+    "copilot/copilot-conversations/agent__in_98._How_some_notes_has_not_loading_properly_like@20260916_165427.md",
+    "98. How/Network Fundamentals/2. Network Components/4. Load Balancers.md",
+    "98. How/Network Fundamentals/2. Network Components/2. Routers and L3 Switches.md",
+    "98. How/Wireless Fundamentals/1. Wireless Basics/1. Introduction to Radio Signals.md",
+    "98. How/OSPF Fundamentals/1. Understanding OSPF/1. Why do we need OSPF.md",
+    "copilot/copilot-conversations/agent__explin_in_details@20260916_155129.md",
+    "copilot/copilot-conversations",
+    "copilot/skills/openartifacts-publish/SKILL.md",
+    "copilot/skills/openartifacts-publish/openartifacts-publish.ps1",
+    "copilot/skills/openartifacts-publish/openartifacts-publish.cmd",
+    "copilot/skills/openartifacts-publish/openartifacts-publish.sh",
+    "copilot/skills/openartifacts-publish/themes/research-memo.md",
+    "copilot/skills/openartifacts-publish/themes",
+    "copilot/skills/openartifacts-publish",
+    "Config/STP Configuration.md",
+    "Config/VTP Server Configuration.md",
+    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
     "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing.md",
     "copilot/skills/obsidian-cli/SKILL.md",
     "copilot/skills/obsidian-cli/LICENSE",
@@ -238,34 +268,14 @@
     "copilot/skills/json-canvas/LICENSE",
     "copilot/skills/json-canvas/references/EXAMPLES.md",
     "copilot/skills/json-canvas/references",
-    "copilot/skills/json-canvas",
     "copilot/skills/obsidian-bases/SKILL.md",
-    "copilot/skills/obsidian-bases/LICENSE",
     "copilot/skills/obsidian-bases/references/EXAMPLES.md",
     "copilot/skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md",
-    "copilot/skills/obsidian-bases/references",
-    "copilot/skills/obsidian-bases",
     "copilot/skills/obsidian-markdown/SKILL.md",
-    "copilot/skills/obsidian-markdown/LICENSE",
     "copilot/skills/obsidian-markdown/references/PROPERTIES.md",
     "copilot/skills/obsidian-markdown/references/EMBEDS.md",
     "copilot/skills/obsidian-markdown/references/CALLOUTS.md",
-    "copilot/skills/obsidian-markdown/references",
     "copilot/skills/symposium-publish/SKILL.md",
-    "copilot/skills/copilot-fetch-x/SKILL.md",
-    "copilot/skills/copilot-youtube-transcript/SKILL.md",
-    "copilot/skills/copilot-read-pdf/SKILL.md",
-    "copilot/skills/copilot-web-fetch/SKILL.md",
-    "copilot/skills/copilot-web-search/SKILL.md",
-    "CCNP/Level 09 - Routing Fundamentals/Dynamic Routing Protocols.md",
-    "CCNP/Level 09 - Routing Fundamentals/09. Floating Static.md",
-    "CCNP/Level 00 - Networking Basics/03. Client-Server.md",
-    "CCNP/Level 09 - Routing Fundamentals/11. Route Summarization.md",
-    "20. Certification Path/20.2 CCNP ENCOR (350-401).md",
-    "20. Certification Path/20.1 CCNA (200-301).md",
-    "98. How/IP Subnetting/1. Introduction to IPv4 Subnetting/1. Why do we need IP Subnetting.md",
-    "99. Labs/02 - Switching/VLAN.md",
-    "99. Labs/02 - Switching/Access Port.md",
     "Web App/assets/switch.svg",
     "Web App/assets/server.svg",
     "Web App/assets/router.svg",

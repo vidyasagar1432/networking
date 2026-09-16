@@ -2,6 +2,7 @@
   "nativeMenus": false,
   "cssTheme": "Obsidianite",
   "enabledCssSnippets": [
-    "styled-code-blocks"
+    "styled-code-blocks",
+    "image-bg"
   ]
 }
